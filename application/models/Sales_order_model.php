@@ -15,6 +15,16 @@ class Sales_order_model extends CI_Model {
 	var $fk = 'no_pelanggan';
 	var $fk2 = 'kode_barang';
 
+	public function get_all_query()
+	{
+		$this->db->join($this->join, $this->table.'.'.$this->fk.' = '.$this->join.'.'.$this->fk);
+		$this->db->join($this->join2, $this->table.'.'.$this->fk2.' = '.$this->join2.'.'.$this->fk2);
+		$q =  $this->db->get_compiled_select();
+		$q = str_replace('SELECT', "", $q);
+		$q = str_replace('*', "", $q);
+		return $q;
+	}
+
 	public function get_all()
 	{
 		$this->db->select('*');
@@ -110,6 +120,7 @@ class Sales_order_model extends CI_Model {
 		    return true;
 		}*/
 	}
+
 
 	public function delete($id)
 	{

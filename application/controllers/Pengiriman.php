@@ -1,0 +1,241 @@
+<?php
+defined('BASEPATH') OR exit('No direct script access allowed');
+
+class Pengiriman extends CI_Controller {
+
+	public function __construct()
+	{
+		parent::__construct();
+		$this->load->model("Pengiriman_model", "", TRUE);
+	}
+
+	public function gen_table()
+	{
+		$query=$this->Pengiriman_model->get_all();
+		$res = $query->result();
+		$num_rows = $query->num_rows();
+
+		$tmpl = array(  'table_open'    => '<table class="table table-striped table-hover dataTable">',
+				'row_alt_start'  => '<tr>',
+				'row_alt_end'    => '</tr>'
+			);
+
+		$this->table->set_template($tmpl);
+
+		$this->table->set_empty("&nbsp;");
+
+		$this->table->set_heading('No', 'Id Transaksi', 'Nama Pelanggan', 'Nama Barang', 'Jasa Pengiriman', 'No Resi', 'Tgl Pengiriman', 'Status', 'Aksi');
+
+		if ($num_rows > 0)
+		{
+			$i = 0;
+
+			foreach ($res as $row){
+				$sts = '<span class="badge badge-success">Sudah dikirim</span>';
+				if($row->status_pengiriman==1){
+					$sts = '<span class="badge badge-info">Sudah diterima</span>';
+				}
+				$this->table->add_row(	++$i,
+							$row->id_transaksi,
+							$row->nama_pelanggan,
+							$row->nama_barang,
+							$row->jasa_pengiriman,
+							$row->no_resi,
+							date("d-m-Y", strtotime($row->tgl_kirim)),
+							$sts,
+							anchor('pengiriman/detail/'.e_url($row->id_pengiriman),'<span class="fa fa-eye"></span>',array( 'title' => 'Detail', 'class' => 'btn btn-warning btn-xs', 'data-toggle' => 'tooltip'))
+							.'&nbsp;'.
+							anchor('pengiriman/ubah/'.e_url($row->id_pengiriman),'<span class="fa fa-check"></span>',array( 'title' => 'Ubah', 'class' => 'btn btn-success btn-xs', 'data-toggle' => 'tooltip'))
+						);
+			}
+		}
+		return  $this->table->generate();
+	}
+
+	public function index()
+	{
+		$data = array(
+						"page" => "pengiriman_view",
+						"ket"  => "Data",
+						"table" => $this->gen_table()
+						);
+		$this->load->view('index', $data);
+	}
+
+	public function gen_table_belum()
+	{
+		$query=$this->Sales_order_model->get_where(["status_order" => "0"]);
+		$res = $query->result();
+		$num_rows = $query->num_rows();
+
+		$tmpl = array(  'table_open'    => '<table class="table table-striped table-hover dataTable">',
+				'row_alt_start'  => '<tr>',
+				'row_alt_end'    => '</tr>'
+			);
+
+		$this->table->set_template($tmpl);
+		$this->table->set_empty("&nbsp;");
+		$this->table->set_heading('No', 'Id Transaksi', 'Nama Pelanggan', 'Nama Barang', 'Jumlah', 'Total', 'Status', 'Aksi');
+
+		if ($num_rows > 0)
+		{
+			$i = 0;
+
+			foreach ($res as $row){
+				$sts = '<span class="badge badge-danger">Belum dikirim</span>';
+				if($sts==1){
+					$sts = '<span class="badge badge-success">Sudah dikirim</span>';
+				}
+				$this->table->add_row(	++$i,
+							$row->id_transaksi,
+							$row->nama_pelanggan,
+							$row->nama_barang,
+							number_format($row->jumlah_order),
+							'Rp. '.number_format($row->total_order),
+							$sts,
+							anchor('pengiriman/tambah/'.e_url($row->id_transaksi),'<span class="fa fa-box"></span>',array( 'title' => 'Kirim', 'class' => 'btn btn-success btn-xs', 'data-toggle' => 'tooltip'))
+						);
+			}
+		}
+		return  $this->table->generate();
+	}
+
+	public function belum(){
+		$data = array(
+						"page" => "pengiriman_view",
+						"ket"  => "Data",
+						"table" => $this->gen_table_belum()
+						);
+		$this->load->view('index', $data);
+	}
+
+	public function tambah($v=""){
+		
+		$data = array(
+						"page" => "pengiriman_view",
+						"ket"  => "Tambah",
+						"form" => "pengiriman/add"
+						);
+		$v = d_url($v);
+		$q = $this->Sales_order_model->get_data($v);
+		$res = $q->result();
+		$detail = [];
+		foreach ($res as $row) {
+			$detail["Id Transaksi"] = $row->id_transaksi;
+			$detail["Nama Pelanggan"] = $row->nama_pelanggan;
+			$detail["No Telp"] = $row->notelp;
+			$detail["Alamat"] = $row->alamat;
+			$detail["Nama Barang"] = $row->nama_barang;
+			$detail["Harga Barang"] = "Rp. ".number_format($row->harga_order);
+			$detail["Jumlah"] = number_format($row->jumlah_order);
+			$detail["Total"] = "Rp. ".number_format($row->total_order);
+		}
+		$data["transaksi"] = $detail;
+		$this->load->view('index', $data);
+	}
+
+	public function add(){
+		$data = $this->input->post();
+		unset($data['id_pengiriman']);
+		unset($data['btnSimpan']);
+		$data['id_user'] = $this->session->userdata('user')->id_user;
+		if($this->Pengiriman_model->add($data)){
+			alert_notif("success");
+			redirect('pengiriman');
+		}else{
+			alert_notif("danger");
+			redirect('pengiriman/tambah/'.e_url($data['id_transaksi']));
+		}
+	}
+
+	public function detail($v){
+		$v = d_url($v);
+		$data = array(
+						"page" => "pengiriman_view",
+						"ket" => "Detail Data",
+						);
+		$q = $this->Pengiriman_model->get_data($v);
+		$res = $q->result();
+		$detail = [];
+		foreach ($res as $row) {
+			$id_transaksi = $row->id_transaksi;
+		}
+		$qa = $this->Sales_order_model->get_data($id_transaksi);
+		$res = $qa->result();
+		foreach ($res as $row) {
+			$detail['Data Transaksi']["Id Transaksi"] = $row->id_transaksi;
+			$detail['Data Transaksi']["Nama Pelanggan"] = $row->nama_pelanggan;
+			$detail['Data Transaksi']["No Telp"] = $row->notelp;
+			$detail['Data Transaksi']["Alamat"] = $row->alamat;
+			$detail['Data Transaksi']["Nama Barang"] = $row->nama_barang;
+			$detail['Data Transaksi']["Harga Barang"] = "Rp. ".number_format($row->harga_order);
+			$detail['Data Transaksi']["Jumlah"] = number_format($row->jumlah_order);
+			$detail['Data Transaksi']["Total"] = "Rp. ".number_format($row->total_order);
+			$detail['Data Transaksi']["Status"] = $row->status_order==1?'<span class="badge badge-success">Sudah dikirim</span>':'<span class="badge badge-danger">Belum dikirim</span>';
+		}
+		$res = $q->result();
+		foreach ($res as $row) {
+			$detail['Data Pengiriman']['Jasa Pengiriman'] = $row->jasa_pengiriman;
+			$detail['Data Pengiriman']['No Resi'] = $row->no_resi;
+			$detail['Data Pengiriman']['Tgl Kirim'] = date("d-m-Y", strtotime($row->tgl_kirim));
+			$detail['Data Pengiriman']['Pengirim'] = $row->nama;
+			$detail['Data Pengiriman']["Status Pengiriman"] = $row->status_pengiriman==1?'<span class="badge badge-success">Sudah diterima</span>':'<span class="badge badge-info">Terkirim</span>';
+		}
+		$data["detail"] = $detail;
+		$this->load->view('index', $data);
+	}
+
+
+
+	public function ubah($v=""){
+		
+		$data = array(
+						"page" => "pengiriman_view",
+						"ket"  => "Ubah",
+						"form" => "pengiriman/update"
+						);
+		$v = d_url($v);
+		$q = $this->Pengiriman_model->get_data($v);
+		$res = $q->result();
+		$detail = [];
+		foreach ($res as $row) {
+			$id_transaksi = $row->id_transaksi;
+			$data['id_pengiriman'] = $row->id_pengiriman;
+			$data['jasa_pengiriman'] = $row->jasa_pengiriman;
+			$data['no_resi'] = $row->no_resi;
+			$data['tgl_kirim'] = $row->tgl_kirim;
+		}
+
+		$q = $this->Sales_order_model->get_data($id_transaksi);
+		$res = $q->result();
+		$detail = [];
+		foreach ($res as $row) {
+			$detail["Id Transaksi"] = $row->id_transaksi;
+			$detail["Nama Pelanggan"] = $row->nama_pelanggan;
+			$detail["No Telp"] = $row->notelp;
+			$detail["Alamat"] = $row->alamat;
+			$detail["Nama Barang"] = $row->nama_barang;
+			$detail["Harga Barang"] = "Rp. ".number_format($row->harga_order);
+			$detail["Jumlah"] = number_format($row->jumlah_order);
+			$detail["Total"] = "Rp. ".number_format($row->total_order);
+		}
+		$data["transaksi"] = $detail;
+		$this->load->view('index', $data);
+	}
+
+	public function update()
+	{
+		$id_pengiriman = $this->input->post("id_pengiriman");
+		$data = ["status_pengiriman" => 1];
+		if($this->Pengiriman_model->update($data, $id_pengiriman)){
+			alert_notif("success");
+			redirect('pengiriman');
+		}else{
+			alert_notif("danger");
+			redirect('pengiriman/ubah/'.e_url($id_pengiriman));
+		}
+	}
+}
+
+/* End of file Pengiriman.php */
+/* Location: ./application/controllers/Pengiriman.php */

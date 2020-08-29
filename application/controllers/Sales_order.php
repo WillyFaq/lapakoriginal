@@ -10,6 +10,7 @@ class Sales_order extends CI_Controller {
 		$this->load->model("Sales_model", "", TRUE);
 		$this->load->model("Barang_model", "", TRUE);
 		$this->load->model("Sales_order_model", "", TRUE);
+		$this->load->model("Pengiriman_model", "", TRUE);
 	}
 
 	public function gen_table()
@@ -35,7 +36,7 @@ class Sales_order extends CI_Controller {
 
 			foreach ($res as $row){
 				$sts = '<span class="badge badge-danger">Belum dikirim</span>';
-				if($sts==1){
+				if($row->status_order==1){
 					$sts = '<span class="badge badge-success">Sudah dikirim</span>';
 				}
 				$this->table->add_row(	++$i,
@@ -45,7 +46,6 @@ class Sales_order extends CI_Controller {
 							number_format($row->jumlah_order),
 							'Rp. '.number_format($row->total_order),
 							$sts,
-							//anchor('Sales_order/ubah/'.e_url($row->kode_barang),'<span class="fa fa-pencil-alt"></span>',array( 'title' => 'Ubah', 'class' => 'btn btn-primary btn-xs', 'data-toggle' => 'tooltip')).'&nbsp;'.
 							anchor('sales_order/detail/'.e_url($row->id_transaksi),'<span class="fa fa-eye"></span>',array( 'title' => 'Detail', 'class' => 'btn btn-warning btn-xs', 'data-toggle' => 'tooltip'))
 						);
 			}
@@ -72,7 +72,6 @@ class Sales_order extends CI_Controller {
 		$q = $this->Sales_model->get_data($id);
 		$res = $q->result();
 		foreach ($res as $row) {
-			//$ret .= $row->nama_barang." (".$row->minimal_sale.")"."<br>";
 			$opt[$row->kode_barang] = $row->nama_barang;
 		}
 		$js = 'class="form-control" id="kode_barang"';
@@ -114,13 +113,24 @@ class Sales_order extends CI_Controller {
 			$detail["Status"] = $row->status_order==1?'<span class="badge badge-success">Sudah dikirim</span>':'<span class="badge badge-danger">Belum dikirim</span>';
 		}
 		$data["detail"] = $detail;
+		$q = $this->Pengiriman_model->get_where(['pengiriman.id_transaksi' => $id_trans]);
+		if($q->num_rows()>0){
+			$res = $q->result();
+			$det = [];
+			foreach ($res as $row) {
+				$det['Jasa Pengiriman'] = $row->jasa_pengiriman;
+				$det['No Resi'] = $row->no_resi;
+				$det['Tgl Kirim'] = date("d-m-Y", strtotime($row->tgl_kirim));
+				$det['Pengirim'] = $row->nama;
+				$det["Status Pengiriman"] = $row->status_pengiriman==1?'<span class="badge badge-success">Sudah diterima</span>':'<span class="badge badge-info">Terkirim</span>';
+			}
+			$data['pengiriman'] = $det;
+		}
 		$this->load->view('index', $data);
 	}
 
 	public function add()
 	{
-		print_pre($this->input->post());
-
 		$id_transaksi = $this->Sales_order_model->gen_idtrans();
 		$no_pelanggan = str_replace("T", "P", $id_transaksi);
 		$pelaggan = array(

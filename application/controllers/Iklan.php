@@ -110,14 +110,10 @@ class Iklan extends CI_Controller {
 		$data = $this->input->post();
 		unset($data['id_iklan'], $data['btnSimpan'], $data['nama_barang']);
 		if($this->Iklan_model->add($data)){
-			$this->session->set_flashdata('msg_title', 'Sukses!');
-			$this->session->set_flashdata('msg_status', 'alert-success');
-			$this->session->set_flashdata('msg', 'Data berhasil disimpan! ');
+			alert_notif("success");
 			redirect('iklan');
 		}else{
-			$this->session->set_flashdata('msg_title', 'Terjadi Kesalahan!');
-			$this->session->set_flashdata('msg_status', 'alert-danger');
-			$this->session->set_flashdata('msg', 'Data gagal disimpan! ');
+			alert_notif("danger");
 			redirect('iklan/tambah');
 		}
 		
@@ -150,14 +146,10 @@ class Iklan extends CI_Controller {
 		unset($data['id_iklan'], $data['btnSimpan'], $data['nama_barang']);
 
 		if( $this->Iklan_model->update($data, $id) ){
-			$this->session->set_flashdata('msg_title', 'Sukses!');
-			$this->session->set_flashdata('msg_status', 'alert-success');
-			$this->session->set_flashdata('msg', 'Data berhasil disimpan! ');
+			alert_notif("success");
 			redirect('iklan');
 		}else{
-			$this->session->set_flashdata('msg_title', 'Terjadi Kesalahan!');
-			$this->session->set_flashdata('msg_status', 'alert-danger');
-			$this->session->set_flashdata('msg', 'Data gagal disimpan! ');
+			alert_notif("danger");
 			redirect('iklan/ubah.'.e_url($id));
 		}
 	}

@@ -59,3 +59,18 @@ if(!function_exists('d_password')){
 	    return $pass;
 	}
 }
+
+if(!function_exists('alert_notif')){
+	function alert_notif($type) {
+		$ci =& get_instance();
+	    if($type=="success"){
+	    	$ci->session->set_flashdata('msg_title', 'Sukses!');
+			$ci->session->set_flashdata('msg_status', 'alert-success');
+			$ci->session->set_flashdata('msg', 'Data berhasil disimpan! ');
+	    }else if($type==="danger"){
+	    	$ci->session->set_flashdata('msg_title', 'Terjadi Kesalahan!');
+			$ci->session->set_flashdata('msg_status', 'alert-danger');
+			$ci->session->set_flashdata('msg', 'Data gagal disimpan! ');
+	    }
+	}
+}

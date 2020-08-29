@@ -150,6 +150,36 @@ body::-webkit-scrollbar-thumb:hover {
 	font-weight: 600;
 	text-align: center;
 }
+.icon_preview{
+	width: 100%;
+	color: #2E55C7;
+	font-size: 2em;
+}
+
+.btn-icon-pilih{
+	width: 100%;
+	height: 100px;
+}
+.btn-icon-pilih>i{
+	font-size: 1.6em;
+}
+.btn-icon-pilih:hover{
+	color: #2E55C7;
+}
+
+.txt-cari-icon{
+	border-right: none;
+}
+
+.icon-cari-icon{
+	background: #FFF;
+	border-left: none;
+}
+
+.icon_load_box{
+	height: 350px;
+	overflow-y: scroll;
+}
 
 /* ------ MOBILE ----------- */
 @media (min-width: 320px) and (max-width: 768px) {

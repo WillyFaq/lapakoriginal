@@ -69,14 +69,10 @@ class Barang extends CI_Controller {
 	public function add()
 	{
 		if($this->Barang_model->add($this->input->post())){
-			$this->session->set_flashdata('msg_title', 'Sukses!');
-			$this->session->set_flashdata('msg_status', 'alert-success');
-			$this->session->set_flashdata('msg', 'Data berhasil disimpan! ');
+			alert_notif("success");
 			redirect('barang');
 		}else{
-			$this->session->set_flashdata('msg_title', 'Terjadi Kesalahan!');
-			$this->session->set_flashdata('msg_status', 'alert-danger');
-			$this->session->set_flashdata('msg', 'Data gagal disimpan! ');
+			alert_notif("danger");
 			redirect('barang/tambah');
 		}
 	}
@@ -110,14 +106,10 @@ class Barang extends CI_Controller {
 		unset($data['kode_barang']);
 
 		if( $this->Barang_model->update($data, $id) ){
-			$this->session->set_flashdata('msg_title', 'Sukses!');
-			$this->session->set_flashdata('msg_status', 'alert-success');
-			$this->session->set_flashdata('msg', 'Data berhasil disimpan! ');
+			alert_notif("success");
 			redirect('barang');
 		}else{
-			$this->session->set_flashdata('msg_title', 'Terjadi Kesalahan!');
-			$this->session->set_flashdata('msg_status', 'alert-danger');
-			$this->session->set_flashdata('msg', 'Data gagal disimpan! ');
+			alert_notif("danger");
 			redirect('barang/ubah.'.e_url($id));
 		}
 	}

@@ -83,14 +83,10 @@ class Admin extends CI_Controller {
 		$data['sts'] = 1;
 		print_r($data);
 		if($this->User_model->add($data)){
-			$this->session->set_flashdata('msg_title', 'Sukses!');
-			$this->session->set_flashdata('msg_status', 'alert-success');
-			$this->session->set_flashdata('msg', 'Data berhasil disimpan! ');
+			alert_notif("success");
 			redirect('admin');
 		}else{
-			$this->session->set_flashdata('msg_title', 'Terjadi Kesalahan!');
-			$this->session->set_flashdata('msg_status', 'alert-danger');
-			$this->session->set_flashdata('msg', 'Data gagal disimpan! ');
+			alert_notif("danger");
 			redirect('admin/tambah');
 		}
 	}
@@ -122,14 +118,10 @@ class Admin extends CI_Controller {
 		unset($data['id_user'], $data['btnSimpan']);
 		$data['password'] = e_password($data['password']);
 		if( $this->User_model->update($data, $id) ){
-			$this->session->set_flashdata('msg_title', 'Sukses!');
-			$this->session->set_flashdata('msg_status', 'alert-success');
-			$this->session->set_flashdata('msg', 'Data berhasil disimpan! ');
+			alert_notif("success");
 			redirect('admin');
 		}else{
-			$this->session->set_flashdata('msg_title', 'Terjadi Kesalahan!');
-			$this->session->set_flashdata('msg_status', 'alert-danger');
-			$this->session->set_flashdata('msg', 'Data gagal disimpan! ');
+			alert_notif("danger");
 			redirect('admin/ubah.'.e_url($id));
 		}
 	}

@@ -99,6 +99,24 @@
                     ?>
                     </tbody>
                 </table>
+                <?php if(isset($pengiriman)): ?>
+                <h3>Pengiriman</h3>
+                <table class="table">
+                    <tbody>
+                    <?php
+                        foreach ($pengiriman as $key => $value) {
+                    ?>
+                        <tr>
+                            <th style="width:20%;"><?= $key; ?></th>
+                            <td style="width:1%;">:</td>
+                            <td><?= $value; ?></td>
+                        </tr>
+                    <?php
+                        }
+                    ?>
+                    </tbody>
+                </table>
+                <?php endif; ?>
                 <?php endif; ?>
             </div>
         </div>
