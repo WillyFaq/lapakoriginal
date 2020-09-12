@@ -1,7 +1,8 @@
 <?php
     
-    $q = $this->Menu_model->get_menu();
+    $q = $this->Menu_model->get_where(["level" => $this->session->userdata('user')->level]);
     $res = $q->result_array();
+    //echo $this->db->last_query();
     $menu = [];
     foreach ($res as $row) {
         $menu[$row['parent_menu']][] = $row;
@@ -21,7 +22,7 @@
         }
     }
 ?>
-<li class="nav-item" id="menu">
+<!-- <li class="nav-item" id="menu">
     <a class="nav-link" href="<?= base_url('menu'); ?>">
         <i class="fas fa-fw fa-list"></i>
         <span>Menu</span>
@@ -33,3 +34,4 @@
         <span>Role</span>
     </a>
 </li>
+ -->

@@ -79,23 +79,36 @@
                        <label for="menu" class="col-sm-6 col-form-label">Menu</label> 
                     </div>
                     <div class="form-group row">
-                       <div class="col-sm-6">
-                            <select class="form-control" name="fruit" multiple>
-                                <option value="1">OKE</option>
-                                <option value="1">OKE</option>
-                                <option value="1">OKE</option>
+                        <?php ///print_pre($menu_all); ?>
+                        <div class="col-sm-6">
+                            <div class="load_jabatan1">
+                                <select class="form-control" name="jabatan" id="list-jabatan" multiple style="height: 250px;">
+                                    <?php foreach($jabatan_all as $jrow): ?>
+                                    <option value="<?= $jrow->id_jabatan; ?>"><?= $jrow->nama_jabatan; ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <select name="menu" id="cb_menu" class="form-control mb-2">
+                                <?php foreach($menu_all as $mrow): ?>
+                                <option value="<?= $mrow->id_menu; ?>"><?= $mrow->nama_menu; ?></option>
+                                <?php endforeach; ?>
                             </select>
-                       </div>
-                       <div class="col-sm-6">
-                            <select name="menu" id="menu" class="form-control mb-2">
-                                <option value="0">Dahsboard</option>
-                            </select>
-                            <select class="form-control" name="fruit" multiple>
-                                <option value="1">OKE</option>
-                                <option value="1">OKE</option>
-                                <option value="1">OKE</option>
-                            </select>
-                       </div>
+                            <label for="role" class="col-sm-6 col-form-label">Jabatan</label>
+                            <div class="load_jabatan">
+                                <select class="form-control" name="role[]" id="cb_role" multiple style="height: 160px;">
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-sm-10">
+                            <p>*) Double Click untuk memindahkan.</p>
+                        </div>
+                        <div class="col-sm-2">
+                            <input type="submit" class="btn btn-primary" name="btnSimpan" value="Simpan">
+                        </div>
                     </div>
                 </form>
                 <?php endif; ?>
@@ -154,7 +167,67 @@
             var v = $(this).val();
             $(".load_icon").load("<?= base_url("menu/fa_list") ?>/"+v);
         });
+
+        load_combobox(1);
+        //$(".load_jabatan").load('<?= base_url("menu/load_jabatan_role/1"); ?>');
+        $("#cb_menu").change(function(){
+            var v = $(this).val();
+            load_combobox(v);
+            //$(".load_jabatan").load('<?= base_url("menu/load_jabatan_role/"); ?>'+v);
+        });
+
+        $("#list-jabatan").dblclick(function(){
+            var v = $(this).val();
+            var txt = $("#list-jabatan>option[value='"+v+"']").text();
+            var opt = "<option value='"+v+"' selected>"+txt+"</option>";
+            if(txt!=""){
+                $("#cb_role").append(opt);
+                $("#list-jabatan>option[value='"+v+"']").remove();
+            }
+        });
+        $("#cb_role").dblclick(function(){
+            var v = $(this).val();
+            var txt = $("#cb_role>option[value='"+v+"']").text();
+            var opt = "<option value='"+v+"' selected>"+txt+"</option>";
+            if(txt!=""){
+                $("#list-jabatan").append(opt);
+                $("#cb_role>option[value='"+v+"']").remove();
+            }
+        });
     });
+
+    function hapus_jabatan(ini) {
+        var v = $(ini).val();
+        var txt = $("#list-jabatan>option[value='"+v+"']").text();
+        var opt = "<option value='"+v+"' selected>"+txt+"</option>";
+        if(txt!=""){
+            $("#cb_role").append(opt);
+            $("#list-jabatan>option[value='"+v+"']").remove();
+        }
+    }
+    function hapus_role(ini) {
+        var v = $(ini).val();
+            var txt = $("#cb_role>option[value='"+v+"']").text();
+            var opt = "<option value='"+v+"' selected>"+txt+"</option>";
+            if(txt!=""){
+                $("#list-jabatan").append(opt);
+                $("#cb_role>option[value='"+v+"']").remove();
+            }
+    }
+
+    function load_combobox(id) {
+        $.ajax({
+            url: "<?= base_url("menu/load_jabatan_role/"); ?>"+id, 
+            success: function(result){
+                //$("#div1").html(result);
+                //console.log(result);
+                var data = JSON.parse(result);
+                //console.log(data);
+                $(".load_jabatan").html(data.jabatan2);
+                $(".load_jabatan1").html(data.jabatan1);
+            }
+        });
+    }
 
     function pilih_icon(icn) {
         console.log(icn);

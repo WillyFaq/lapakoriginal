@@ -32,8 +32,10 @@ class Pengiriman extends CI_Controller {
 
 			foreach ($res as $row){
 				$sts = '<span class="badge badge-success">Sudah dikirim</span>';
+				$btn_update = anchor('pengiriman/ubah/'.e_url($row->id_pengiriman),'<span class="fa fa-check"></span>',array( 'title' => 'Ubah', 'class' => 'btn btn-success btn-xs', 'data-toggle' => 'tooltip'));
 				if($row->status_pengiriman==1){
 					$sts = '<span class="badge badge-info">Sudah diterima</span>';
+					$btn_update = '';
 				}
 				$this->table->add_row(	++$i,
 							$row->id_transaksi,
@@ -45,7 +47,7 @@ class Pengiriman extends CI_Controller {
 							$sts,
 							anchor('pengiriman/detail/'.e_url($row->id_pengiriman),'<span class="fa fa-eye"></span>',array( 'title' => 'Detail', 'class' => 'btn btn-warning btn-xs', 'data-toggle' => 'tooltip'))
 							.'&nbsp;'.
-							anchor('pengiriman/ubah/'.e_url($row->id_pengiriman),'<span class="fa fa-check"></span>',array( 'title' => 'Ubah', 'class' => 'btn btn-success btn-xs', 'data-toggle' => 'tooltip'))
+							$btn_update
 						);
 			}
 		}

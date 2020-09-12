@@ -10,6 +10,7 @@ class Menu extends CI_Controller {
 	public function __construct() { 
 		parent::__construct();
 		$this->load->model("Menu_model", "", TRUE);
+		$this->load->model("User_model", "", TRUE);
 	}
 
 	public function gen_table()
@@ -162,7 +163,57 @@ class Menu extends CI_Controller {
 						"ket" => "Role",
 						"role" => "menu/update_role"
 						);
+		$data['jabatan_all'] = $this->User_model->get_all_jabatan()->result();
+		$data['menu_all'] = $this->Menu_model->get_all()->result();
 		$this->load->view('index', $data);
+	}
+
+	public function load_jabatan_role($id_menu)
+	{
+		$data = [];
+		$ret = '<select class="form-control" name="role[]" id="cb_role" multiple style="height: 160px;" ondblclick="hapus_role(this)">';
+		$q = $this->Menu_model->get_role($id_menu);
+		$res = $q->result();
+		$id_jbt = [];
+		foreach ($res as $row) {
+			$ret .= "<option value='$row->id_jabatan' selected >$row->nama_jabatan</option>";
+			$id_jbt[] = $row->id_jabatan;
+		}
+		$ret .= '</select>';
+		$data['jabatan2'] =  $ret;
+		
+		$ret = '<select class="form-control" name="jabatan" id="list-jabatan" multiple style="height: 160px;" ondblclick="hapus_jabatan(this)">';
+		$q2  = $this->User_model->get_all_jabatan();
+		if(!empty($id_jbt)){
+			$q2  = $this->Menu_model->get_jabatan_role($id_jbt);
+		}
+		$res2 = $q2->result();
+		foreach ($res2 as $row) {
+			$ret .= "<option value='$row->id_jabatan' selected >$row->nama_jabatan</option>";
+		}
+		$ret .= '</select>';
+		$data['jabatan1'] =  $ret;
+		//print_pre($data);
+		echo json_encode($data);
+	}
+
+	public function update_role()
+	{
+		$role = $this->input->post("role");
+		$data = [];
+		foreach ($role as $k => $v) {
+			$data[$k]['id_jabatan'] = $v;
+			$data[$k]['id_menu'] = $this->input->post('menu');
+			$data[$k]['access'] = "CRUD";
+			$data[$k]['sts_role'] = "1";
+		}
+		if($this->Menu_model->add_role($data)){
+			alert_notif("success");
+			redirect('menu/role');
+		}else{
+			alert_notif("danger");
+			redirect('menu/ubah/'.e_url($id));
+		}
 	}
 }
 
