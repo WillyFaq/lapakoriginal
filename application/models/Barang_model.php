@@ -109,6 +109,64 @@ class Barang_model extends CI_Model {
 		return $this->db->delete($this->table, array($this->pk => $id));
 	}
 
+
+	public function laporan_harian($tgl1, $tgl2)
+	{
+		$whr = "WHERE 1 = 1 ";
+		if($tgl1 != ""){
+			$whr .= " AND a.tgl_order >= '$tgl1' ";
+		}
+
+		if($tgl2 != ""){
+			$whr .= " AND a.tgl_order <= '$tgl2' ";
+		}
+
+		$sql = "SELECT
+					a.id_transaksi,
+					a.id_user,
+					b.nama AS 'sales', 
+					d.kode_barang,
+					d.nama_barang,
+					a.tgl_order,
+					a.jumlah_order,
+					a.total_order,
+					a.harga_order,
+					d.laba_barang,
+					(d.laba_barang*a.jumlah_order) AS 'laba_penjualan'
+				FROM sales_order a
+				JOIN user b ON a.id_user = b.id_user
+				JOIN pelanggan c ON a.no_pelanggan = c.no_pelanggan
+				JOIN barang d ON a.kode_barang = d.kode_barang
+				$whr";
+		return $this->db->query($sql);
+	}
+
+	public function laporan_bulanan($bln)
+	{
+		$whr = "";
+		if($bln!=""){
+			$whr = " WHERE MONTH(a.tgl_order) = '$bln' ";
+		}
+		$sql = "SELECT
+					a.id_transaksi,
+					a.id_user,
+					b.nama AS 'sales', 
+					d.kode_barang,
+					d.nama_barang,
+					MONTH(a.tgl_order) AS 'bulan',
+					SUM(a.jumlah_order) AS 'jumlah_order',
+					SUM(a.total_order) AS 'total_order',
+					SUM(a.harga_order) AS 'harga_order',
+					SUM(d.laba_barang) AS 'laba_barang',
+					SUM((d.laba_barang*a.jumlah_order)) AS 'laba_penjualan'
+				FROM sales_order a
+				JOIN user b ON a.id_user = b.id_user
+				JOIN pelanggan c ON a.no_pelanggan = c.no_pelanggan
+				JOIN barang d ON a.kode_barang = d.kode_barang
+				$whr
+				GROUP BY a.kode_barang, MONTH(a.tgl_order)";
+		return $this->db->query($sql);
+	}
 }
 
 /* End of file Barang_model.php */

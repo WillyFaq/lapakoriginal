@@ -12,13 +12,7 @@
 
     <script type="text/javascript">
         $(document).ready(function(){
-            if ($(window).width() < 768) {
-                var table = $(".dataTable").DataTable({
-                    "scrollX": true
-                });
-            }else{
-                var table = $(".dataTable").DataTable();
-            }
+            init_datatable();
             $('[data-toggle="tooltip"]').tooltip();
             setTimeout(function(){
                 $(".alert").hide(500);
@@ -33,6 +27,16 @@
                 $("#home").addClass("active");
             }
         });
+
+        function init_datatable() {
+            if ($(window).width() < 768) {
+                var table = $(".dataTable").DataTable({
+                    "scrollX": true
+                });
+            }else{
+                var table = $(".dataTable").DataTable();
+            }
+        }
     </script>
     
 </body>

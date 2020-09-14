@@ -65,6 +65,13 @@ class CI_Table {
 	public $heading		= array();
 
 	/**
+	 * Data for table footer
+	 *
+	 * @var array
+	 */
+	public $footer		= array();
+
+	/**
 	 * Whether or not to automatically create the table header
 	 *
 	 * @var bool
@@ -155,6 +162,20 @@ class CI_Table {
 	public function set_heading($args = array())
 	{
 		$this->heading = $this->_prep_args(func_get_args());
+		return $this;
+	}
+
+	/**
+	 * Set the table Footer
+	 *
+	 * Can be passed as an array or discreet params
+	 *
+	 * @param	mixed
+	 * @return	CI_Table
+	 */
+	public function set_footer($args = array())
+	{
+		$this->footer = $this->_prep_args(func_get_args());
 		return $this;
 	}
 
@@ -407,6 +428,31 @@ class CI_Table {
 			$out .= $this->template['tbody_close'].$this->newline;
 		}
 
+		// Is there a table footer to display?
+		if ( ! empty($this->footer))
+		{
+			$out .= $this->template['tfoot_open'].$this->newline.$this->template['footer_row_start'].$this->newline;
+
+			foreach ($this->footer as $footer)
+			{
+				$temp = $this->template['footer_cell_start'];
+
+				foreach ($footer as $key => $val)
+				{
+					if ($key !== 'data')
+					{
+						$temp = str_replace('<th', '<th '.$key.'="'.$val.'"', $temp);
+					}
+				}
+
+				$out .= $temp.(isset($footer['data']) ? $footer['data'] : '').$this->template['footer_cell_end'];
+			}
+
+			$out .= $this->template['footer_row_end'].$this->newline.$this->template['tfoot_close'].$this->newline;
+		}
+
+
+
 		$out .= $this->template['table_close'];
 
 		// Clear table class properties before generating the table
@@ -489,7 +535,14 @@ class CI_Table {
 		}
 
 		$this->temp = $this->_default_template();
-		foreach (array('table_open', 'thead_open', 'thead_close', 'heading_row_start', 'heading_row_end', 'heading_cell_start', 'heading_cell_end', 'tbody_open', 'tbody_close', 'row_start', 'row_end', 'cell_start', 'cell_end', 'row_alt_start', 'row_alt_end', 'cell_alt_start', 'cell_alt_end', 'table_close') as $val)
+		foreach (array('table_open', 'thead_open', 'thead_close', 'heading_row_start', 'heading_row_end', 'heading_cell_start', 'heading_cell_end', 'tbody_open', 'tbody_close', 'row_start', 'row_end', 'cell_start', 'cell_end', 'row_alt_start', 'row_alt_end', 'cell_alt_start', 'cell_alt_end', 
+			'tfoot_open',
+			'tfoot_close',
+			'footer_row_start',
+			'footer_row_end',
+			'footer_cell_start',
+			'footer_cell_end',
+			'table_close') as $val)
 		{
 			if ( ! isset($this->template[$val]))
 			{
@@ -530,6 +583,14 @@ class CI_Table {
 			'row_alt_end'		=> '</tr>',
 			'cell_alt_start'	=> '<td>',
 			'cell_alt_end'		=> '</td>',
+
+			'tfoot_open'		=> '<tfoot>',
+			'tfoot_close'		=> '</tfoot>',
+
+			'footer_row_start'	=> '<tr>',
+			'footer_row_end'	=> '</tr>',
+			'footer_cell_start'	=> '<th>',
+			'footer_cell_end'	=> '</th>',
 
 			'table_close'		=> '</table>'
 		);

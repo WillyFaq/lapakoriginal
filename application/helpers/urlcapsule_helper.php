@@ -74,3 +74,35 @@ if(!function_exists('alert_notif')){
 	    }
 	}
 }
+
+if(!function_exists('get_bulan')){
+	function get_bulan($bln="") {
+		$bulan = [
+					"",
+					"Januari",
+					"Februari",
+					"Maret",
+					"April",
+					"Mei",
+					"Juni",
+					"Juli",
+					"Agustus",
+					"Septermber",
+					"Oktober",
+					"November",
+					"Desember",
+					];
+		unset($bulan[0]);
+		return $bln==""?$bulan:$bulan[$bln];
+		/*$ci =& get_instance();
+	    if($type=="success"){
+	    	$ci->session->set_flashdata('msg_title', 'Sukses!');
+			$ci->session->set_flashdata('msg_status', 'alert-success');
+			$ci->session->set_flashdata('msg', 'Data berhasil disimpan! ');
+	    }else if($type==="danger"){
+	    	$ci->session->set_flashdata('msg_title', 'Terjadi Kesalahan!');
+			$ci->session->set_flashdata('msg_status', 'alert-danger');
+			$ci->session->set_flashdata('msg', 'Data gagal disimpan! ');
+	    }*/
+	}
+}
