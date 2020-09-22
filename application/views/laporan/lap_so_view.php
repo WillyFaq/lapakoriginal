@@ -43,7 +43,86 @@
                                 <td><?= $v; ?></td>
                             </tr>
                         <?php endforeach; ?>
+                        <tr>
+                            <th>Detail Penjualan</th>
+                            <td></td>
+                            <td></td>
+                        </tr>
                         </tbody>
+                    </table>
+                    <table class="table dataTable">
+                        <thead>
+                            <tr>
+                                <th>No</th>
+                                <th>Tanggal</th>
+                                <th>Barang</th>
+                                <th>Jumlah</th>
+                                <th>Ketrangan</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php
+                                $date_arr = [];
+                                $d = date("Y")."-".$bln."-01";
+                                $today = date('d-m-Y', strtotime($d)); 
+                                $date_arr[$today] = 0;
+                                $d=cal_days_in_month(CAL_GREGORIAN,$bln,date("Y"));
+                                for($i=1; $i<$d; $i++){
+                                    $repeat = strtotime("+1 day",strtotime($today));
+                                    $today = date('d-m-Y',$repeat);
+                                    $date_arr[$today] = 0;
+                                }
+
+
+                                $res = $penjualan->result();
+                                $nama_barang = '';
+                                foreach ($res as $row) {
+                                    $date_arr[date("d-m-Y", strtotime($row->tgl_order))] = array(
+                                                        "nama_barang" => $row->nama_barang,
+                                                        "jumlah_order" => $row->jumlah_order,
+                                                        );
+                                    
+                                    $nama_barang = $row->nama_barang;
+                                }
+                                foreach ($date_arr as $k => $row){
+                                    if(!isset($row['nama_barang'])){
+                                        $date_arr[$k] = array(
+                                                        "nama_barang" => $nama_barang,
+                                                        "jumlah_order" => 0,
+                                                        );
+                                    }
+                                }
+                                //print_pre($date_arr);
+
+                                $i=0;
+                                $jml = 0;
+                                foreach ($date_arr as $k => $row):
+                                   
+                                $jml += $row['jumlah_order'];
+                            ?>
+                            <tr>
+                                <td><?= ++$i; ?></td>
+                                <td><?= $k; ?></td>
+                                <td><?= $row['nama_barang']; ?></td>
+                                <td><?= $row['jumlah_order']; ?></td>
+                                <td>
+                                    <?php
+                                        if($row['jumlah_order']>= $detail['target']){
+                                            echo '<span class="badge badge-success">Target</span>';
+                                        }else{
+                                            echo '<span class="badge badge-danger">Tidak Target</span>';
+                                        }
+                                    ?>        
+                                </td>
+                            </tr>
+                            <?php endforeach; ?>
+                        </tbody>    
+                        <tfoot>
+                            <tr>
+                                <th colspan="3">Total</th>
+                                <th><?= $jml; ?></th>
+                            </tr>
+                        </tfoot>
                     </table>
                 <?php endif;?>
             </div>
