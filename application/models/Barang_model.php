@@ -109,6 +109,21 @@ class Barang_model extends CI_Model {
 		return $this->db->delete($this->table, array($this->pk => $id));
 	}
 
+	public function get_iklan($kode, $bln)
+	{
+		$sql = "SELECT 
+					kode_barang,
+					MONTH(tgl_iklan) AS 'bulan',
+					SUM(biaya_iklan) AS 'biaya_iklan'
+				FROM iklan
+				WHERE kode_barang = '$kode' AND MONTH(tgl_iklan) = $bln
+				GROUP BY kode_barang, MONTH(tgl_iklan)";
+		$q = $this->db->query($sql);
+		$res = $q->result();
+		foreach ($res as $row) {
+			return $row->biaya_iklan;
+		}
+	}
 
 	public function laporan_harian($tgl1, $tgl2)
 	{
@@ -164,6 +179,32 @@ class Barang_model extends CI_Model {
 				JOIN pelanggan c ON a.no_pelanggan = c.no_pelanggan
 				JOIN barang d ON a.kode_barang = d.kode_barang
 				$whr
+				GROUP BY a.kode_barang, MONTH(a.tgl_order)";
+		return $this->db->query($sql);
+	}
+
+
+	public function laporan_bulanan_id($bln, $id)
+	{
+		
+		$sql = "SELECT
+					a.id_transaksi,
+					a.id_user,
+					b.nama AS 'sales', 
+					d.kode_barang,
+					d.nama_barang,
+					d.harga_jual,
+					MONTH(a.tgl_order) AS 'bulan',
+					SUM(a.jumlah_order) AS 'jumlah_order',
+					SUM(a.total_order) AS 'total_order',
+					SUM(a.harga_order) AS 'harga_order',
+					SUM(d.laba_barang) AS 'laba_barang',
+					SUM((d.laba_barang*a.jumlah_order)) AS 'laba_penjualan'
+				FROM sales_order a
+				JOIN user b ON a.id_user = b.id_user
+				JOIN pelanggan c ON a.no_pelanggan = c.no_pelanggan
+				JOIN barang d ON a.kode_barang = d.kode_barang
+				WHERE MONTH(a.tgl_order) = '$bln'  AND  d.kode_barang = '$id'
 				GROUP BY a.kode_barang, MONTH(a.tgl_order)";
 		return $this->db->query($sql);
 	}

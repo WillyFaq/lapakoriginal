@@ -118,6 +118,22 @@ class Sales_model extends CI_Model {
 		return $this->db->delete($this->table, array($this->pk => $id));
 	}
 
+	public function get_penjualan($id, $bln)
+	{
+		$sql = "SELECT 
+					id_user,
+					MONTH(tgl_order) AS bulan,
+					SUM(jumlah_order) AS jumlah_order
+				FROM sales_order 
+				WHERE id_user = '$id' AND MONTH(tgl_order) = $bln
+				GROUP BY id_user, MONTH(tgl_order)";
+		$q = $this->db->query($sql);
+		$res = $q->result();
+		foreach ($res as $row) {
+			return $row->jumlah_order;
+		}
+	}
+
 }
 
 /* End of file Sales_model.php */

@@ -13,6 +13,7 @@
                 </div>
             </div>
             <div class="card-body">
+                <?php if(!isset($detail)): ?>
                 <div class="container filter">
                     <div class="form-group row">
                         <label for="filter" class="col-sm-2 col-form-label">Filter</label>
@@ -48,6 +49,82 @@
                 </div>
                 <hr>
                 <div class="load_table"></div>
+                <?php else: ?>
+                <table class="table">
+                    <tbody>
+                        <tr>
+                            <th width="20%">Kode Barang</th>
+                            <td width="1%">:</td>
+                            <td><?= $kode_barang; ?></td>
+                        </tr>
+                        <tr>
+                            <th>Nama Barang</th>
+                            <td>:</td>
+                            <td><?= $nama_barang; ?></td>
+                        </tr>
+
+                        <tr>
+                            <th>Harga Jual</th>
+                            <td>:</td>
+                            <td>Rp. <?= number_format($harga_jual); ?></td>
+                        </tr>
+                        <tr>
+                            <th>Bulan </th>
+                            <td>:</td>
+                            <td><?= get_bulan($bulan); ?></td>
+                        </tr>
+                        <tr>
+                            <th>Jumlah Penjualan </th>
+                            <td>:</td>
+                            <td><?= $jumlah_order; ?></td>
+                        </tr>
+                        <tr>
+                            <th colspan="2">Pendapatan dari penjulan</th>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>Penjualan Bersih </th>
+                            <td>:</td>
+                            <th class="text-center">Rp. <?= number_format($total_order); ?></th>
+                        </tr>
+                        <tr>
+                            <th colspan="2">Beban Barang</th>
+                            <td></td>
+                        </tr>
+                        <?php $tot=0; foreach ($beban as $k => $v): $tot+=$v['nominal']*$jumlah_order; ?>
+                            <tr>
+                                <td><?= $v['nama_beban']; ?></td>
+                                <td>:</td>
+                                <td>Rp. <?= number_format($v['nominal']*$jumlah_order); ?></td>
+                            </tr>
+                        <?php endforeach; ?>
+                        <tr>
+                            <th>Jumlah Beban Barang</th>
+                            <td>:</td>
+                            <th>Rp. <?= number_format($tot); ?> </th>
+                        </tr>
+
+                        <tr>
+                            <th>Beban Iklan</th>
+                            <td>:</td>
+                            <th>Rp. <?= number_format($beban_iklan); ?></th>
+                        </tr>
+                        <tr>
+                            <th>Jumlah Beban Penjualan</th>
+                            <td>:</td>
+                            <?php  $jml_beban_penjualan =  $tot - $beban_iklan; ?>
+                            <th class="text-center">Rp. <?= number_format($jml_beban_penjualan); ?></th>
+                        </tr>
+                        <tr>
+                            <th>Laba Bersih</th>
+                            <td>:</td>
+                            <?php $laba_bersih = $total_order - $jml_beban_penjualan ?>
+                            <th class="text-center">Rp. <?= number_format($laba_bersih); ?></th>
+                        </tr>
+                    </tbody>
+                </table>
+                <a href="<?= base_url('laporan_penjualan'); ?>" class="btn btn-success">Kembali</a>
+                <?php endif; ?>
             </div>
         </div>
     </div>

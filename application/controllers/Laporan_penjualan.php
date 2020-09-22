@@ -24,10 +24,10 @@ class Laporan_penjualan extends CI_Controller {
 
 		$this->table->set_empty("&nbsp;");
 
-		$this->table->set_heading('No', 'Kode Barang', 'Nama Barang', 'Tanggal', 'Total Penjualan', 'Laba Penjuaalan');
+		$this->table->set_heading('No', 'Kode Barang', 'Nama Barang', 'Tanggal', 'Jumlah Penjualan', 'Total Penjualan', 'Laba Penjuaalan');
 
-			$tot = 0;
-			$laba = 0;
+		$tot = 0;
+		$laba = 0;
 		if ($num_rows > 0)
 		{
 			$i = 0;
@@ -38,6 +38,7 @@ class Laporan_penjualan extends CI_Controller {
 							$row->kode_barang,
 							$row->nama_barang,
 							date("d-m-Y", strtotime($row->tgl_order)),
+							$row->jumlah_order,
 							'Rp. '.number_format($row->total_order),
 							'Rp. '.number_format($row->laba_penjualan)
 						);
@@ -45,7 +46,7 @@ class Laporan_penjualan extends CI_Controller {
 		}
 
 		$this->table->set_footer(
-								array('data' => 'Total', "colspan" => 4),
+								array('data' => 'Total', "colspan" => 5),
 								'Rp. '.number_format($tot),
 								'Rp. '.number_format($laba)
 								);
@@ -68,28 +69,31 @@ class Laporan_penjualan extends CI_Controller {
 
 		$this->table->set_empty("&nbsp;");
 
-		$this->table->set_heading('No', 'Kode Barang', 'Nama Barang', 'Bulan', 'Total Penjualan', 'Laba Penjuaalan');
+		$this->table->set_heading('No', 'Kode Barang', 'Nama Barang', 'Bulan', 'Jumlah Penjualan', 'Total Penjualan', 'Laba Penjuaalan', 'Aksi');
 
-			$tot = 0;
-			$laba = 0;
+		$tot = 0;
+		$laba = 0;
 		if ($num_rows > 0)
 		{
 			$i = 0;
 			foreach ($res as $row){
 				$tot += $row->total_order;
-				$laba += $row->laba_penjualan;
+				$laba_penjualan = $row->total_order - $row->laba_penjualan - $this->Barang_model->get_iklan($row->kode_barang, $row->bulan);
+				$laba += $laba_penjualan;
 				$this->table->add_row(	++$i,
 							$row->kode_barang,
 							$row->nama_barang,
 							get_bulan($row->bulan),
+							$row->jumlah_order,
 							'Rp. '.number_format($row->total_order),
-							'Rp. '.number_format($row->laba_penjualan)
+							'Rp. '.number_format($laba_penjualan),
+							anchor('laporan_penjualan/detail/'.e_url($row->bulan).'/'.e_url($row->kode_barang), '<i class="fa fa-eye"></i>', array("class" => "btn btn-success btn-xs", "title" => "detail", 'data-toggle' => 'tooltip'))
 						);
 			}
 		}
 
 		$this->table->set_footer(
-								array('data' => 'Total', "colspan" => 4),
+								array('data' => 'Total', "colspan" => 5),
 								'Rp. '.number_format($tot),
 								'Rp. '.number_format($laba)
 								);
@@ -103,6 +107,38 @@ class Laporan_penjualan extends CI_Controller {
 						"page" => "laporan/lap_penjualan_view",
 						"ket" => "Laporan",
 						);
+		$this->load->view('index', $data);
+	}
+
+	public function detail($bln, $id)
+	{
+		$data = array(
+						"page" => "laporan/lap_penjualan_view",
+						"ket" => "Detail Laporan",
+						"detail" => 'det'
+						);
+		$bln = d_url($bln);
+		$id = d_url($id);
+		$q = $this->Barang_model->laporan_bulanan_id($bln, $id);
+		$res = $q->result();
+		foreach ($res as $row) {
+			$data['kode_barang'] = $row->kode_barang;
+			$data['nama_barang'] = $row->nama_barang;
+			$data['harga_jual'] = $row->harga_jual;
+			$data['laba_barang'] = $row->laba_barang;
+			$data['bulan'] = $row->bulan;
+			$data['jumlah_order'] = $row->jumlah_order;
+			$data['total_order'] = $row->total_order;
+			$data['beban_iklan'] = $this->Barang_model->get_iklan($row->kode_barang, $row->bulan);
+		}
+
+		$q = $this->Barang_model->get_update($id);
+		$res = $q->result();
+		foreach ($res as $row) {
+			$data['beban'][$row->id_beban]['id'] = $row->id_beban;
+			$data['beban'][$row->id_beban]['nama_beban'] = $row->nama_beban;
+			$data['beban'][$row->id_beban]['nominal'] = $row->nominal;
+		}
 		$this->load->view('index', $data);
 	}
 

@@ -13,7 +13,6 @@
     <script type="text/javascript">
         $(document).ready(function(){
             init_datatable();
-            $('[data-toggle="tooltip"]').tooltip();
             setTimeout(function(){
                 $(".alert").hide(500);
             }, 3000);
@@ -29,6 +28,7 @@
         });
 
         function init_datatable() {
+            $('[data-toggle="tooltip"]').tooltip();
             if ($(window).width() < 768) {
                 var table = $(".dataTable").DataTable({
                     "scrollX": true
