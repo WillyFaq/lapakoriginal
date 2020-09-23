@@ -176,7 +176,7 @@ class Sales extends CI_Controller {
 		$id = $this->input->post('id_user');
 		unset($data['id_user'], $data['btnSimpan']);
 		$data['password'] = e_password($data['password']);
-		print_pre($data);
+		//print_pre($data);
 		if(empty($this->input->post('kode_barang')[0])){
 
 			$this->session->set_flashdata('msg_title', 'Terjadi Kesalahan!');

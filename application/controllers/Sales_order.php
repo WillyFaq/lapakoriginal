@@ -39,6 +39,10 @@ class Sales_order extends CI_Controller {
 				if($row->status_order==1){
 					$sts = '<span class="badge badge-success">Sudah dikirim</span>';
 				}
+				if($this->Sales_order_model->cek_laporan($row->id_transaksi)==1){
+					$sts = '<span class="badge badge-info">Sudah diterima</span>';
+
+				}
 				$this->table->add_row(	++$i,
 							$row->id_transaksi,
 							$row->nama_pelanggan,
@@ -80,13 +84,53 @@ class Sales_order extends CI_Controller {
 		return $ret;
 	}
 
+	public function cb_provinsi($sel='')
+	{
+		$ret = '<div class="form-group row"><label for="provinsi" class="col-sm-2 col-form-label">Provinsi</label><div class="col-sm-10">';
+		$res = get_provinsi();
+		foreach ($res as $k => $row) {
+			$opt[$row['id']] = $row['nama'];
+		}
+		$js = 'class="form-control cb_provinsi" id="provinsi"';
+		$ret= $ret.''.form_dropdown('provinsi',$opt,$sel,$js);
+		$ret= $ret.'</div></div>';
+		return $ret;
+	}
+
+	public function cb_kota($id='', $sel='')
+	{
+		$ret = '<div class="form-group row"><label for="kota" class="col-sm-2 col-form-label">Kabupaten/Kota</label><div class="col-sm-10">';
+		$res = get_kota($id);
+		foreach ($res as $k => $row) {
+			$opt[$row['id']] = $row['nama'];
+		}
+		$js = 'class="form-control cb_kota" id="kota"';
+		$ret= $ret.''.form_dropdown('kota',$opt,$sel,$js);
+		$ret= $ret.'</div></div>';
+		echo $ret;
+	}
+
+	public function cb_kecamatan($id='', $sel='')
+	{
+		$ret = '<div class="form-group row"><label for="kecamatan" class="col-sm-2 col-form-label">Kecamatan/Kota</label><div class="col-sm-10">';
+		$res = get_kecamatan($id);
+		foreach ($res as $k => $row) {
+			$opt[$row['id']] = $row['nama'];
+		}
+		$js = 'class="form-control cb_kecamatan" id="kecamatan"';
+		$ret= $ret.''.form_dropdown('kecamatan',$opt,$sel,$js);
+		$ret= $ret.'</div></div>';
+		echo $ret;
+	}
+
 	public function tambah()
 	{
 		$data = array(
 						"page" => "Sales_order_view",
 						"ket" => "Tambah Data",
 						"form" => "sales_order/add",
-						"cb_barang" => $this->cb_barang("")
+						"cb_barang" => $this->cb_barang(""),
+						"cb_provinsi" => $this->cb_provinsi(""),
 						);
 		$this->load->view('index', $data);
 	}
@@ -105,7 +149,16 @@ class Sales_order extends CI_Controller {
 			$detail["Id Transaksi"] = $row->id_transaksi;
 			$detail["Nama Pelanggan"] = $row->nama_pelanggan;
 			$detail["No Telp"] = $row->notelp;
-			$detail["Alamat"] = $row->alamat;
+			//echo strpos($row->alamat,"|");
+			$alamat = explode("|", $row->alamat);
+			if(sizeof($alamat)==1){
+				$detail["Alamat"] = $row->alamat;
+			}else{
+				$prov = get_provinsi($alamat[0])['nama'];
+				$kot = get_kota($alamat[1])['nama'];
+				$kec = get_kecamatan($alamat[2])['nama'];
+				$detail["Alamat"] = $alamat[3].", $kec, $kot, $prov";
+			}
 			$detail["Nama Barang"] = $row->nama_barang;
 			$detail["Harga Barang"] = "Rp. ".number_format($row->harga_order);
 			$detail["Jumlah"] = number_format($row->jumlah_order);
@@ -131,13 +184,20 @@ class Sales_order extends CI_Controller {
 
 	public function add()
 	{
+		$provinsi = $this->input->post("provinsi");
+		$kota = $this->input->post("kota");
+		$kecamatan = $this->input->post("kecamatan");
+		$alamat = "$provinsi|$kota|$kecamatan|".$this->input->post("alamat");
+		/*print_pre($provinsi);
+		print_pre($kota);
+		print_pre($kecamatan);*/
 		$id_transaksi = $this->Sales_order_model->gen_idtrans();
 		$no_pelanggan = str_replace("T", "P", $id_transaksi);
 		$pelaggan = array(
 							"no_pelanggan" => $no_pelanggan,
 							"nama_pelanggan" => $this->input->post("nama_pelanggan"),
 							"notelp" => $this->input->post("notelp"),
-							"alamat" => $this->input->post("alamat"),
+							"alamat" => $alamat,
 							);
 		$order = array(
 						"id_transaksi" => $id_transaksi,

@@ -127,6 +127,17 @@ class Sales_order_model extends CI_Model {
 		return $this->db->delete($this->table, array($this->pk => $id));
 	}
 
+	public function cek_laporan($id)
+	{
+		
+		$sql = "SELECT * FROM pengiriman WHERE id_transaksi = '$id'";
+		$q =  $this->db->query($sql);
+		$res = $q->result();
+		foreach ($res as $row) {
+			return $row->status_pengiriman;
+		}
+	}
+
 }
 
 /* End of file Sales_order_model.php */

@@ -1,6 +1,6 @@
 <?php
 
-if($this->session->userdata('user')->level==1 || $this->session->userdata('user')->level==0):
+if($this->session->userdata('user')->level==1 /*|| $this->session->userdata('user')->level==0*/):
     $judul = "Notifikasi Pengiriman :";
     $nr = 100;
     $res = [];

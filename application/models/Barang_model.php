@@ -178,7 +178,7 @@ class Barang_model extends CI_Model {
 				JOIN user b ON a.id_user = b.id_user
 				JOIN pelanggan c ON a.no_pelanggan = c.no_pelanggan
 				JOIN barang d ON a.kode_barang = d.kode_barang
-				$whr
+				$whr AND YEAR(a.tgl_order) = ".date("Y")."
 				GROUP BY a.kode_barang, MONTH(a.tgl_order)";
 		return $this->db->query($sql);
 	}
@@ -204,7 +204,7 @@ class Barang_model extends CI_Model {
 				JOIN user b ON a.id_user = b.id_user
 				JOIN pelanggan c ON a.no_pelanggan = c.no_pelanggan
 				JOIN barang d ON a.kode_barang = d.kode_barang
-				WHERE MONTH(a.tgl_order) = '$bln'  AND  d.kode_barang = '$id'
+				WHERE MONTH(a.tgl_order) = '$bln'  AND  d.kode_barang = '$id' AND YEAR(a.tgl_order) = ".date("Y")."
 				GROUP BY a.kode_barang, MONTH(a.tgl_order)";
 		return $this->db->query($sql);
 	}

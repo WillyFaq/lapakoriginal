@@ -106,3 +106,68 @@ if(!function_exists('get_bulan')){
 	    }*/
 	}
 }
+
+
+
+if(!function_exists('get_provinsi')){
+	function get_provinsi($id='') {
+		$prov = json_decode(file_get_contents(base_url('assets/provinsi.json')), true);
+		$ret = [];
+		if($id!=''){
+			foreach ($prov as $k => $v) {
+				if($v['id'] == $id){
+					$ret = $v;
+				}
+			}
+		}else{
+			$ret = $prov;
+		}
+		return $ret;
+	}
+}
+if(!function_exists('get_kota')){
+	function get_kota($id='') {
+		$prov = json_decode(file_get_contents(base_url('assets/kota.json')), true);
+		$ret = [];
+		if($id!=''){
+			foreach ($prov as $k => $v) {
+				if($v['id_provinsi'] == $id){
+					$ret[] = $v;
+				}
+			}
+			if(empty($ret)){
+				foreach ($prov as $k => $v) {
+					if($v['id'] == $id){
+						$ret = $v;
+					}
+				}
+			}
+		}else{
+			$ret = $prov;
+		}
+		return $ret;
+	}
+}
+if(!function_exists('get_kecamatan')){
+	function get_kecamatan($id='') {
+		$prov = json_decode(file_get_contents(base_url('assets/kecamatan.json')), true);
+		$ret = [];
+		if($id!=''){
+			foreach ($prov as $k => $v) {
+				if($v['id_kota'] == $id){
+					$ret[] = $v;
+				}
+			}
+			if(empty($ret)){
+				foreach ($prov as $k => $v) {
+					if($v['id'] == $id){
+						$ret = $v;
+					}
+				}
+			}
+		}else{
+			$ret = $prov;
+		}
+		return $ret;
+	}
+}

@@ -53,7 +53,8 @@ class Dahsboard extends CI_Controller {
 			$data['bulan_ini'] = $this->get_all_penjualan(date("n"));
 			$data['hari_ini'] = $this->get_all_penjualan_hari(date("n"));
 			$b = $this->Barang_model->get_all();
-			$data['barang'] = $b->num_rows();;
+			$data['barang'] = $b->num_rows();
+			$data['chart'] = $this->get_atasan_chart();
 		}
 		$this->load->view('index', $data);
 	}
@@ -85,6 +86,23 @@ class Dahsboard extends CI_Controller {
 		}
 
 		return $num_rows;
+	}
+
+	public function get_atasan_chart()
+	{
+		$bln = get_bulan();
+	    //print_pre($bln);
+
+	    $data = [];
+	    foreach ($bln as $k => $v) {
+	        $data[] = $this->get_all_penjualan($k);
+	    }
+
+	    //print_pre($data);
+	    return array(
+	    				"label" => $bln,
+	    				"data" => $data,
+	    			);
 	}
 
 }

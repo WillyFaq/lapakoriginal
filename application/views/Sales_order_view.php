@@ -22,6 +22,8 @@
                     $class = array("class" => 'row');
                     echo form_open($form, "", $hidden);
                 ?>
+                    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/css/select2.min.css" rel="stylesheet" />
+                    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/js/select2.min.js"></script>
                     <fieldset>
                         <legend>Data Pelanggan</legend>
                         <div class="form-group row">
@@ -36,6 +38,10 @@
                                 <input type="text" class="form-control" name="notelp" id="notelp" placeholder="No Tlp" <?= isset($notelp)?"value='$notelp'":''; ?> required >
                             </div>
                         </div>
+                        <?= isset($cb_provinsi)?$cb_provinsi:''; ?>
+                        
+                        <div class="load_kota"></div>
+                        <div class="load_kecamatan"></div>
                         <div class="form-group row">
                             <label for="alamat" class="col-sm-2 col-form-label">Alamat</label>
                             <div class="col-sm-10">
@@ -140,6 +146,21 @@
             var tot = jml*hrg;
             $("#total").val(tot);
         });
+        $('.cb_provinsi').select2();
+
+        $('.cb_provinsi').change(function(){
+            var val = $(this).val();
+            $(".load_kota").load('<?= base_url("sales_order/cb_kota/"); ?>'+val, function(){
+                $('.cb_kota').select2();
+                $('.cb_kota').change(function(){
+                    var v = $(this).val();
+                    $(".load_kecamatan").load('<?= base_url("sales_order/cb_kecamatan/"); ?>'+v, function(){
+                        $('.cb_kecamatan').select2();
+                    });
+                });
+            });
+        });
+
     });
 
     function load_harga(kode_barang) {
