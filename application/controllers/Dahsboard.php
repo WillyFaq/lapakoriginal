@@ -55,6 +55,7 @@ class Dahsboard extends CI_Controller {
 			$b = $this->Barang_model->get_all();
 			$data['barang'] = $b->num_rows();
 			$data['chart'] = $this->get_atasan_chart();
+			$data['omset'] = $this->get_atasan_chart_omset();
 		}
 		$this->load->view('index', $data);
 	}
@@ -103,6 +104,39 @@ class Dahsboard extends CI_Controller {
 	    				"label" => $bln,
 	    				"data" => $data,
 	    			);
+	}
+
+
+
+	public function get_atasan_chart_omset()
+	{
+		$bln = get_bulan();
+	    //print_pre($bln);
+
+	    $data = [];
+	    foreach ($bln as $k => $v) {
+	        $data[] = $this->get_all_omset($k);
+	    }
+
+	    //print_pre($data);
+	    return array(
+	    				"label" => $bln,
+	    				"data" => $data,
+	    			);
+	}
+
+	public function get_all_omset($bln="")
+	{
+		$query=$this->Barang_model->laporan_bulanan($bln);
+		$res = $query->result();
+		$tot = 0;
+		$laba = 0;
+		foreach ($res as $row){
+			//$tot += $row->total_order;
+			//$laba_penjualan = $row->total_order - $row->laba_penjualan - $this->Barang_model->get_iklan($row->kode_barang, $row->bulan);
+			$laba += $row->total_order;
+		}
+		return $laba;
 	}
 
 }

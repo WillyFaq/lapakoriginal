@@ -23,6 +23,8 @@ class Pengiriman_model extends CI_Model {
 		$this->db->join($this->join1, $this->table.'.'.$this->fk1.' = '.$this->join1.'.'.$this->fk1);
 		$q =  $this->db->get_compiled_select();
 		$q .= " ".$this->Sales_order_model->get_all_query();
+		$q .= " ORDER BY tgl_kirim DESC "; 
+		//$this->db->order_by($this->table.'.tgl_kirim', 'desc');
 		return $this->db->query($q);
 	}
 

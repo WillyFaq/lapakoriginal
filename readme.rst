@@ -37,7 +37,31 @@ Lapak Original
 - status so
 - saran
 
+==================
+tambahan
+==================
 
+1. Gudang
+2. tambah chart omset
+3. barang ditolak
+
+
+
+username : firstdrive.101@gmail.com
+password : Qwerty1010
+
+
+dzulfikar.ayub@gmail.com
+Readypush09!
+
+wonokusumokidul44
+
+
+
+
+db : axelposc_kopasus
+user : axelposc_kopaja
+pass : 7O~$jcg3#h,I
 
 ###################
 What is CodeIgniter
