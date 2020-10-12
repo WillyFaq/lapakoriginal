@@ -20,7 +20,7 @@
                         <label for="filter" class="col-sm-2 col-form-label">Bulan</label>
                         <div class="col-sm-10">
                             <select name="filter" id="cb_bulan" class="form-control">
-                                <option value="1">Semua Bulan</option>
+                                <option value="">Semua Bulan</option>
                                 <?php
                                     $bln = date("n");
                                     foreach (get_bulan() as $k => $v) {

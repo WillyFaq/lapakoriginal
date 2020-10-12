@@ -28,7 +28,7 @@
                     <div class="form-group row cb_bulan_box">
                         <div class="offset-md-2 col-sm-10">
                             <select name="filter" id="cb_bulan" class="form-control">
-                                <option value="1">Semua Bulan</option>
+                                <option value="">Semua Bulan</option>
                                 <?php
                                     foreach (get_bulan() as $k => $v) {
                                         echo '<option value="'.$k.'">'.$v.'</option>';

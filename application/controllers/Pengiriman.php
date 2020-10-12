@@ -175,7 +175,16 @@ class Pengiriman extends CI_Controller {
 			$detail['Data Transaksi']["Id Transaksi"] = $row->id_transaksi;
 			$detail['Data Transaksi']["Nama Pelanggan"] = $row->nama_pelanggan;
 			$detail['Data Transaksi']["No Telp"] = $row->notelp;
-			$detail['Data Transaksi']["Alamat"] = $row->alamat;
+			//$detail['Data Transaksi']["Alamat"] = $row->alamat;
+			$alamat = explode("|", $row->alamat);
+			if(sizeof($alamat)==1){
+				$detail['Data Transaksi']["Alamat"] = $row->alamat;
+			}else{
+				$prov = get_provinsi($alamat[0])['nama'];
+				$kot = get_kota($alamat[1])['nama'];
+				$kec = get_kecamatan($alamat[2])['nama'];
+				$detail['Data Transaksi']["Alamat"] = $alamat[3].", $kec, $kot, $prov";
+			}
 			$detail['Data Transaksi']["Nama Barang"] = $row->nama_barang;
 			$detail['Data Transaksi']["Harga Barang"] = "Rp. ".number_format($row->harga_order);
 			$detail['Data Transaksi']["Jumlah"] = number_format($row->jumlah_order);

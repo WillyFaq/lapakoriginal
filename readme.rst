@@ -42,9 +42,13 @@ tambahan
 ==================
 
 1. Gudang
-2. tambah chart omset
-3. barang ditolak
+2. tambah chart omset v
+3. barang ditolak v
 
+	
+//todo
+- demografi
+- gudang stok
 
 
 username : firstdrive.101@gmail.com
@@ -57,7 +61,8 @@ Readypush09!
 wonokusumokidul44
 
 
-
+admin
+bossbagus07
 
 db : axelposc_kopasus
 user : axelposc_kopaja

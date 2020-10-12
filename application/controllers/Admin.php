@@ -81,7 +81,7 @@ class Admin extends CI_Controller {
 		unset($data['btnSimpan']);
 		$data['password'] = e_password($data['password']);
 		$data['sts'] = 1;
-		print_r($data);
+		//print_r($data);
 		if($this->User_model->add($data)){
 			alert_notif("success");
 			redirect('admin');

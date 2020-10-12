@@ -21,7 +21,7 @@ class Laporan_so extends CI_Controller {
 		return $ret;
 	}
 
-	public function gen_table($bln)
+	public function gen_table($bln="")
 	{
 		$query=$this->Sales_model->get_all();
 		$res = $query->result();
