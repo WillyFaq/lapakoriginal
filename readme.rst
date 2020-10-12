@@ -50,6 +50,19 @@ tambahan
 - demografi
 - gudang stok
 
+# Dashboard
+- 7
+- 14
+- 30
+- custom
+- filter produk
+
+2 x verifikasi pengiriman
+
+sales oder keterangan
+sales oder follback wa status
+
+
 
 username : firstdrive.101@gmail.com
 password : Qwerty1010

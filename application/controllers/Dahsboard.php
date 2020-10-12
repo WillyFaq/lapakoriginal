@@ -56,6 +56,8 @@ class Dahsboard extends CI_Controller {
 			$data['barang'] = $b->num_rows();
 			$data['chart'] = $this->get_atasan_chart();
 			$data['omset'] = $this->get_atasan_chart_omset();
+		}else if($lvl==3){
+			$data['sub_page'] = 'dashboard/dashboard_admin_view';
 		}
 		$this->load->view('index', $data);
 	}
