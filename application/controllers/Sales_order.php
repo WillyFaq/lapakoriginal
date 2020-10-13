@@ -163,6 +163,7 @@ class Sales_order extends CI_Controller {
 			$detail["Harga Barang"] = "Rp. ".number_format($row->harga_order);
 			$detail["Jumlah"] = number_format($row->jumlah_order);
 			$detail["Total"] = "Rp. ".number_format($row->total_order);
+			$detail["Keterangan"] = $row->keterangan;
 			$detail["Status"] = $row->status_order==1?'<span class="badge badge-success">Sudah dikirim</span>':'<span class="badge badge-danger">Belum dikirim</span>';
 		}
 		$data["detail"] = $detail;
@@ -208,6 +209,7 @@ class Sales_order extends CI_Controller {
 						"jumlah_order" => $this->input->post("jumlah_beli"),
 						"total_order" => $this->input->post("harga_barang") * $this->input->post("jumlah_beli"),
 						"tgl_order" => date("Y-m-d H:i:s"),
+						"keterangan" => $this->input->post("keterangan"),
 						);
 		if($this->Sales_order_model->add($pelaggan, $order)){
 			$this->session->set_flashdata('msg_title', 'Sukses!');

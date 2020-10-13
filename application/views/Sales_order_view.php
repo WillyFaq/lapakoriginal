@@ -81,6 +81,13 @@
                                 </div>
                             </div>
                         </div>
+
+                        <div class="form-group row">
+                            <label for="keterangan" class="col-sm-2 col-form-label">Keterangan</label>
+                            <div class="col-sm-10">
+                                <textarea class="form-control" name="keterangan" id="keterangan" placeholder="Keterangan" rows="5" required><?= isset($keterangan)?"$keterangan":''; ?></textarea>
+                            </div>
+                        </div>
                     </fieldset>
                     
                     <div class="form-group row">

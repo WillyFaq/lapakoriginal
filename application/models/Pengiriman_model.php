@@ -11,9 +11,11 @@ class Pengiriman_model extends CI_Model {
 	var $table = 'pengiriman';
 	var $join1 = 'sales_order';
 	var $join2 = 'user';
+	var $join3 = 'gudang';
 	var $pk = 'id_pengiriman';
 	var $fk1 = 'id_transaksi';
 	var $fk2 = 'id_user';
+	var $fk3 = 'id_gudang';
 
 
 	public function get_all()
@@ -34,6 +36,7 @@ class Pengiriman_model extends CI_Model {
 		$this->db->from($this->table);
 		$this->db->join($this->join1, $this->table.'.'.$this->fk1.' = '.$this->join1.'.'.$this->fk1);
 		$this->db->join($this->join2, $this->table.'.'.$this->fk2.' = '.$this->join2.'.'.$this->fk2);
+		$this->db->join($this->join3, $this->table.'.'.$this->fk3.' = '.$this->join3.'.'.$this->fk3);
 		$this->db->where(array($this->table.".".$this->pk => $id));
 		return $this->db->get();
 	}
@@ -44,8 +47,19 @@ class Pengiriman_model extends CI_Model {
 		$this->db->from($this->table);
 		$this->db->join($this->join1, $this->table.'.'.$this->fk1.' = '.$this->join1.'.'.$this->fk1);
 		$this->db->join($this->join2, $this->table.'.'.$this->fk2.' = '.$this->join2.'.'.$this->fk2);
+		$this->db->join($this->join3, $this->table.'.'.$this->fk3.' = '.$this->join3.'.'.$this->fk3);
+		$q =  $this->db->get_compiled_select();
+		$q .= " ".$this->Sales_order_model->get_all_query();
+		$q .=  " WHERE ";
+		foreach ($id as $k => $v) {
+			$q .= "$k = $v";
+		}
+		$q .= " ORDER BY tgl_kirim DESC "; 
+		return $this->db->query($q);
+		/*
 		$this->db->where($id);
 		return $this->db->get();
+		*/
 	}
 
 	public function add($da)

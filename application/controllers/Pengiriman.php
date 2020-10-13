@@ -7,12 +7,12 @@ class Pengiriman extends CI_Controller {
 	{
 		parent::__construct();
 		$this->load->model("Pengiriman_model", "", TRUE);
+		$this->load->model("Gudang_barang_model", "", TRUE);
 	}
 
 	public function gen_table()
 	{
 		$query=$this->Pengiriman_model->get_all();
-		//echo $this->db->last_query();
 		$res = $query->result();
 		$num_rows = $query->num_rows();
 
@@ -32,15 +32,18 @@ class Pengiriman extends CI_Controller {
 			$i = 0;
 
 			foreach ($res as $row){
-				$sts = '<span class="badge badge-success">Sudah dikirim</span>';
-				$btn_update = anchor('pengiriman/terima/'.e_url($row->id_pengiriman),'<span class="fa fa-check"></span>',array( 'title' => 'Diterima', 'class' => 'btn btn-success btn-xs', 'data-toggle' => 'tooltip'));
-				$btn_update .= "&nbsp;";
-				$btn_update .= anchor('pengiriman/tolak/'.e_url($row->id_pengiriman),'<span class="fa fa-ban"></span>',array( 'title' => 'Ditolak', 'class' => 'btn btn-danger btn-xs', 'data-toggle' => 'tooltip'));
-				
+				$sts = '<span class="badge badge-warning">Sudah di acc</span>';
+				$btn_update = anchor('pengiriman/tambah/'.e_url($row->id_pengiriman),'<span class="fas fa-paper-plane"></span>',array( 'title' => 'Kirim', 'class' => 'btn btn-success btn-xs', 'data-toggle' => 'tooltip'));
 				if($row->status_pengiriman==1){
+					$sts = '<span class="badge badge-success">Sudah dikirim</span>';
+					$btn_update = anchor('pengiriman/terima/'.e_url($row->id_pengiriman),'<span class="fa fa-check"></span>',array( 'title' => 'Diterima', 'class' => 'btn btn-success btn-xs', 'data-toggle' => 'tooltip'));
+					$btn_update .= "&nbsp;";
+					$btn_update .= anchor('pengiriman/tolak/'.e_url($row->id_pengiriman),'<span class="fa fa-ban"></span>',array( 'title' => 'Ditolak', 'class' => 'btn btn-danger btn-xs', 'data-toggle' => 'tooltip'));
+					
+				}else if($row->status_pengiriman==2){
 					$sts = '<span class="badge badge-info">Sudah diterima</span>';
 					$btn_update = '';
-				}else if($row->status_pengiriman==2){
+				}else if($row->status_pengiriman==3){
 					$sts = '<span class="badge badge-danger">Ditolak</span>';
 					$btn_update = '';
 				}
@@ -102,7 +105,7 @@ class Pengiriman extends CI_Controller {
 							number_format($row->jumlah_order),
 							'Rp. '.number_format($row->total_order),
 							$sts,
-							anchor('pengiriman/tambah/'.e_url($row->id_transaksi),'<span class="fa fa-box"></span>',array( 'title' => 'Kirim', 'class' => 'btn btn-success btn-xs', 'data-toggle' => 'tooltip'))
+							anchor('pengiriman/acc/'.e_url($row->id_transaksi),'<span class="fa fa-box"></span>',array( 'title' => 'Kirim', 'class' => 'btn btn-success btn-xs', 'data-toggle' => 'tooltip'))
 						);
 			}
 		}
@@ -118,12 +121,14 @@ class Pengiriman extends CI_Controller {
 		$this->load->view('index', $data);
 	}
 
-	public function tambah($v=""){
+
+
+	public function acc($v=""){
 		
 		$data = array(
 						"page" => "pengiriman_view",
-						"ket"  => "Tambah",
-						"form" => "pengiriman/add"
+						"ket"  => "Acc",
+						"form" => "pengiriman/acc_add"
 						);
 		$v = d_url($v);
 		$q = $this->Sales_order_model->get_data($v);
@@ -133,22 +138,99 @@ class Pengiriman extends CI_Controller {
 			$detail["Id Transaksi"] = $row->id_transaksi;
 			$detail["Nama Pelanggan"] = $row->nama_pelanggan;
 			$detail["No Telp"] = $row->notelp;
-			$detail["Alamat"] = $row->alamat;
+			
+			$alamat = explode("|", $row->alamat);
+			if(sizeof($alamat)==1){
+				$detail["Alamat"] = $row->alamat;
+			}else{
+				$prov = get_provinsi($alamat[0])['nama'];
+				$kot = get_kota($alamat[1])['nama'];
+				$kec = get_kecamatan($alamat[2])['nama'];
+				$detail["Alamat"] = $alamat[3].", $kec, $kot, $prov";
+			}
+
+			$data["kode_barang"] = $row->kode_barang;
 			$detail["Nama Barang"] = $row->nama_barang;
 			$detail["Harga Barang"] = "Rp. ".number_format($row->harga_order);
+			$data["jumlah"] = $row->jumlah_order;
 			$detail["Jumlah"] = number_format($row->jumlah_order);
 			$detail["Total"] = "Rp. ".number_format($row->total_order);
+			$detail["Keterangan"] = $row->keterangan;
 		}
 		$data["transaksi"] = $detail;
 		$this->load->view('index', $data);
 	}
 
-	public function add(){
+	public function tambah($v=""){
+		
+		$data = array(
+						"page" => "pengiriman_view",
+						"ket"  => "Tambah",
+						"form" => "pengiriman/add"
+						);
+		$v = d_url($v);
+
+		$q = $this->Pengiriman_model->get_data($v);
+		$res = $q->result();
+		$detail = [];
+		foreach ($res as $row) {
+			$id_transaksi = $row->id_transaksi;
+			$data['id_pengiriman'] = $row->id_pengiriman;
+		}
+
+		$qq = $this->Sales_order_model->get_data($id_transaksi);
+		$res = $qq->result();
+		$detail = [];
+		foreach ($res as $row) {
+			$detail["Id Transaksi"] = $row->id_transaksi;
+			$detail["Nama Pelanggan"] = $row->nama_pelanggan;
+			$detail["No Telp"] = $row->notelp;
+			
+			$alamat = explode("|", $row->alamat);
+			if(sizeof($alamat)==1){
+				$detail["Alamat"] = $row->alamat;
+			}else{
+				$prov = get_provinsi($alamat[0])['nama'];
+				$kot = get_kota($alamat[1])['nama'];
+				$kec = get_kecamatan($alamat[2])['nama'];
+				$detail["Alamat"] = $alamat[3].", $kec, $kot, $prov";
+			}
+
+			$detail["Nama Barang"] = $row->nama_barang;
+			$detail["Harga Barang"] = "Rp. ".number_format($row->harga_order);
+			$detail["Jumlah"] = number_format($row->jumlah_order);
+			$detail["Total"] = "Rp. ".number_format($row->total_order);
+			$detail["Keterangan"] = $row->keterangan;
+		}
+
+		$data["transaksi"] = $detail;
+		$this->load->view('index', $data);
+	}
+
+	public function acc_add(){
 		$data = $this->input->post();
+		unset($data['nama_gudang']);
 		unset($data['id_pengiriman']);
 		unset($data['btnSimpan']);
 		$data['id_user'] = $this->session->userdata('user')->id_user;
+		
 		if($this->Pengiriman_model->add($data)){
+			alert_notif("success");
+			redirect('pengiriman');
+		}else{
+			alert_notif("danger");
+			redirect('pengiriman/tambah/'.e_url($data['id_transaksi']));
+		}
+	}
+
+	public function add(){
+		$data = $this->input->post();
+		$idp = $data['id_pengiriman']; 
+		$data['status_pengiriman'] = 1;
+		unset($data['id_pengiriman']);
+		unset($data['btnSimpan']);
+		$data['id_user'] = $this->session->userdata('user')->id_user;
+		if($this->Pengiriman_model->update($data, $idp)){
 			alert_notif("success");
 			redirect('pengiriman');
 		}else{
@@ -189,20 +271,30 @@ class Pengiriman extends CI_Controller {
 			$detail['Data Transaksi']["Harga Barang"] = "Rp. ".number_format($row->harga_order);
 			$detail['Data Transaksi']["Jumlah"] = number_format($row->jumlah_order);
 			$detail['Data Transaksi']["Total"] = "Rp. ".number_format($row->total_order);
-			$detail['Data Transaksi']["Status"] = $row->status_order==1?'<span class="badge badge-success">Sudah dikirim</span>':'<span class="badge badge-danger">Belum dikirim</span>';
+			if($row->status_order!=1){
+				$detail['Data Transaksi']["Status"] = '<span class="badge badge-danger">Belum diproses</span>';
+			}
+			//$detail['Data Transaksi']["Status"] = $row->status_order==1?'<span class="badge badge-success">Sudah dikirim</span>':'<span class="badge badge-danger">Belum dikirim</span>';
 		}
 		$res = $q->result();
 		foreach ($res as $row) {
-			$detail['Data Pengiriman']['Jasa Pengiriman'] = $row->jasa_pengiriman;
-			$detail['Data Pengiriman']['No Resi'] = $row->no_resi;
-			$detail['Data Pengiriman']['Tgl Kirim'] = date("d-m-Y", strtotime($row->tgl_kirim));
-			$detail['Data Pengiriman']['Pengirim'] = $row->nama;
+			if($row->status_pengiriman==0){
+				$detail['Data Pengiriman']['Nama Gudang'] = $row->nama_gudang;
+			}else{
+				$detail['Data Pengiriman']['Nama Gudang'] = $row->nama_gudang;
+				$detail['Data Pengiriman']['Jasa Pengiriman'] = $row->jasa_pengiriman;
+				$detail['Data Pengiriman']['No Resi'] = $row->no_resi;
+				$detail['Data Pengiriman']['Tgl Kirim'] = date("d-m-Y", strtotime($row->tgl_kirim));
+				$detail['Data Pengiriman']['Pengirim'] = $row->nama;
+			}
 			
-			$sts = '<span class="badge badge-success">Sudah dikirim</span>';
+			$sts = '<span class="badge badge-warning">Sudah di acc</span>';
 			
 			if($row->status_pengiriman==1){
-				$sts = '<span class="badge badge-info">Sudah diterima</span>';
+				$sts = '<span class="badge badge-info">Sudah dikirim</span>';
 			}else if($row->status_pengiriman==2){
+				$sts = '<span class="badge badge-info">Sudah diterima</span>';
+			}else if($row->status_pengiriman==3){
 				$sts = '<span class="badge badge-danger">Ditolak</span>';
 			}
 			
@@ -287,6 +379,46 @@ class Pengiriman extends CI_Controller {
 			alert_notif("danger");
 			redirect('pengiriman/ubah/'.e_url($id_pengiriman));
 		}
+	}
+
+	public function gen_table_gudang($kode, $bth)
+	{
+		$query=$this->Gudang_barang_model->get_gudang_barang($kode);
+		$res = $query->result();
+		$num_rows = $query->num_rows();
+
+		$tmpl = array(  'table_open'    => '<table class="table table-striped table-hover dataTableModal">',
+				'row_alt_start'  => '<tr>',
+				'row_alt_end'    => '</tr>'
+			);
+
+		$this->table->set_template($tmpl);
+
+		$this->table->set_empty("&nbsp;");
+
+		$this->table->set_heading('No', 'Nama Gudang', 'Stok', 'Ket', 'Aksi');
+
+		if ($num_rows > 0)
+		{
+			$i = 0;
+			
+			foreach ($res as $row){
+				$ket = "";
+				$kt = 1;
+				if($row->stok<$bth){
+					$ket = '<span class="badge badge-warning">Stok kurang</span>';
+					$kt = 0;
+				}
+				$this->table->add_row(	++$i,
+							$row->nama_gudang,
+							$row->stok,
+							$ket,
+							'<button type="button" onclick="pilih_gudang(\''.$row->id_gudang.'\', \''.$row->nama_gudang.'\', '.$kt.')" class="btn btn-xs btn-success" data-toggle="tooltip" title="Pilih"><i class="fa fa-check"></i></button>'
+				);
+			}
+		}
+		echo $this->table->generate();
+		init_datatable_tooltips();
 	}
 }
 

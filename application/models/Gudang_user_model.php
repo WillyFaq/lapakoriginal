@@ -40,6 +40,12 @@ class Gudang_user_model extends CI_Model {
 		return $this->db->get($this->table);
 	}
 
+	public function get_by_user($id)
+	{			
+		$this->db->where(array($this->fk2 => $id));
+		return $this->db->get($this->table);
+	}
+
 	public function add($da)
 	{
 		$id_gudang = $da['id_gudang'];

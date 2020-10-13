@@ -24,7 +24,7 @@ if($this->session->userdata('user')->level==1 /*|| $this->session->userdata('use
         </h6>
         <div class="scroll_notification">
             <?php foreach($res as $row): ?>
-            <a class="dropdown-item d-flex align-items-center" href="<?= base_url("pengiriman/tambah/").e_url($row->id_transaksi); ?>">
+            <a class="dropdown-item d-flex align-items-center" href="<?= base_url("pengiriman/acc/").e_url($row->id_transaksi); ?>">
                 <div class="mr-3">
                     <div class="icon-circle bg-primary">
                         <i class="fas fa-dollar-sign text-white"></i>

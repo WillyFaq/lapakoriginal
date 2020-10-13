@@ -3,7 +3,7 @@
 <div class="d-sm-flex align-items-center justify-content-between mb-4">
     <h1 class="h3 mb-0 text-gray-800"> <i class="fas fa-box-open"></i> Pengiriman</h1>
 </div>
-<div class="row row_angket">
+<div class="row">
 	<div class="col mb-4">
 		<div class="card shadow mb-4">
             <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
@@ -33,6 +33,7 @@
                     endif; 
                 ?>
                 <?php if(isset($form)):
+                
                     $hidden = array('id_pengiriman' => isset($id_pengiriman)?$id_pengiriman:'');
                     echo form_open($form, '', $hidden);
                 ?>
@@ -57,7 +58,24 @@
                             </tbody>
                         </table>
                     </fieldset>
+                    <?php
+                    if($form == "pengiriman/acc_add"):
+                    ?>
 
+                    <fieldset>
+                        <legend>Form Acc Pengiriman</legend>
+                        <div class="form-group row">
+                            <label for="gudang" class="col-sm-2 col-form-label">Gudang</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" name="nama_gudang" id="nama_gudang" placeholder="Nama Gudang" <?= isset($nama_gudang)?"value='$nama_gudang' readonly":'required'; ?>  >
+                                <input type="hidden" id="id_gudang" name="id_gudang" <?= isset($id_gudang)?"value='$id_gudang'":'required'; ?>>
+                            </div>
+                        </div>
+                    </fieldset>
+
+                    <?php
+                    else:
+                    ?>
                     <fieldset>
                         <legend>Form Pengiriman</legend>
                         <div class="form-group row">
@@ -83,7 +101,7 @@
                                 <input type="date" class="form-control" name="tgl_kirim" id="tgl_kirim" placeholder="Tgl Kirim" <?= isset($tgl_kirim)?"value='".date("Y-m-d", strtotime($tgl_kirim))."' readonly":'required'; ?>  >
                             </div>
                         </div>
-                        <?php if(isset($id_pengiriman)): ?>
+                        <?php if(isset($status_pengiriman)): ?>
                         <div class="form-group row">
                             <label for="status_pengiriman" class="col-sm-2 col-form-label">Status Pengiriman</label>
                             <div class="col-sm-10">
@@ -95,6 +113,7 @@
                         </div>
                         <?php endif; ?>
                     </fieldset>
+                    <?php endif; ?>
                     <div class="form-group row">
                         <div class="col-sm-10 offset-md-2">
                             <input type="submit" class="btn btn-primary" name="btnSimpan" value="Simpan">
@@ -107,11 +126,11 @@
     </div>
 </div>
 
-<div class="modal fade" id="modalBarang" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<div class="modal fade" id="modalGudang" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Data Barang</h5>
+                <h5 class="modal-title" id="exampleModalLabel">Data Gudang</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -126,27 +145,49 @@
     </div>
 </div>
 
+<div class="modal fade" id="promtModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Anda yakin?</h5>
+                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p id="ket_gudang">-</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" type="button" data-dismiss="modal">Batal</button>
+                <button class="btn btn-success btn_iya" type="button" data-dismiss="modal">Iya</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 
 <script type="text/javascript">
     $(document).ready(function(){
-        $(".btn-hapus").click(function(){
-            var id = $(this).attr("data-id");
-            $('#hapusModal').modal('show');
-            $(".btnhapus-link").attr("href", "<?= base_url('iklan/delete/'); ?>"+id);
-        });
 
-        $("#nama_barang").focus(function(){
-            $(".load-modal").load('<?= base_url("iklan/gen_table_barang"); ?>');
-            $('#modalBarang').modal('show');
+        $("#nama_gudang").focus(function(){
+            var kode = '<?= isset($kode_barang)?$kode_barang:''; ?>';
+            var bth = '<?= isset($jumlah)?$jumlah:''; ?>';
+            $(".load-modal").load('<?= base_url("pengiriman/gen_table_gudang/"); ?>'+kode+"/"+bth);
+            $('#modalGudang').modal('show');
         });
 
     });
 
-    function pilih_barang(kode_barang, nama_barang) {
-        $('#modalBarang').modal('hide');
-        $("#kode_barang").val(kode_barang);
-        $("#nama_barang").val(nama_barang);
+    function pilih_gudang(kode_barang, nama_barang, kt) {
+        if(kt==0){
+            $(".btn_iya").attr("onclick", "pilih_gudang('"+kode_barang+"', '"+nama_barang+"', 1)");
+            $("#ket_gudang").html(nama_barang+" tidak mempunyai cukup stok!");
+            $('#promtModal').modal('show');
+        }else{
+            $('#modalGudang').modal('hide');
+            $("#id_gudang").val(kode_barang);
+            $("#nama_gudang").val(nama_barang);
+        }
     }
 
 </script>
