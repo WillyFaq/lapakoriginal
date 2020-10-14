@@ -118,7 +118,7 @@ class Sales_model extends CI_Model {
 		return $this->db->delete($this->table, array($this->pk => $id));
 	}
 
-	public function get_tot_penjualan($id, $bln, $kode)
+	public function get_tot_penjualan($id, $thn, $bln, $kode)
 	{
 		$whr = "";
 		if($kode!=""){
@@ -129,7 +129,7 @@ class Sales_model extends CI_Model {
 					MONTH(tgl_order) AS bulan,
 					SUM(jumlah_order) AS jumlah_order
 				FROM sales_order 
-				WHERE id_user = '$id' AND MONTH(tgl_order) = $bln $whr
+				WHERE id_user = '$id' AND YEAR(tgl_order) = $thn AND MONTH(tgl_order) = $bln $whr
 				GROUP BY id_user, MONTH(tgl_order)";
 		$q = $this->db->query($sql);
 		$res = $q->result();
@@ -138,7 +138,7 @@ class Sales_model extends CI_Model {
 		}
 	}
 
-	public function get_penjualan($id, $bln, $kode)
+	public function get_penjualan($id, $bln, $kode, $thn)
 	{
 		$sql = "SELECT 
 					a.id_user,
@@ -147,7 +147,7 @@ class Sales_model extends CI_Model {
 					SUM(a.jumlah_order) as jumlah_order
 				FROM sales_order a
 				JOIN barang b ON a.kode_barang = b.kode_barang
-				WHERE a.id_user = '$id' AND MONTH(a.tgl_order) = $bln  AND a.kode_barang = '$kode'
+				WHERE a.id_user = '$id' AND MONTH(a.tgl_order) = $bln AND YEAR(a.tgl_order) = $thn  AND a.kode_barang = '$kode'
 				GROUP BY DATE(a.tgl_order)";
 		return $this->db->query($sql);
 	}

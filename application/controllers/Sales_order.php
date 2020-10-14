@@ -28,7 +28,7 @@ class Sales_order extends CI_Controller {
 
 		$this->table->set_empty("&nbsp;");
 
-		$this->table->set_heading('No', 'Id Transaksi', 'Nama Pelanggan', 'Nama Barang', 'Jumlah', 'Total', 'Status', 'Aksi');
+		$this->table->set_heading('No', 'Id Transaksi', 'Nama Pelanggan', 'Tgl Order', 'Nama Barang', 'Jumlah', 'Total', 'Status', 'Aksi');
 
 		if ($num_rows > 0)
 		{
@@ -50,6 +50,7 @@ class Sales_order extends CI_Controller {
 				$this->table->add_row(	++$i,
 							$row->id_transaksi,
 							$row->nama_pelanggan,
+							date("d-m-Y", strtotime($row->tgl_order)),
 							$row->nama_barang,
 							number_format($row->jumlah_order),
 							'Rp. '.number_format($row->total_order),

@@ -17,10 +17,31 @@
                 <?php if(!isset($detail)):?>
                 <div class="container filter">
                     <div class="form-group row cb_bulan_box">
+                        <label for="filter" class="col-sm-2 col-form-label">Tahun</label>
+                        <div class="col-sm-10">
+                            <select name="filter" id="cb_thn" class="form-control">
+                                <?php
+                                    $sql = "SELECT YEAR(tgl_order) AS tahun
+                                            FROM sales_order
+                                            GROUP BY YEAR(tgl_order)";
+                                    $q = $this->db->query($sql);
+                                    $res = $q->result();
+                                    foreach ($res as $row) {
+                                        $sel = '';
+                                        if($row->tahun==date("Y")){
+                                            $sel = 'selected';
+                                        }
+                                        echo '<option value="'.$row->tahun.'" '.$sel.'>'.$row->tahun.'</option>';
+                                    }
+                                ?>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group row cb_bulan_box">
                         <label for="filter" class="col-sm-2 col-form-label">Bulan</label>
                         <div class="col-sm-10">
                             <select name="filter" id="cb_bulan" class="form-control">
-                                <option value="">Semua Bulan</option>
+                                <!-- <option value="">Semua Bulan</option> -->
                                 <?php
                                     $bln = date("n");
                                     foreach (get_bulan() as $k => $v) {
@@ -132,13 +153,22 @@
 
 <script type="text/javascript">
     $(document).ready(function(){
-        $(".load_table").load('<?= base_url("laporan_so/gen_table/").date('n'); ?>',function(){
+        $(".load_table").load('<?= base_url("laporan_so/gen_table/").date('Y').'/'.date('n'); ?>',function(){
             init_datatable();
         });
 
         $("#cb_bulan").change(function(){
             var va = $(this).val();
-            $(".load_table").load('<?= base_url("laporan_so/gen_table/"); ?>'+va,function(){
+            var thn = $("#cb_thn").val();
+            $(".load_table").load('<?= base_url("laporan_so/gen_table/"); ?>'+thn+'/'+va,function(){
+                init_datatable();
+            });
+        });
+
+        $("#cb_thn").change(function(){
+            var va = $("#cb_bulan").val();
+            var thn = $(this).val();
+            $(".load_table").load('<?= base_url("laporan_so/gen_table/"); ?>'+thn+'/'+va,function(){
                 init_datatable();
             });
         });
@@ -146,4 +176,4 @@
     });
 </script>
 
-<!--  -->
+<!-- 

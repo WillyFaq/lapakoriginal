@@ -156,11 +156,12 @@ class Barang_model extends CI_Model {
 		return $this->db->query($sql);
 	}
 
-	public function laporan_bulanan($bln)
+	public function laporan_bulanan($bln, $thn)
 	{
-		$whr = "";
+		$whr = "WHERE YEAR(a.tgl_order) = '".$thn."'";
+
 		if($bln!=""){
-			$whr = " WHERE MONTH(a.tgl_order) = '$bln' ";
+			$whr .= " AND MONTH(a.tgl_order) = '$bln' ";
 		}
 		$sql = "SELECT
 					a.id_transaksi,
@@ -179,9 +180,10 @@ class Barang_model extends CI_Model {
 				JOIN pelanggan c ON a.no_pelanggan = c.no_pelanggan
 				JOIN barang d ON a.kode_barang = d.kode_barang
 				JOIN pengiriman e ON a.id_transaksi = e.id_transaksi
-				$whr AND YEAR(a.tgl_order) = ".date("Y")."
-				AND e.status_pengiriman = 1	
+				$whr
+				AND e.status_pengiriman = 2	
 				GROUP BY a.kode_barang, MONTH(a.tgl_order)";
+
 		return $this->db->query($sql);
 	}
 

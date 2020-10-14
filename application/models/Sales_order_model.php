@@ -51,6 +51,7 @@ class Sales_order_model extends CI_Model {
 		$this->db->join($this->join, $this->table.'.'.$this->fk.' = '.$this->join.'.'.$this->fk);
 		$this->db->join($this->join2, $this->table.'.'.$this->fk2.' = '.$this->join2.'.'.$this->fk2);
 		$this->db->where($id);
+		$this->db->order_by("$this->table.tgl_order", 'desc');
 		return $this->db->get();
 	}
 

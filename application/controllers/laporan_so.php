@@ -21,7 +21,7 @@ class Laporan_so extends CI_Controller {
 		return $ret;
 	}
 
-	public function gen_table($bln="")
+	public function gen_table($thn="", $bln="")
 	{
 		$query=$this->Sales_model->get_all();
 		$res = $query->result();
@@ -43,8 +43,8 @@ class Laporan_so extends CI_Controller {
 			$i = 0;
 
 			foreach ($res as $row){
-				$tot_penj = $this->Sales_model->get_tot_penjualan($row->id_user, $bln, $row->kode_barang);
-				$d=cal_days_in_month(CAL_GREGORIAN,$bln,date("Y"));
+				$tot_penj = $this->Sales_model->get_tot_penjualan($row->id_user, $thn, $bln, $row->kode_barang);
+				$d=cal_days_in_month(CAL_GREGORIAN,$bln,$thn);
 				$target = $row->minimal_sale * $d;
 				if($tot_penj>=$target){
 					$sts = '<span class="badge badge-success">Target</span>';
@@ -55,7 +55,7 @@ class Laporan_so extends CI_Controller {
 							$row->nama,
 							$row->nama_barang.' ('.$row->minimal_sale.')',
 							$sts,
-							anchor('laporan_so/detail/'.e_url($bln)."/".e_url($row->id_user)."/".e_url($row->kode_barang), '<i class="fa fa-eye"></i>', array("class" => "btn btn-success btn-xs", "title" => "detail", 'data-toggle' => 'tooltip'))
+							anchor('laporan_so/detail/'.e_url($bln)."/".e_url($row->id_user)."/".e_url($row->kode_barang)."/".e_url($thn), '<i class="fa fa-eye"></i>', array("class" => "btn btn-success btn-xs", "title" => "detail", 'data-toggle' => 'tooltip'))
 						);
 			}
 		}
@@ -72,16 +72,17 @@ class Laporan_so extends CI_Controller {
 		$this->load->view('index', $data);
 	}
 
-	public function detail($bln, $id, $kode)
+	public function detail($bln, $id, $kode, $thn)
 	{
 		$data = array(
 						"page" => "laporan/lap_so_view",
 						"ket" => "Detail Laporan"
 						);
 		$bln = d_url($bln);
+		$thn = d_url($thn);
 		$id = d_url($id);
 		$kode = d_url($kode);
-		$d=cal_days_in_month(CAL_GREGORIAN,$bln,date("Y"));
+		$d=cal_days_in_month(CAL_GREGORIAN,$bln,$thn);
 		$data['bln'] = $bln;
 		$query=$this->Sales_model->get_data($id);
 		$res = $query->result();
@@ -89,10 +90,10 @@ class Laporan_so extends CI_Controller {
 			$data['detail']['Nama'] = $row->nama;
 			$data['detail']['target'] = $row->minimal_sale;
 			$data['detail']['Barang (Minimal Penjualan)'] = $row->nama_barang.' ('.$row->minimal_sale.')';
-			$data['detail']['Bulan'] = get_bulan($bln);
+			$data['detail']['Periode'] = get_bulan($bln)." ".$thn;
 			$data['detail']['Target'] = $row->minimal_sale * $d;
 		}
-		$data['penjualan'] = $this->Sales_model->get_penjualan($id, $bln, $kode);
+		$data['penjualan'] = $this->Sales_model->get_penjualan($id, $bln, $kode, $thn);
 		$this->load->view('index', $data);
 	}
 

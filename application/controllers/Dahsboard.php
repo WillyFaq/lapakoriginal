@@ -33,7 +33,7 @@ class Dahsboard extends CI_Controller {
 											);
 				$data['bulan_ini'][] =  array(
 												"barang" => $row->nama_barang,
-												"jml" => $this->Sales_model->get_tot_penjualan($id, date("n"), $row->kode_barang),
+												"jml" => $this->Sales_model->get_tot_penjualan($id, date("Y"), date("n"), $row->kode_barang),
 											);
 				$data['hari_ini'][] =  array(
 												"barang" => $row->nama_barang,
@@ -52,8 +52,8 @@ class Dahsboard extends CI_Controller {
 		}else if($lvl==0){
 			$data['sub_page'] = 'dashboard/dashboard_atasan_view';
 			$data['semua'] = $this->get_all_penjualan();
-			$data['bulan_ini'] = $this->get_all_penjualan(date("n"));
-			$data['hari_ini'] = $this->get_all_penjualan_hari(date("n"));
+			$data['bulan_ini'] = $this->get_all_penjualan(date("n"), date("Y"));
+			$data['hari_ini'] = $this->get_all_penjualan_hari(date("n"), date("Y"));
 			$b = $this->Barang_model->get_all();
 			$data['barang'] = $b->num_rows();
 			$data['chart'] = $this->get_atasan_chart();
@@ -66,9 +66,9 @@ class Dahsboard extends CI_Controller {
 	}
 
 
-	public function get_all_penjualan($bln="")
+	public function get_all_penjualan($bln="", $thn="")
 	{
-		$query=$this->Barang_model->laporan_bulanan($bln);
+		$query=$this->Barang_model->laporan_bulanan($thn, $bln);
 		$res = $query->result();
 		$tot = 0;
 		$laba = 0;
@@ -132,7 +132,7 @@ class Dahsboard extends CI_Controller {
 
 	public function get_all_omset($bln="")
 	{
-		$query=$this->Barang_model->laporan_bulanan($bln);
+		$query=$this->Barang_model->laporan_bulanan(date("Y"), $bln);
 		$res = $query->result();
 		$tot = 0;
 		$laba = 0;

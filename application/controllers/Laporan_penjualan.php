@@ -54,9 +54,11 @@ class Laporan_penjualan extends CI_Controller {
 		echo $this->table->generate();
 	}
 
-	public function gen_table_bulanan($bln="")
+	public function gen_table_bulanan($thn="", $bln="")
 	{
-		$query=$this->Barang_model->laporan_bulanan($bln);
+		$query=$this->Barang_model->laporan_bulanan($bln, $thn);
+		//echo $query;
+		//echo $this->db->last_query();
 		$res = $query->result();
 		$num_rows = $query->num_rows();
 
@@ -66,9 +68,7 @@ class Laporan_penjualan extends CI_Controller {
 			);
 
 		$this->table->set_template($tmpl);
-
 		$this->table->set_empty("&nbsp;");
-
 		$this->table->set_heading('No', 'Kode Barang', 'Nama Barang', 'Bulan', 'Jumlah Penjualan', 'Total Penjualan', 'Laba Penjuaalan', 'Aksi');
 
 		$tot = 0;

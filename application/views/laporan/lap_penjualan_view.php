@@ -27,6 +27,26 @@
                     </div>
                     <div class="form-group row cb_bulan_box">
                         <div class="offset-md-2 col-sm-10">
+                            <select name="filter" id="cb_thn" class="form-control">
+                                <?php
+                                    $sql = "SELECT YEAR(tgl_order) AS tahun
+                                            FROM sales_order
+                                            GROUP BY YEAR(tgl_order)";
+                                    $q = $this->db->query($sql);
+                                    $res = $q->result();
+                                    foreach ($res as $row) {
+                                        $sel = '';
+                                        if($row->tahun==date("Y")){
+                                            $sel = 'selected';
+                                        }
+                                        echo '<option value="'.$row->tahun.'" '.$sel.'>'.$row->tahun.'</option>';
+                                    }
+                                ?>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group row cb_bulan_box">
+                        <div class="offset-md-2 col-sm-10">
                             <select name="filter" id="cb_bulan" class="form-control">
                                 <option value="">Semua Bulan</option>
                                 <?php
@@ -133,14 +153,17 @@
 <script type="text/javascript">
     $(document).ready(function(){
 
-        load_bulanan("");
+        var thn = $("#cb_thn").val(); 
+        load_bulanan("", thn);
 
         $("#cb_filter").change(function(){
             var v = $(this).val();
             if(v==1){
                 $(".cb_bulan_box").show();
                 $(".cb_tgl_box").hide();
-                load_bulanan("");
+                var thn = $("#cb_thn").val(); 
+                load_bulanan("", thn);
+                console.log("BULANAN");
             }else if (v==2){
                 $(".cb_tgl_box").show();
                 $(".cb_bulan_box").hide();
@@ -149,7 +172,14 @@
         });
         $("#cb_bulan").change(function(){
             var v = $(this).val(); 
-            load_bulanan(v);
+            var thn = $("#cb_thn").val(); 
+            load_bulanan(v, thn);
+        });
+
+        $("#cb_thn").change(function(){
+            var v = $("#cb_bulan").val(); 
+            var thn = $(this).val(); 
+            load_bulanan(v, thn);
         });
 
         $(".cb_tgl").change(function(){
@@ -160,8 +190,10 @@
 
     });
 
-    function load_bulanan(v){
-        $(".load_table").load('<?= base_url("laporan_penjualan/gen_table_bulanan/"); ?>'+v, function(){
+    function load_bulanan(v, thn){
+        var url = '<?= base_url("laporan_penjualan/gen_table_bulanan/"); ?>'+thn+"/"+v;
+        //console.log(url)
+        $(".load_table").load(url, function(){
             init_datatable();
         });
     }
