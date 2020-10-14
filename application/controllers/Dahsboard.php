@@ -59,7 +59,8 @@ class Dahsboard extends CI_Controller {
 			$data['chart'] = $this->get_atasan_chart();
 			$data['omset'] = $this->get_atasan_chart_omset();
 		}else if($lvl==3){
-			$data['sub_page'] = 'dashboard/dashboard_admin_view';
+			$data['sub_page'] = 'dashboard/dashboard_gudang_view';
+			$data['table'] = $this->gen_table_gudang();
 		}
 		$this->load->view('index', $data);
 	}
@@ -191,6 +192,81 @@ class Dahsboard extends CI_Controller {
 							.'&nbsp;'.
 							$btn_update
 						);
+			}
+		}
+		return $this->table->generate();
+	}
+
+	public function gen_table_gudang()
+	{
+		$ids = $this->session->userdata('user')->id_user;
+		$sql = "SELECT * FROM gudang_user WHERE id_user = '$ids'";
+		$q = $this->db->query($sql);
+		$res = $q->result();
+		$id_gudang = $res[0]->id_gudang;
+		
+		$sql = "SELECT * FROM pengiriman a
+				JOIN sales_order b ON a.id_transaksi = b.id_transaksi
+				JOIN barang c ON b.kode_barang = c.kode_barang
+				JOIN pelanggan d ON b.no_pelanggan = d.no_pelanggan
+				WHERE a.id_gudang = $id_gudang AND a.status_pengiriman = 0";
+		$q = $this->db->query($sql);
+		$res = $q->result();
+
+		$data = [];
+
+		foreach ($res as $row) {
+			$data[] = array(
+							"id_pengiriman" => $row->id_pengiriman,
+							"kode_barang" => $row->kode_barang,
+							"nama_barang" => $row->nama_barang,
+							"sts" => '<span class="badge badge-info">Akan dikirim</span>',
+							"btn" => 0,
+							);
+		}
+
+		$sql = "SELECT * FROM pengiriman a
+				JOIN sales_order b ON a.id_transaksi = b.id_transaksi
+				JOIN barang c ON b.kode_barang = c.kode_barang
+				JOIN pelanggan d ON b.no_pelanggan = d.no_pelanggan
+				WHERE a.id_gudang = $id_gudang AND a.status_pengiriman = 3";
+		$q = $this->db->query($sql);
+		$res = $q->result();
+		foreach ($res as $row) {
+			$data[] = array(
+							"id_pengiriman" => $row->id_pengiriman,
+							"kode_barang" => $row->kode_barang,
+							"nama_barang" => $row->nama_barang,
+							"sts" => '<span class="badge badge-danger">Ditolak</span>',
+							"btn" => 1,
+							);
+		}
+
+		$tmpl = array(  'table_open'    => '<table class="table table-striped table-hover dataTable">',
+				'row_alt_start'  => '<tr>',
+				'row_alt_end'    => '</tr>'
+			);
+		$this->table->set_template($tmpl);
+		$this->table->set_empty("&nbsp;");
+		$this->table->set_heading('No', 'Kode Barang', 'Nama Barang', 'Status', 'Aksi');
+
+		if (sizeof($data) > 0){
+			$i = 0;
+			foreach ($data as $k => $row) {
+
+				$btn = anchor('gudang_dashboard/detail_kirim/'.e_url($row['id_pengiriman']), '<span class="fa fa-eye"></span>', array( 'title' => 'Detail', 'class' => 'btn btn-warning btn-xs', 'data-toggle' => 'tooltip'));
+				if($row['btn']==1){
+					$btn = anchor('gudang_dashboard/detail_ditolak/'.e_url($row['id_pengiriman']), '<span class="fa fa-eye"></span>', array( 'title' => 'Detail', 'class' => 'btn btn-warning btn-xs', 'data-toggle' => 'tooltip'));
+				}
+
+
+				$this->table->add_row(	
+										++$i,
+										$row['kode_barang'],
+										$row['nama_barang'],
+										$row['sts'],
+										$btn,
+				);
 			}
 		}
 		return $this->table->generate();

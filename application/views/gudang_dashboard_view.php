@@ -1,13 +1,13 @@
 
 <!-- Page Heading -->
 <div class="d-sm-flex align-items-center justify-content-between mb-4">
-    <h1 class="h3 mb-0 text-gray-800"> <i class="fas fa-box-open"></i> Restok</h1>
+    <h1 class="h3 mb-0 text-gray-800"> <i class="fas fa-box-open"></i> Barang Ditolak</h1>
 </div>
 <div class="row row_angket">
 	<div class="col mb-4">
 		<div class="card shadow mb-4">
             <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                <h6 class="m-0 font-weight-bold text-primary"><?= ucfirst($ket); ?> Restok</h6>
+                <h6 class="m-0 font-weight-bold text-primary"><?= ucfirst($ket); ?> Barang Ditolak</h6>
                 <div class="dropdown no-arrow">
                     <?= isset($add)?$add:''; ?>
                 </div>
@@ -48,6 +48,24 @@
                         </div>
                     </div>
                 </form>
+                <?php elseif(isset($detail)): 
+                        //print_pre($detail);
+                        echo '<table class="table"><tbody>';
+                        foreach ($detail as $k => $v):
+                            echo "<tr><td></td><td></td><th>$k</th></tr>";
+                            foreach ($v as $a => $b):
+                ?>
+                            <tr>
+                                <th style="width:20%;"><?= $a; ?></th>
+                                <td style="width:1%;">:</td>
+                                <td><?= $b; ?></td>
+                            </tr>
+                <?php 
+                            endforeach; 
+                        endforeach; 
+                        echo '</tbody></table>';
+                ?>
+                    <a href="<?= base_url('gudang_dashboard/konfirmasi_tolak/'.$id_pengiriman); ?>" class="btn btn-primary">Konfirmasi</a>
                 <?php endif; ?>
             </div>
         </div>

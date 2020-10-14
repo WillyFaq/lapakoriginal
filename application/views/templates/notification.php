@@ -1,6 +1,6 @@
 <?php
 
-if($this->session->userdata('user')->level==1 /*|| $this->session->userdata('user')->level==0*/):
+if($this->session->userdata('user')->level==1 /*|| $this->session->userdata('user')->level==3*/):
     $judul = "Notifikasi Pengiriman :";
     $nr = 100;
     $res = [];
@@ -15,7 +15,9 @@ if($this->session->userdata('user')->level==1 /*|| $this->session->userdata('use
     <a class="nav-link dropdown-toggle" href="#" id="alertsDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
         <i class="fas fa-bell fa-fw"></i>
         <!-- Counter - Alerts -->
+        <?php if($nr!=0): ?>
         <span class="badge badge-danger badge-counter"><?= $nr; ?></span>
+        <?php endif; ?>
     </a>
     <!-- Dropdown - Alerts -->
     <div class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="alertsDropdown">
@@ -43,4 +45,5 @@ if($this->session->userdata('user')->level==1 /*|| $this->session->userdata('use
         <!-- <div class="dropdown-item text-center small text-gray-500"></div> -->
     </div>
 </li>
+
 <?php endif; ?>

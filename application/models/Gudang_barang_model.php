@@ -55,8 +55,12 @@ class Gudang_barang_model extends CI_Model {
 
 	public function get_where($id)
 	{			
+		$this->db->select('*');
+		$this->db->from($this->table);
+		$this->db->join($this->join1, "$this->table.$this->fk1 = $this->join1.$this->fk1");
+		$this->db->join($this->join2, "$this->table.$this->fk2 = $this->join2.$this->fk2");
 		$this->db->where($id);
-		return $this->db->get($this->table);
+		return $this->db->get();
 	}
 
 	public function add($da)
@@ -75,6 +79,20 @@ class Gudang_barang_model extends CI_Model {
 		return $this->db->delete($this->table, array($this->pk => $id));
 	}
 	
+
+	public function get_laporan($w=[])
+	{
+		$this->db->select('*');
+		$this->db->from('gudang_barang a');
+		$this->db->join('gudang_user b', 'a.id_gudang_user = b.id_gudang_user');
+		$this->db->join('gudang c', 'b.id_gudang = c.id_gudang');
+		$this->db->join('barang d', 'a.kode_barang = d.kode_barang');
+		if(!empty($w)){
+			$this->db->where($w);
+		}
+		$this->db->order_by('tgl_gb', 'desc');
+		return $this->db->get();
+	}
 
 }
 

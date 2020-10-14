@@ -21,6 +21,7 @@ class Gudang_user_model extends CI_Model {
 		$this->db->from($this->table);
 		$this->db->join($this->join1, "$this->join1.$this->fk1 = $this->table.$this->fk1");
 		$this->db->join($this->join2, "$this->join2.$this->fk2 = $this->table.$this->fk2");
+		$this->db->where('user.id_user !=', 1);
 		return $this->db->get();
 	}
 

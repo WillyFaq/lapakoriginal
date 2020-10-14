@@ -8,6 +8,7 @@ class Pengiriman extends CI_Controller {
 		parent::__construct();
 		$this->load->model("Pengiriman_model", "", TRUE);
 		$this->load->model("Gudang_barang_model", "", TRUE);
+		$this->load->model("Gudang_user_model", "", TRUE);
 	}
 
 	public function gen_table()
@@ -35,17 +36,21 @@ class Pengiriman extends CI_Controller {
 				$sts = '<span class="badge badge-warning">Sudah di acc</span>';
 				$btn_update = anchor('pengiriman/tambah/'.e_url($row->id_pengiriman),'<span class="fas fa-paper-plane"></span>',array( 'title' => 'Kirim', 'class' => 'btn btn-success btn-xs', 'data-toggle' => 'tooltip'));
 				if($row->status_pengiriman==1){
-					$sts = '<span class="badge badge-success">Sudah dikirim</span>';
+					$sts = '<span class="badge badge-info">Sudah dikirim</span>';
 					$btn_update = anchor('pengiriman/terima/'.e_url($row->id_pengiriman),'<span class="fa fa-check"></span>',array( 'title' => 'Diterima', 'class' => 'btn btn-success btn-xs', 'data-toggle' => 'tooltip'));
 					$btn_update .= "&nbsp;";
 					$btn_update .= anchor('pengiriman/tolak/'.e_url($row->id_pengiriman),'<span class="fa fa-ban"></span>',array( 'title' => 'Ditolak', 'class' => 'btn btn-danger btn-xs', 'data-toggle' => 'tooltip'));
 					
 				}else if($row->status_pengiriman==2){
-					$sts = '<span class="badge badge-info">Sudah diterima</span>';
+					$sts = '<span class="badge badge-success">Sudah diterima</span>';
 					$btn_update = '';
-				}else if($row->status_pengiriman==3){
+				}else if($row->status_pengiriman>=3){
 					$sts = '<span class="badge badge-danger">Ditolak</span>';
 					$btn_update = '';
+				}
+				$tgl = '';
+				if($row->tgl_kirim!=null){
+					$tgl = date("d-m-Y", strtotime($row->tgl_kirim));
 				}
 				$this->table->add_row(	++$i,
 							$row->id_transaksi,
@@ -53,7 +58,7 @@ class Pengiriman extends CI_Controller {
 							$row->nama_barang,
 							$row->jasa_pengiriman,
 							$row->no_resi,
-							date("d-m-Y", strtotime($row->tgl_kirim)),
+							$tgl,
 							$sts,
 							anchor('pengiriman/detail/'.e_url($row->id_pengiriman),'<span class="fa fa-eye"></span>',array( 'title' => 'Detail', 'class' => 'btn btn-warning btn-xs', 'data-toggle' => 'tooltip'))
 							.'&nbsp;'.
@@ -176,6 +181,12 @@ class Pengiriman extends CI_Controller {
 		foreach ($res as $row) {
 			$id_transaksi = $row->id_transaksi;
 			$data['id_pengiriman'] = $row->id_pengiriman;
+			$id_gudang = $row->id_gudang;
+		}
+		$qa = $this->Gudang_user_model->get_where(array('id_gudang' => $id_gudang, 'id_user' => $this->session->userdata('user')->id_user));
+		$qres = $qa->result();
+		foreach ($qres as $row) {
+			$data['id_gudang_user'] = $row->id_gudang_user;
 		}
 
 		$qq = $this->Sales_order_model->get_data($id_transaksi);
@@ -196,6 +207,8 @@ class Pengiriman extends CI_Controller {
 				$detail["Alamat"] = $alamat[3].", $kec, $kot, $prov";
 			}
 
+			$data['kode_barang'] = $row->kode_barang;
+			$data['jumlah'] = $row->jumlah_order;
 			$detail["Nama Barang"] = $row->nama_barang;
 			$detail["Harga Barang"] = "Rp. ".number_format($row->harga_order);
 			$detail["Jumlah"] = number_format($row->jumlah_order);
@@ -225,12 +238,12 @@ class Pengiriman extends CI_Controller {
 
 	public function add(){
 		$data = $this->input->post();
-		$idp = $data['id_pengiriman']; 
 		$data['status_pengiriman'] = 1;
-		unset($data['id_pengiriman']);
+		//	unset($data['id_pengiriman']);
 		unset($data['btnSimpan']);
 		$data['id_user'] = $this->session->userdata('user')->id_user;
-		if($this->Pengiriman_model->update($data, $idp)){
+		//print_pre($data);
+		if($this->Pengiriman_model->add_kirim($data)){
 			alert_notif("success");
 			redirect('pengiriman');
 		}else{
@@ -294,7 +307,7 @@ class Pengiriman extends CI_Controller {
 				$sts = '<span class="badge badge-info">Sudah dikirim</span>';
 			}else if($row->status_pengiriman==2){
 				$sts = '<span class="badge badge-info">Sudah diterima</span>';
-			}else if($row->status_pengiriman==3){
+			}else if($row->status_pengiriman>=3){
 				$sts = '<span class="badge badge-danger">Ditolak</span>';
 			}
 			
@@ -358,7 +371,7 @@ class Pengiriman extends CI_Controller {
 	public function terima($id='')
 	{
 		$id_pengiriman = d_url($id);
-		$data = ["status_pengiriman" => 1];
+		$data = ["status_pengiriman" => 2];
 		if($this->Pengiriman_model->update($data, $id_pengiriman)){
 			alert_notif("success");
 			redirect('pengiriman');
@@ -371,7 +384,7 @@ class Pengiriman extends CI_Controller {
 	public function tolak($id='')
 	{
 		$id_pengiriman = d_url($id);
-		$data = ["status_pengiriman" => 2];
+		$data = ["status_pengiriman" => 3];
 		if($this->Pengiriman_model->update($data, $id_pengiriman)){
 			alert_notif("success");
 			redirect('pengiriman');

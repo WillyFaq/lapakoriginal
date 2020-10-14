@@ -25,7 +25,7 @@ class Pengiriman_model extends CI_Model {
 		$this->db->join($this->join1, $this->table.'.'.$this->fk1.' = '.$this->join1.'.'.$this->fk1);
 		$q =  $this->db->get_compiled_select();
 		$q .= " ".$this->Sales_order_model->get_all_query();
-		$q .= " ORDER BY tgl_kirim DESC "; 
+		$q .= " ORDER BY pengiriman.id_transaksi DESC "; 
 		//$this->db->order_by($this->table.'.tgl_kirim', 'desc');
 		return $this->db->query($q);
 	}
@@ -71,6 +71,31 @@ class Pengiriman_model extends CI_Model {
 		$this->db->where($this->fk1, $da['id_transaksi']);
 		$this->db->update($this->join1);
 
+		if ($this->db->trans_status() === FALSE){
+		    $this->db->trans_rollback();
+		    return false;
+		}else{
+		    $this->db->trans_commit();
+		    return true;
+		}
+	}
+
+	public function add_kirim($da)
+	{	
+		$idp = $da['id_pengiriman'];
+		$gb = array(
+					'id_gudang_user' => $da['id_gudang_user'],
+					'kode_barang' => $da['kode_barang'],
+					'jumlah_gb' => $da['jumlah'],
+					'tgl_gb' => $da['tgl_kirim'],
+					'ket_gb' => 2
+					);
+		unset($da['id_pengiriman'], $da['id_gudang_user'], $da['kode_barang'], $da['jumlah']);
+		$this->db->trans_begin();
+		$this->db->insert('gudang_barang', $gb);
+
+		$this->db->where($this->pk, $idp);
+		$this->db->update($this->table, $da);
 		if ($this->db->trans_status() === FALSE){
 		    $this->db->trans_rollback();
 		    return false;

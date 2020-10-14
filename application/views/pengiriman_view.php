@@ -76,6 +76,10 @@
                     <?php
                     else:
                     ?>
+
+                    <input type="hidden" name="kode_barang" value="<?= isset($kode_barang)?$kode_barang:''; ?>">
+                    <input type="hidden" name="jumlah" value="<?= isset($jumlah)?$jumlah:''; ?>">
+                    <input type="hidden" name="id_gudang_user" value="<?= isset($id_gudang_user)?$id_gudang_user:''; ?>">
                     <fieldset>
                         <legend>Form Pengiriman</legend>
                         <div class="form-group row">

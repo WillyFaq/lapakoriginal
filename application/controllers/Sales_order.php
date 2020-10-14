@@ -37,11 +37,15 @@ class Sales_order extends CI_Controller {
 			foreach ($res as $row){
 				$sts = '<span class="badge badge-danger">Belum dikirim</span>';
 				if($row->status_order==1){
-					$sts = '<span class="badge badge-success">Sudah dikirim</span>';
+					$sts = '<span class="badge badge-warning">Sudah diproses</span>';
 				}
-				if($this->Sales_order_model->cek_laporan($row->id_transaksi)==1){
-					$sts = '<span class="badge badge-info">Sudah diterima</span>';
-
+				$png = $this->Sales_order_model->cek_laporan($row->id_transaksi);
+				if($png==1){
+					$sts = '<span class="badge badge-info">Sudah dikirim</span>';
+				}else if($png==2){
+					$sts = '<span class="badge badge-success">Sudah diterima</span>';
+				}else if($png>=3){
+					$sts = '<span class="badge badge-danger">ditolak</span>';
 				}
 				$this->table->add_row(	++$i,
 							$row->id_transaksi,
@@ -164,19 +168,31 @@ class Sales_order extends CI_Controller {
 			$detail["Jumlah"] = number_format($row->jumlah_order);
 			$detail["Total"] = "Rp. ".number_format($row->total_order);
 			$detail["Keterangan"] = $row->keterangan;
-			$detail["Status"] = $row->status_order==1?'<span class="badge badge-success">Sudah dikirim</span>':'<span class="badge badge-danger">Belum dikirim</span>';
+			$detail["Status"] = $row->status_order==1?'<span class="badge badge-warning">Sudah diporses</span>':'<span class="badge badge-danger">Belum diproses</span>';
 		}
 		$data["detail"] = $detail;
-		$q = $this->Pengiriman_model->get_where(['pengiriman.id_transaksi' => $id_trans]);
+		$q = $this->Pengiriman_model->get_where(['pengiriman.id_transaksi' => "'$id_trans'"]);
 		if($q->num_rows()>0){
 			$res = $q->result();
 			$det = [];
 			foreach ($res as $row) {
-				$det['Jasa Pengiriman'] = $row->jasa_pengiriman;
-				$det['No Resi'] = $row->no_resi;
-				$det['Tgl Kirim'] = date("d-m-Y", strtotime($row->tgl_kirim));
-				$det['Pengirim'] = $row->nama;
-				$det["Status Pengiriman"] = $row->status_pengiriman==1?'<span class="badge badge-success">Sudah diterima</span>':'<span class="badge badge-info">Terkirim</span>';
+				if($row->status_pengiriman!=0){
+					unset($data['detail']['Status']);
+					$det['Jasa Pengiriman'] = $row->jasa_pengiriman;
+					$det['No Resi'] = $row->no_resi;
+					$det['Tgl Kirim'] = date("d-m-Y", strtotime($row->tgl_kirim));
+					$det['Pengirim'] = $row->nama;
+					$sts = '<span class="badge badge-warning">Sudah di acc</span>';
+			
+					if($row->status_pengiriman==1){
+						$sts = '<span class="badge badge-info">Sudah dikirim</span>';
+					}else if($row->status_pengiriman==2){
+						$sts = '<span class="badge badge-info">Sudah diterima</span>';
+					}else if($row->status_pengiriman>=3){
+						$sts = '<span class="badge badge-danger">Ditolak</span>';
+					}
+					$det["Status Pengiriman"] = $sts;
+				}
 			}
 			$data['pengiriman'] = $det;
 		}

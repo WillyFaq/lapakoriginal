@@ -17,7 +17,7 @@ class Restok extends CI_Controller {
 		$res = $query->result();
 		$num_rows = $query->num_rows();
 
-		$tmpl = array(  'table_open'    => '<table class="table table-striped table-hover dataTableModal">',
+		$tmpl = array(  'table_open'    => '<table class="table table-striped table-hover dataTable">',
 				'row_alt_start'  => '<tr>',
 				'row_alt_end'    => '</tr>'
 			);

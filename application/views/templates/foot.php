@@ -38,6 +38,8 @@
                 var table = $(".dataTable").DataTable();
             }
         }
+
+        
     </script>
     
 </body>
