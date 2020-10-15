@@ -64,6 +64,7 @@ class Pengiriman extends CI_Controller {
 							.'&nbsp;'.
 							$btn_update
 						);
+				if($i>=1000){break;}
 			}
 		}
 		return  $this->table->generate();

@@ -170,4 +170,16 @@ if(!function_exists('get_kecamatan')){
 		}
 		return $ret;
 	}
+
+if(!function_exists('get_type_feedback')){
+	function get_type_feedback($bln="") {
+		$bulan = [
+					"Diproses",
+					"Dikirm",
+					"Diterima",
+					"Ditolak",
+					];
+		return $bln==""?$bulan:$bulan[$bln];
+	}
+}
 }

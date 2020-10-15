@@ -130,6 +130,7 @@
                     </tbody>
                 </table>
                 <?php endif; ?>
+                <?= isset($feedback)?$feedback:''; ?>
                 <?php endif; ?>
             </div>
         </div>

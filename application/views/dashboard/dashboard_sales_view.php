@@ -136,6 +136,7 @@ $sql = "SELECT
         FROM sales_order a
         JOIN barang b ON a.kode_barang = b.kode_barang
         WHERE a.id_user = ".$this->session->userdata('user')->id_user."
+        AND YEAR(a.tgl_order) = ".date("Y")."
         GROUP BY a.kode_barang, DATE(a.tgl_order)";
 $q = $this->db->query($sql);
 $res = $q->result();
@@ -214,7 +215,7 @@ var myLineChart = new Chart(ctx, {
             }],
         },
         legend: {
-            display: false
+            display: "bootom"
         },
         tooltips: {
             backgroundColor: "rgb(255,255,255)",

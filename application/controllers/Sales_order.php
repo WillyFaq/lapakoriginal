@@ -11,6 +11,7 @@ class Sales_order extends CI_Controller {
 		$this->load->model("Barang_model", "", TRUE);
 		$this->load->model("Sales_order_model", "", TRUE);
 		$this->load->model("Pengiriman_model", "", TRUE);
+		$this->load->model("Feedback_model", "", TRUE);
 	}
 
 	public function gen_table()
@@ -57,6 +58,7 @@ class Sales_order extends CI_Controller {
 							$sts,
 							anchor('sales_order/detail/'.e_url($row->id_transaksi),'<span class="fa fa-eye"></span>',array( 'title' => 'Detail', 'class' => 'btn btn-warning btn-xs', 'data-toggle' => 'tooltip'))
 						);
+				if($i>=1000){break;}
 			}
 		}
 		return  $this->table->generate();
@@ -147,13 +149,16 @@ class Sales_order extends CI_Controller {
 						"page" => "Sales_order_view",
 						"ket" => "Detail Data",
 						);
+		$fb = '-1';
 		$q = $this->Sales_order_model->get_data($id_trans);
 		$res = $q->result();
 		$detail = [];
+		$not = "";
 		foreach ($res as $row) {
 			$detail["Id Transaksi"] = $row->id_transaksi;
 			$detail["Nama Pelanggan"] = $row->nama_pelanggan;
 			$detail["No Telp"] = $row->notelp;
+			$not = $row->notelp;
 			//echo strpos($row->alamat,"|");
 			$alamat = explode("|", $row->alamat);
 			if(sizeof($alamat)==1){
@@ -170,6 +175,7 @@ class Sales_order extends CI_Controller {
 			$detail["Total"] = "Rp. ".number_format($row->total_order);
 			$detail["Keterangan"] = $row->keterangan;
 			$detail["Status"] = $row->status_order==1?'<span class="badge badge-warning">Sudah diporses</span>':'<span class="badge badge-danger">Belum diproses</span>';
+			$fb = $row->status_order==1?0:'';
 		}
 		$data["detail"] = $detail;
 		$q = $this->Pengiriman_model->get_where(['pengiriman.id_transaksi' => "'$id_trans'"]);
@@ -187,15 +193,46 @@ class Sales_order extends CI_Controller {
 			
 					if($row->status_pengiriman==1){
 						$sts = '<span class="badge badge-info">Sudah dikirim</span>';
+						$fb = 1;
 					}else if($row->status_pengiriman==2){
 						$sts = '<span class="badge badge-info">Sudah diterima</span>';
+						$fb = 2;
 					}else if($row->status_pengiriman>=3){
 						$sts = '<span class="badge badge-danger">Ditolak</span>';
+						$fb = 3;
 					}
 					$det["Status Pengiriman"] = $sts;
 				}
 			}
 			$data['pengiriman'] = $det;
+		}
+
+		if($fb!='-1'){
+			
+			$q = $this->Feedback_model->get_where(array("type" => $fb));
+			$res = $q->result();
+			$pesan = $res[0]->pesan;
+			if (strpos($pesan, '<transaksi>') !== false) {
+				$datt = "\r\n";
+				if($fb>0){
+					$datt .= "\r\nNo Resi : *".$det['No Resi']."*";
+					$datt .= "\r\nJasa Pengiriman : *".$det['Jasa Pengiriman']."*";
+					$datt .= "\r\nTgl dikirim : *".$det['Tgl Kirim']."*";
+				}
+
+				$datt .= "\r\nNama : *".$detail["Nama Pelanggan"]."*";
+				$datt .= "\r\nAlamat : *".$detail["Alamat"]."*";
+				$datt .= "\r\nNama Barang : *".$detail["Nama Barang"]."*";
+				$datt .= "\r\nJumlah : *".$detail["Jumlah"]."*";
+				$datt .= "\r\nTotal : *".$detail["Total"]."*";
+				$datt .= "\r\n";
+			    $pesan = str_replace("<transaksi>", $datt, $pesan);
+			}
+			$msg = urlencode($pesan);
+			$not = "62".substr($not, 1, strlen($not));
+			$url = 'https://api.whatsapp.com/send?phone='.$not.'&text='.$msg;
+			$data['feedback'] =  anchor($url,'<span class="fab fa-whatsapp"></span> &nbsp; Feedback',array( 'title' => 'Feedback', 'class' => 'btn btn-success', 'data-toggle' => 'tooltip', 'target' => 'blank'));
+			
 		}
 		$this->load->view('index', $data);
 	}
@@ -206,9 +243,7 @@ class Sales_order extends CI_Controller {
 		$kota = $this->input->post("kota");
 		$kecamatan = $this->input->post("kecamatan");
 		$alamat = "$provinsi|$kota|$kecamatan|".$this->input->post("alamat");
-		/*print_pre($provinsi);
-		print_pre($kota);
-		print_pre($kecamatan);*/
+
 		$id_transaksi = $this->Sales_order_model->gen_idtrans();
 		$no_pelanggan = str_replace("T", "P", $id_transaksi);
 		$pelaggan = array(
