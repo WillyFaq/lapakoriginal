@@ -181,6 +181,14 @@ body::-webkit-scrollbar-thumb:hover {
 	overflow-y: scroll;
 }
 
+.loading_box{
+	text-align: center;
+}
+
+.img_demo_load{
+	margin-top: -80px;
+}
+
 /* ------ MOBILE ----------- */
 @media (min-width: 320px) and (max-width: 768px) {
 

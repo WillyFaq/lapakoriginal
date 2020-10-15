@@ -56,8 +56,6 @@ class Dahsboard extends CI_Controller {
 			$data['hari_ini'] = $this->get_all_penjualan_hari(date("n"), date("Y"));
 			$b = $this->Barang_model->get_all();
 			$data['barang'] = $b->num_rows();
-			$data['chart'] = $this->get_atasan_chart();
-			$data['omset'] = $this->get_atasan_chart_omset();
 		}else if($lvl==3){
 			$data['sub_page'] = 'dashboard/dashboard_gudang_view';
 			$data['table'] = $this->gen_table_gudang();
@@ -68,7 +66,8 @@ class Dahsboard extends CI_Controller {
 
 	public function get_all_penjualan($bln="", $thn="")
 	{
-		$query=$this->Barang_model->laporan_bulanan($thn, $bln);
+		$thn = $thn==''?date("Y"):$thn;
+		$query=$this->Barang_model->laporan_bulanan($bln, $thn);
 		$res = $query->result();
 		$tot = 0;
 		$laba = 0;
@@ -94,14 +93,14 @@ class Dahsboard extends CI_Controller {
 		return $num_rows;
 	}
 
-	public function get_atasan_chart()
+	public function get_atasan_chart($thn="")
 	{
 		$bln = get_bulan();
 	    //print_pre($bln);
 
 	    $data = [];
 	    foreach ($bln as $k => $v) {
-	        $data[] = $this->get_all_penjualan($k);
+	        $data[] = $this->get_all_penjualan($k, $thn);
 	    }
 
 	    //print_pre($data);
@@ -113,14 +112,14 @@ class Dahsboard extends CI_Controller {
 
 
 
-	public function get_atasan_chart_omset()
+	public function get_atasan_chart_omset($thn="")
 	{
 		$bln = get_bulan();
 	    //print_pre($bln);
 
 	    $data = [];
 	    foreach ($bln as $k => $v) {
-	        $data[] = $this->get_all_omset($k);
+	        $data[] = $this->get_all_omset($k, $thn);
 	    }
 
 	    //print_pre($data);
@@ -130,9 +129,9 @@ class Dahsboard extends CI_Controller {
 	    			);
 	}
 
-	public function get_all_omset($bln="")
+	public function get_all_omset($bln="", $thn="")
 	{
-		$query=$this->Barang_model->laporan_bulanan(date("Y"), $bln);
+		$query=$this->Barang_model->laporan_bulanan($bln, $thn);
 		$res = $query->result();
 		$tot = 0;
 		$laba = 0;
@@ -272,6 +271,65 @@ class Dahsboard extends CI_Controller {
 		return $this->table->generate();
 	}
 
+
+	public function load_demografi($type="", $brg="")
+	{
+		$data = array("type" => $type, "brg" => $brg);
+		$whr = "";
+        if($type!=""){
+            if($type=="1"){
+                $whr .= " AND a.tgl_order >= DATE(NOW()) - INTERVAL 7 DAY ";
+            }else if($type=="2"){
+                $whr .= " AND a.tgl_order >= DATE(NOW()) - INTERVAL 14 DAY ";
+            }else if($type==3){
+                $whr .= " AND a.tgl_order >= DATE(NOW()) - INTERVAL 30 DAY ";
+            }else{
+            	$t = explode("_", $type);
+            	if($t[0]==4){
+            		$tgl1 = $t[1];
+            		$tgl2 = $t[2];
+            		if($tgl1!="" && $tgl2!=""){
+                		$whr .= " AND a.tgl_order >= '$tgl1' ";
+            		}
+
+            		if($tgl2!=""){
+                		$whr .= " AND a.tgl_order <= '$tgl2' ";
+            		}
+            	}
+            }
+        }
+
+        if($brg!=""){
+        	$whr .= " AND a.kode_barang = '$brg' ";
+        }
+        $sql = "SELECT  
+                    SUBSTR(b.alamat, 1, 2) AS prov,
+                    COUNT(*) AS jml
+                FROM sales_order a
+                JOIN pelanggan b ON a.no_pelanggan = b.no_pelanggan
+                WHERE 1=1 $whr
+                GROUP BY SUBSTR(b.alamat, 1, 2)";
+        $q = $this->db->query($sql);
+
+        $data["q"] = $q;
+		$this->load->view('chart/demograpi_view', $data);
+	}
+
+	public function load_profit($thn="")
+	{
+		$data = array(
+						'chart' => $this->get_atasan_chart($thn)
+						);
+		$this->load->view('chart/profit_view', $data);
+	}
+
+	public function load_omset($thn="")
+	{
+		$data = array(
+						'omset' => $this->get_atasan_chart_omset($thn)
+						);
+		$this->load->view('chart/omset_view', $data);
+	}
 }
 
 /* End of file Dahsboard.php */

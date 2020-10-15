@@ -84,88 +84,63 @@
                 </div>
             </div>
                 <!-- Card Body -->
+
+            <script src="https://code.highcharts.com/maps/highmaps.js"></script>
+            <script src="https://code.highcharts.com/maps/modules/exporting.js"></script>
+            <script src="<?= base_url("assets/js/id_map.js"); ?>"></script>
+            <!-- <script src="https://code.highcharts.com/mapdata/countries/id/id-all.js"></script> -->
             <div class="card-body">
-                <script src="https://code.highcharts.com/maps/highmaps.js"></script>
-                <script src="https://code.highcharts.com/maps/modules/exporting.js"></script>
-                <script src="<?= base_url("assets/js/id_map.js"); ?>"></script>
-                <!-- <script src="https://code.highcharts.com/mapdata/countries/id/id-all.js"></script> -->
-                <div id="container"></div>
-                <?php
-                        $sql = "SELECT  
-                                    SUBSTR(b.alamat, 1, 2) AS prov,
-                                    COUNT(*) AS jml
-                                FROM sales_order a
-                                JOIN pelanggan b ON a.no_pelanggan = b.no_pelanggan
-                                GROUP BY SUBSTR(b.alamat, 1, 2)";
-                        $q = $this->db->query($sql);
-                        $res = $q->result();
-                        $data = [];
-                        $map = json_decode(file_get_contents(base_url('assets/mapping.json')), true);
-                        foreach ($res as $row) {
-                            $data[$map[$row->prov]] = $row->jml;
-                        }
-                    ?>
-                <script type="text/javascript">
-                    //console.log(Highcharts.maps["countries/id/id-all"].features);
-                    /*var f = Highcharts.maps["countries/id/id-all"].features;
-                    var pro = [{"id":11,"nama":"Aceh"},{"id":12,"nama":"Sumatera Utara"},{"id":13,"nama":"Sumatera Barat"},{"id":14,"nama":"Riau"},{"id":15,"nama":"Jambi"},{"id":16,"nama":"Sumatera Selatan"},{"id":17,"nama":"Bengkulu"},{"id":18,"nama":"Lampung"},{"id":19,"nama":"Kepulauan Bangka Belitung"},{"id":21,"nama":"Kepulauan Riau"},{"id":31,"nama":"Dki Jakarta"},{"id":32,"nama":"Jawa Barat"},{"id":33,"nama":"Jawa Tengah"},{"id":34,"nama":"Di Yogyakarta"},{"id":35,"nama":"Jawa Timur"},{"id":36,"nama":"Banten"},{"id":51,"nama":"Bali"},{"id":52,"nama":"Nusa Tenggara Barat"},{"id":53,"nama":"Nusa Tenggara Timur"},{"id":61,"nama":"Kalimantan Barat"},{"id":62,"nama":"Kalimantan Tengah"},{"id":63,"nama":"Kalimantan Selatan"},{"id":64,"nama":"Kalimantan Timur"},{"id":65,"nama":"Kalimantan Utara"},{"id":71,"nama":"Sulawesi Utara"},{"id":72,"nama":"Sulawesi Tengah"},{"id":73,"nama":"Sulawesi Selatan"},{"id":74,"nama":"Sulawesi Tenggara"},{"id":75,"nama":"Gorontalo"},{"id":76,"nama":"Sulawesi Barat"},{"id":81,"nama":"Maluku"},{"id":82,"nama":"Maluku Utara"},{"id":91,"nama":"Papua Barat"},{"id":94,"nama":"Papua"}];
-                    
-                    f.forEach(function(item, index){
-                        $("#pre").append(item.properties.name);
-                        $("#pre").append("<br>");
-                    });*/
-                    // Prepare demo data
-                    // Data is joined to map using value of 'hc-key' property by default.
-                    // See API docs for 'joinBy' for more info on linking data and map.
+                <div class="container filter">
+                    <div class="form-group row">
+                        <label for="filter" class="col-sm-2 col-form-label">Filter</label>
+                        <div class="col-sm-10">
+                            <select name="filter" id="cb_filter" class="form-control">
+                                <option value="1">7 Hari</option>
+                                <option value="2">14 Hari</option>
+                                <option value="3">30 Hari</option>
+                                <option value="4">Custom</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group row cb_tgl_box" style="display: none;">
+                        <div class="col-sm-2"></div>
+                        <div class="col">
+                            <input type="date" class="form-control cb_tgl" id="tgl1" format="Y-m-d">
+                        </div>
+                        <div class="col">
+                            <input type="date" class="form-control cb_tgl" id="tgl2" format="Y-m-d">
+                        </div>
+                    </div>
 
-                    var data = [
-                        ['id-3700', 0],
-                        <?php foreach ($data as $k => $v) {
-                            echo "['$k', $v],";
-                        }?>
-                    ];
-
-                    // Create the chart
-                    Highcharts.mapChart('container', {
-                        chart: {
-                            map: 'countries/id/id-all'
-                        },
-
-                        title: {
-                            text: 'Demograpi Penjualan'
-                        },
-
-                        subtitle: {
-                            text: 'Source map: <a href="http://code.highcharts.com/mapdata/countries/id/id-all.js">Indonesia</a>'
-                        },
-
-                        mapNavigation: {
-                            enabled: true,
-                            buttonOptions: {
-                                verticalAlign: 'bottom'
-                            }
-                        },
-
-                        colorAxis: {
-                            min: 0
-                        },
-
-                        series: [{
-                            data: data,
-                            name: 'Total Penjualan',
-                            states: {
-                                hover: {
-                                    color: '#BADA55'
-                                }
-                            },
-                            dataLabels: {
-                                enabled: false,
-                                format: '{point.name}'
-                            }
-                        }]
-                    });
-
-                </script>
+                    <div class="form-group row cb_product_box">
+                        <label for="filter" class="col-sm-2 col-form-label">Barang</label>
+                        <div class="col-sm-10">
+                            <select name="filter" id="cb_brg" class="form-control">
+                                <option value="">Semua Barang</option>
+                                <?php
+                                    $sql = "SELECT *
+                                            FROM barang
+                                            GROUP BY kode_barang";
+                                    $q = $this->db->query($sql);
+                                    $res = $q->result();
+                                    foreach ($res as $row) {
+                                        $sel = '';
+                                        /*if($row->tahun==date("Y")){
+                                            $sel = 'selected';
+                                        }*/
+                                        echo '<option value="'.$row->kode_barang.'" '.$sel.'>'.$row->nama_barang.'</option>';
+                                    }
+                                ?>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <hr>
+                <div id="container">
+                    <div class="loading_box" id="demograpi_load">
+                        <img class="img_demo_load" src="<?= base_url('assets/img/loading_world.svg'); ?>" alt="loading">
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -178,10 +153,33 @@
                     
                 </div>
             </div>
-                <!-- Card Body -->
+            <!-- Card Body -->
             <div class="card-body">
-                <div class="chart-area">
-                    <canvas id="myAreaChart"></canvas>
+                <div class="form-group row cb_thn_profit_box">
+                    <label for="filter" class="col-sm-2 col-form-label">Filter</label>
+                    <div class="col-sm-10">
+                        <select name="filter" id="cb_thn_profit" class="form-control">
+                            <?php
+                                $sql = "SELECT YEAR(tgl_order) AS tahun
+                                        FROM sales_order
+                                        GROUP BY YEAR(tgl_order)";
+                                $q = $this->db->query($sql);
+                                $res = $q->result();
+                                foreach ($res as $row) {
+                                    $sel = '';
+                                    if($row->tahun==date("Y")){
+                                        $sel = 'selected';
+                                    }
+                                    echo '<option value="'.$row->tahun.'" '.$sel.'>'.$row->tahun.'</option>';
+                                }
+                            ?>
+                        </select>
+                    </div>
+                </div>
+                <div class="chart-area" id="load_profit_chart">
+                    <div class="loading_box" id="profit_load">
+                        <img  src="<?= base_url('assets/img/loading_barchart.svg'); ?>" alt="loading">
+                    </div>
                 </div>
             </div>
         </div>
@@ -197,8 +195,31 @@
             </div>
                 <!-- Card Body -->
             <div class="card-body">
-                <div class="chart-area">
-                    <canvas id="myAreaChart_omset"></canvas>
+                <div class="form-group row cb_thn_profit_box">
+                    <label for="filter" class="col-sm-2 col-form-label">Filter</label>
+                    <div class="col-sm-10">
+                        <select name="filter" id="cb_thn_omset" class="form-control">
+                            <?php
+                                $sql = "SELECT YEAR(tgl_order) AS tahun
+                                        FROM sales_order
+                                        GROUP BY YEAR(tgl_order)";
+                                $q = $this->db->query($sql);
+                                $res = $q->result();
+                                foreach ($res as $row) {
+                                    $sel = '';
+                                    if($row->tahun==date("Y")){
+                                        $sel = 'selected';
+                                    }
+                                    echo '<option value="'.$row->tahun.'" '.$sel.'>'.$row->tahun.'</option>';
+                                }
+                            ?>
+                        </select>
+                    </div>
+                </div>
+                <div class="chart-area" id="load_omset_chart">
+                    <div class="loading_box" id="omset_load">
+                        <img  src="<?= base_url('assets/img/loading_barchart.svg'); ?>" alt="loading">
+                    </div>
                 </div>
             </div>
         </div>
@@ -211,167 +232,52 @@
 
 ?>
 
-<script type="text/javascript">
-    var ctx = document.getElementById("myAreaChart");
-    var myLineChart = new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: ["<?= join('", "', $chart['label']) ?>"],
-            datasets: [{
-                label:"Laba",
-                backgroundColor:window.chartColors.red,
-                borderColor:window.chartColors.red,
-                data:[<?= join(", ", $chart['data']); ?>],
-                fill:false,
-            }],
-        },
-        options: {
-            maintainAspectRatio: false,
-            layout: {
-                padding: {
-                    left: 10,
-                    right: 25,
-                    top: 25,
-                    bottom: 0
-                }
-            },
-            scales: {
-                xAxes: [{
-                    time: {
-                        unit: 'date'
-                    },
-                    gridLines: {
-                        display: false,
-                        drawBorder: false
-                    },
-                    ticks: {
-                        maxTicksLimit: 7
-                    }
-                }],
-                yAxes: [{
-                    ticks: {
-                        maxTicksLimit: 5,
-                        padding: 10,
-                        callback: function(value, index, values) {
-                            return 'Rp. ' + number_format(value);
-                        }
-                    },
-                    gridLines: {
-                        color: "rgb(234, 236, 244)",
-                        zeroLineColor: "rgb(234, 236, 244)",
-                        drawBorder: false,
-                        borderDash: [2],
-                        zeroLineBorderDash: [2]
-                    }
-                }],
-            },
-            legend: {
-                display: false
-            },
-            tooltips: {
-                backgroundColor: "rgb(255,255,255)",
-                bodyFontColor: "#858796",
-                titleMarginBottom: 10,
-                titleFontColor: '#6e707e',
-                titleFontSize: 14,
-                borderColor: '#dddfeb',
-                borderWidth: 1,
-                xPadding: 15,
-                yPadding: 15,
-                displayColors: false,
-                intersect: false,
-                mode: 'index',
-                caretPadding: 10,
-                callbacks: {
-                    label: function(tooltipItem, chart) {
-                        var datasetLabel = chart.datasets[tooltipItem.datasetIndex].label || '';
-                        return datasetLabel + ': Rp. ' + number_format(tooltipItem.yLabel);
-                    }
-                }
-            }
-        }
-    });
-</script>
+
+
 
 
 <script type="text/javascript">
-    var ctx = document.getElementById("myAreaChart_omset");
-    var myLineChart = new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: ["<?= join('", "', $omset['label']) ?>"],
-            datasets: [{
-                label:"Laba",
-                backgroundColor:window.chartColors.green,
-                borderColor:window.chartColors.green,
-                data:[<?= join(", ", $omset['data']); ?>],
-                fill:false,
-            }],
-        },
-        options: {
-            maintainAspectRatio: false,
-            layout: {
-                padding: {
-                    left: 10,
-                    right: 25,
-                    top: 25,
-                    bottom: 0
-                }
-            },
-            scales: {
-                xAxes: [{
-                    time: {
-                        unit: 'date'
-                    },
-                    gridLines: {
-                        display: false,
-                        drawBorder: false
-                    },
-                    ticks: {
-                        maxTicksLimit: 7
-                    }
-                }],
-                yAxes: [{
-                    ticks: {
-                        maxTicksLimit: 5,
-                        padding: 10,
-                        callback: function(value, index, values) {
-                            return 'Rp. ' + number_format(value);
-                        }
-                    },
-                    gridLines: {
-                        color: "rgb(234, 236, 244)",
-                        zeroLineColor: "rgb(234, 236, 244)",
-                        drawBorder: false,
-                        borderDash: [2],
-                        zeroLineBorderDash: [2]
-                    }
-                }],
-            },
-            legend: {
-                display: false
-            },
-            tooltips: {
-                backgroundColor: "rgb(255,255,255)",
-                bodyFontColor: "#858796",
-                titleMarginBottom: 10,
-                titleFontColor: '#6e707e',
-                titleFontSize: 14,
-                borderColor: '#dddfeb',
-                borderWidth: 1,
-                xPadding: 15,
-                yPadding: 15,
-                displayColors: false,
-                intersect: false,
-                mode: 'index',
-                caretPadding: 10,
-                callbacks: {
-                    label: function(tooltipItem, chart) {
-                        var datasetLabel = chart.datasets[tooltipItem.datasetIndex].label || '';
-                        return datasetLabel + ': Rp. ' + number_format(tooltipItem.yLabel);
-                    }
-                }
-            }
-        }
+    $(document).ready(function(){
+        $("#demograpi_load").load('<?= base_url("dahsboard/load_demografi/1"); ?>');
+        $("#cb_filter").change(function(){
+            filter_demo();
+        });
+
+        $(".cb_tgl").change(function(){
+            filter_demo();
+        });
+
+        $("#cb_brg").change(function(){
+            filter_demo();
+        });
+
+
+        $("#load_profit_chart").load('<?= base_url("dahsboard/load_profit/"); ?>'+$("#cb_thn_profit").val());
+        $("#cb_thn_profit").change(function(){
+            var v = $(this).val();
+            $("#load_profit_chart").load('<?= base_url("dahsboard/load_profit/"); ?>'+v);
+        });
+
+        $("#load_omset_chart").load('<?= base_url("dahsboard/load_omset/"); ?>'+$("#cb_thn_omset").val());
+        $("#cb_thn_omset").change(function(){
+            var v = $(this).val();
+            $("#load_omset_chart").load('<?= base_url("dahsboard/load_omset/"); ?>'+v);
+        });
+
     });
+
+    function filter_demo() {
+        var v = $("#cb_filter").val();
+        var brg = $("#cb_brg").val();
+        if(v==4){
+            $(".cb_tgl_box").show();
+            var tgl1 = $("#tgl1").val();
+            var tgl2 = $("#tgl2").val();
+            var tmbh = "4_"+tgl1+"_"+tgl2;
+            $("#demograpi_load").load('<?= base_url("dahsboard/load_demografi/"); ?>'+tmbh+"/"+brg);
+        }else{
+            $(".cb_tgl_box").hide();
+            $("#demograpi_load").load('<?= base_url("dahsboard/load_demografi/"); ?>'+v+"/"+brg);
+        }
+    }
 </script>
