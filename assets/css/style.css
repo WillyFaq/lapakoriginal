@@ -197,6 +197,7 @@ body::-webkit-scrollbar-thumb:hover {
 	z-index: 9999;
 	background: rgba(0,0,0,0.2);
 	display: none;
+	
 }
 
 /* ------ MOBILE ----------- */
