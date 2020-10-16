@@ -276,6 +276,14 @@ class Sales_order extends CI_Controller {
 		}
 	}
 
+	
+
+	public function get_harga($kode)
+	{
+		$q = $this->Barang_model->get_data($kode)->row();
+		echo $q->harga_jual;
+	}
+
 }
 
 /* End of file Sales_order.php */
