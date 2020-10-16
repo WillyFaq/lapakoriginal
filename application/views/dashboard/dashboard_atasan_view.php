@@ -125,9 +125,6 @@
                                     $res = $q->result();
                                     foreach ($res as $row) {
                                         $sel = '';
-                                        /*if($row->tahun==date("Y")){
-                                            $sel = 'selected';
-                                        }*/
                                         echo '<option value="'.$row->kode_barang.'" '.$sel.'>'.$row->nama_barang.'</option>';
                                     }
                                 ?>
@@ -255,12 +252,22 @@
         $("#load_profit_chart").load('<?= base_url("dahsboard/load_profit/"); ?>'+$("#cb_thn_profit").val());
         $("#cb_thn_profit").change(function(){
             var v = $(this).val();
+            var loading_box = "";
+            loading_box += '<div class="loading_box" id="omset_load">';
+            loading_box += '<img  src="<?= base_url('assets/img/loading_barchart.svg'); ?>" alt="loading">';
+            loading_box += '</div>';
+            $("#load_profit_chart").html(loading_box);
             $("#load_profit_chart").load('<?= base_url("dahsboard/load_profit/"); ?>'+v);
         });
 
         $("#load_omset_chart").load('<?= base_url("dahsboard/load_omset/"); ?>'+$("#cb_thn_omset").val());
         $("#cb_thn_omset").change(function(){
             var v = $(this).val();
+            var loading_box = "";
+            loading_box += '<div class="loading_box" id="omset_load">';
+            loading_box += '<img  src="<?= base_url('assets/img/loading_barchart.svg'); ?>" alt="loading">';
+            loading_box += '</div>';
+            $("#load_omset_chart").html(loading_box);
             $("#load_omset_chart").load('<?= base_url("dahsboard/load_omset/"); ?>'+v);
         });
 
@@ -269,14 +276,21 @@
     function filter_demo() {
         var v = $("#cb_filter").val();
         var brg = $("#cb_brg").val();
+
+        var loading_box = "";
+        loading_box += '<div class="loading_box" id="demograpi_load">';
+        loading_box += '<img class="img_demo_load" src="<?= base_url('assets/img/loading_world.svg'); ?>" alt="loading">';
+        loading_box += '</div>';
         if(v==4){
             $(".cb_tgl_box").show();
             var tgl1 = $("#tgl1").val();
             var tgl2 = $("#tgl2").val();
             var tmbh = "4_"+tgl1+"_"+tgl2;
+            $("#demograpi_load").html(loading_box);
             $("#demograpi_load").load('<?= base_url("dahsboard/load_demografi/"); ?>'+tmbh+"/"+brg);
         }else{
             $(".cb_tgl_box").hide();
+            $("#demograpi_load").html(loading_box);
             $("#demograpi_load").load('<?= base_url("dahsboard/load_demografi/"); ?>'+v+"/"+brg);
         }
     }

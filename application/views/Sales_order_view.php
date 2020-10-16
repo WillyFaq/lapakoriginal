@@ -171,6 +171,13 @@
 
     });
 
+    $(document).ajaxStart(function(){
+        $(".ajax_loading_box").show();
+    });
+    $(document).ajaxComplete(function(){
+        $(".ajax_loading_box").hide();
+    });
+
     function load_harga(kode_barang) {
         $.ajax({
             type : 'POST',
