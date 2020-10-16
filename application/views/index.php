@@ -11,8 +11,6 @@
                     <i class="fab fa-opencart"></i>
                 </div>
                 <div class="sidebar-brand-text mx-3">Lapak Original</div>
-                <!-- <img src="assets/img/logo.png" alt="Logo" width="50px">
-                <div class="sidebar-brand-text mx-3" style="text-align:left;font-size: 0.8em;">SB ADMIN</div> -->
             </a>
 
             <!-- Divider -->
@@ -54,11 +52,11 @@
                         </a>
                         <!-- Dropdown - User Information -->
                         <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="userDropdown">
-                            <a class="dropdown-item" href="index.php?p=user&ket=ubah&id=1">
+                            <!-- <a class="dropdown-item" href="index.php?p=user&ket=ubah&id=1">
                                 <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
                                 Profile
                             </a>
-                            <div class="dropdown-divider"></div>
+                            <div class="dropdown-divider"></div> -->
                             <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">
                                 <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
                                 Logout

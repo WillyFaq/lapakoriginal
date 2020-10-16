@@ -175,7 +175,7 @@ class Sales_order extends CI_Controller {
 			$detail["Total"] = "Rp. ".number_format($row->total_order);
 			$detail["Keterangan"] = $row->keterangan;
 			$detail["Status"] = $row->status_order==1?'<span class="badge badge-warning">Sudah diporses</span>':'<span class="badge badge-danger">Belum diproses</span>';
-			$fb = $row->status_order==1?0:'';
+			$fb = $row->status_order==1?0:'-1';
 		}
 		$data["detail"] = $detail;
 		$q = $this->Pengiriman_model->get_where(['pengiriman.id_transaksi' => "'$id_trans'"]);
@@ -206,7 +206,7 @@ class Sales_order extends CI_Controller {
 			}
 			$data['pengiriman'] = $det;
 		}
-
+		//echo "<h1>$fb</h1>";
 		if($fb!='-1'){
 			
 			$q = $this->Feedback_model->get_where(array("type" => $fb));

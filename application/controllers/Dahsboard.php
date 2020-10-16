@@ -220,7 +220,7 @@ class Dahsboard extends CI_Controller {
 							"kode_barang" => $row->kode_barang,
 							"nama_barang" => $row->nama_barang,
 							"sts" => '<span class="badge badge-info">Akan dikirim</span>',
-							"btn" => 0,
+							"btn" => 0
 							);
 		}
 
@@ -264,7 +264,7 @@ class Dahsboard extends CI_Controller {
 										$row['kode_barang'],
 										$row['nama_barang'],
 										$row['sts'],
-										$btn,
+										$btn
 				);
 			}
 		}
