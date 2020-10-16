@@ -22,16 +22,3 @@
         }
     }
 ?>
-<!-- <li class="nav-item" id="menu">
-    <a class="nav-link" href="<?= base_url('menu'); ?>">
-        <i class="fas fa-fw fa-list"></i>
-        <span>Menu</span>
-    </a>
-</li>
-<li class="nav-item" id="role">
-    <a class="nav-link" href="<?= base_url('menu/role'); ?>">
-        <i class="fas fa-fw fa-list"></i>
-        <span>Role</span>
-    </a>
-</li>
- -->

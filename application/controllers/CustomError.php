@@ -16,6 +16,14 @@ class CustomError extends CI_Controller {
 		$this->load->view('index', $data);
 	}
 
+	public function error_403()
+	{
+		$data = array(
+						"page" => "403"
+						);
+		$this->load->view('index', $data);
+	}
+
 }
 
 /* End of file 404.php */

@@ -109,6 +109,22 @@ class Menu_model extends CI_Model {
 		//return $this->db->insert_batch($this->join, $data);
 	}
 
+	public function cek_accesss($level, $menu)
+	{
+		$this->db->select('*');
+		$this->db->from($this->table);
+		$this->db->join($this->join, $this->join.'.'.$this->pk.' = '.$this->table.'.'.$this->pk);
+		$this->db->join($this->join2, $this->join.'.'.$this->fk2.' = '.$this->join2.'.'.$this->fk2);
+		$this->db->where(array("level" => $level, "link_menu" => $menu));
+		$this->db->order_by('order_menu', 'asc');
+		$q =  $this->db->get();
+		if($q->num_rows()>0){
+			return true;
+		}else{
+			return false;
+		}
+	}
+
 }
 
 /* End of file Menu_model.php */
