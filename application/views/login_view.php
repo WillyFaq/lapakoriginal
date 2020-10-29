@@ -22,7 +22,7 @@
 										<p id="quoteGenius">- <?= $quote['author']; ?></p>			
 									</div><!--end quoteContainer-->
 								</div><!--end container-->
-			              	</div>
+			              	</div>	
 			              	<div class="col-lg-6">
 			                	<div class="p-5">
 				                  	<div class="text-center">

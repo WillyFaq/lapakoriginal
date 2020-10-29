@@ -33,9 +33,7 @@ class Laporan_so extends CI_Controller {
 			);
 
 		$this->table->set_template($tmpl);
-
 		$this->table->set_empty("&nbsp;");
-
 		$this->table->set_heading('No', 'Nama Sales', 'Barang (Minimal Penjualan)', 'Status', 'Aksi');
 
 		if ($num_rows > 0)

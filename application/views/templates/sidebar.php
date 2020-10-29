@@ -1,6 +1,6 @@
 <?php
     
-    $q = $this->Menu_model->get_where(["level" => $this->session->userdata('user')->level]);
+    $q = $this->Menu_model->get_where(["level" => $this->session->userdata('user')->level, "sts_menu" => 1]);
     $res = $q->result_array();
     //echo $this->db->last_query();
     $menu = [];

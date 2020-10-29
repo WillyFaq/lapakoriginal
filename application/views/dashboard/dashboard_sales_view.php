@@ -1,5 +1,39 @@
 <!-- Content Row -->
+<?php
+    $card = [];
+    if(sizeof($semua)>1){
+        foreach ($semua as $k => $v) {
+            //echo "$v[barang] (".number_format($v['jml']).")<br>";
+            /*$card[] = array(
+                            );*/
+            $card["$v[barang]"] = [
+                                $v['jml'],
+                                $bulan_ini[$k]['jml'],
+                                $hari_ini[$k]['jml'],
+                                $target[$k]['jml'],
+                            ];
+        }
+    }else{
+        //echo number_format($bulan_ini[0]['jml']);
+        //$card[0] = array("0" => $semua[0]['jml']);
+        $k = 0;
+        $card[0] =  [
+                                $semua[$k]['jml'],
+                                $bulan_ini[$k]['jml'],
+                                $hari_ini[$k]['jml'],
+                                $target[$k]['jml'],
+                            ];
+    }
+    //print_pre($card);
+?>
+<?php foreach($card as $k => $v): ?>
 <div class="row">
+    <?php if($k!="0"): ?>
+    <div class="col-xl-12 col-md-12">
+        <p><?= $k; ?></p>
+    </div>
+    
+    <?php endif; ?>
     <!-- Earnings (Monthly) Card Example -->
     <div class="col-xl-3 col-md-6 mb-4">
         <div class="card border-left-primary shadow h-100 py-2">
@@ -8,15 +42,7 @@
                     <div class="col mr-2">
                         <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Total Order</div>
                         <div class="h5 mb-0 font-weight-bold text-gray-800">
-                        <?php
-                            if(sizeof($semua)>1){
-                                foreach ($semua as $k => $v) {
-                                    echo "$v[barang] (".number_format($v['jml']).")<br>";
-                                }
-                            }else{
-                                echo number_format($semua[0]['jml']);
-                            }
-                        ?>
+                        <?= number_format($v[0]); ?>
                         </div>
                     </div>
                     <div class="col-auto">
@@ -33,15 +59,7 @@
                     <div class="col mr-2">
                         <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Order Bulan ini</div>
                         <div class="h5 mb-0 font-weight-bold text-gray-800">
-                        <?php
-                            if(sizeof($bulan_ini)>1){
-                                foreach ($bulan_ini as $k => $v) {
-                                    echo "$v[barang] (".number_format($v['jml']).")<br>";
-                                }
-                            }else{
-                                echo number_format($bulan_ini[0]['jml']);
-                            }
-                        ?>
+                        <?= number_format($v[1]); ?>
                         </div>
                     </div>
                     <div class="col-auto">
@@ -59,15 +77,7 @@
                     <div class="col mr-2">
                         <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Order Hari ini</div>
                         <div class="h5 mb-0 font-weight-bold text-gray-800">
-                        <?php
-                            if(sizeof($hari_ini)>1){
-                                foreach ($hari_ini as $k => $v) {
-                                    echo "$v[barang] (".number_format($v['jml']).")<br>";
-                                }
-                            }else{
-                                echo number_format($hari_ini[0]['jml']);
-                            }
-                        ?>
+                        <?= number_format($v[2]); ?>
                         </div>
                     </div>
                     <div class="col-auto">
@@ -85,15 +95,7 @@
                     <div class="col mr-2">
                         <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Target Harian</div>
                         <div class="h5 mb-0 font-weight-bold text-gray-800">
-                        <?php
-                            if(sizeof($target)>1){
-                                foreach ($target as $k => $v) {
-                                    echo "$v[barang] (".number_format($v['jml']).")<br>";
-                                }
-                            }else{
-                                echo number_format($target[0]['jml']);
-                            }
-                        ?>    
+                        <?= number_format($v[3]); ?>
                         </div>
                     </div>
                     <div class="col-auto">
@@ -104,7 +106,7 @@
         </div>
     </div>
 </div>
-
+<?php endforeach; ?>
 
 <div class="row">
     <!-- Area Chart -->
@@ -114,135 +116,46 @@
             <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                 <h6 class="m-0 font-weight-bold text-primary">Order History</h6>
                 <div class="dropdown no-arrow">
-                    
                 </div>
             </div>
                 <!-- Card Body -->
             <div class="card-body">
+                <div class="form-group row cb_tgl_box">
+                    <label for="filter" class="col-sm-2 col-form-label">Filter</label>
+                    <div class="col">
+                        <input type="date" class="form-control cb_tgl" id="tgl1" format="Y-m-d">
+                    </div>
+                    <div class="col">
+                        <input type="date" class="form-control cb_tgl" id="tgl2" format="Y-m-d">
+                    </div>
+                </div>
                 <div class="chart-area">
-                    <canvas id="myAreaChart"></canvas>
+                    <img  src="<?= base_url('assets/img/loading_barchart.svg'); ?>" alt="loading">
                 </div>
             </div>
         </div>
     </div>
 </div>
-<?php
-$sql = "SELECT 
-           a.id_user,
-           a.kode_barang,
-           b.nama_barang,
-           a.tgl_order,
-           SUM(a.jumlah_order) AS jumlah_order
-        FROM sales_order a
-        JOIN barang b ON a.kode_barang = b.kode_barang
-        WHERE a.id_user = ".$this->session->userdata('user')->id_user."
-        AND YEAR(a.tgl_order) = ".date("Y")."
-        GROUP BY a.kode_barang, DATE(a.tgl_order)";
-$q = $this->db->query($sql);
-$res = $q->result();
-$label = [];
-$jml = [];
-$dada = [];
-foreach ($res as $row) {
-    $label[date("d-m-Y", strtotime($row->tgl_order))] = date("d-m-Y", strtotime($row->tgl_order));
-    $jml[$row->kode_barang][] = $row->jumlah_order;
-    $dada[$row->kode_barang] = $row->nama_barang;
-}
-
-$color = ['red','orange','yellow','green','blue','purple','grey'];
-$data_set = [];
-$i=0;
-foreach ($dada as $key => $value) {
-    $ret = '{';
-    //print_pre($jml[$key]);
-    $ret .= 'label:"'.$value.'",';
-    $ret .= 'backgroundColor:window.chartColors.'.$color[$i].','."\n";
-    $ret .= 'borderColor:window.chartColors.'.$color[$i].','."\n";
-    $ret .= 'data:['.join(', ', $jml[$key]).'],'."\n";
-    $ret .= 'fill:false,'."\n";
-
-    $ret .= '}';
-    $i++;
-    $datasets[] = $ret;
-}
-?>
 <script type="text/javascript">
-        
+    $(document).ready(function(){
+        $(".chart-area").load('<?= base_url('dahsboard/load_history'); ?>');
 
-// Area Chart Example
-var ctx = document.getElementById("myAreaChart");
-var myLineChart = new Chart(ctx, {
-    type: 'line',
-    data: {
-        labels: ["<?= join('", "', $label) ?>"],
-        datasets: [<?= join(", ", $datasets); ?>],
-    },
-    options: {
-        maintainAspectRatio: false,
-        layout: {
-            padding: {
-                left: 10,
-                right: 25,
-                top: 25,
-                bottom: 0
-            }
-        },
-        scales: {
-            xAxes: [{
-                time: {
-                    unit: 'date'
-                },
-                gridLines: {
-                    display: false,
-                    drawBorder: false
-                },
-                ticks: {
-                    maxTicksLimit: 7
-                }
-            }],
-            yAxes: [{
-                ticks: {
-                    maxTicksLimit: 5,
-                    padding: 10
-                },
-                gridLines: {
-                    color: "rgb(234, 236, 244)",
-                    zeroLineColor: "rgb(234, 236, 244)",
-                    drawBorder: false,
-                    borderDash: [2],
-                    zeroLineBorderDash: [2]
-                }
-            }],
-        },
-        legend: {
-            display: "bootom"
-        },
-        tooltips: {
-            backgroundColor: "rgb(255,255,255)",
-            bodyFontColor: "#858796",
-            titleMarginBottom: 10,
-            titleFontColor: '#6e707e',
-            titleFontSize: 14,
-            borderColor: '#dddfeb',
-            borderWidth: 1,
-            xPadding: 15,
-            yPadding: 15,
-            displayColors: false,
-            intersect: false,
-            mode: 'index',
-            caretPadding: 10,
-            callbacks: {
-                label: function(tooltipItem, chart) {
-                    var datasetLabel = chart.datasets[tooltipItem.datasetIndex].label || '';
-                    return datasetLabel + ': ' + number_format(tooltipItem.yLabel);
-                }
-            }
-        }
-    }
-});
+        $(".cb_tgl").change(function(){
+            var tgl1 = $("#tgl1").val();
+            var tgl2 = $("#tgl2").val();
+            var url  = '<?= base_url('dahsboard/load_history'); ?>/'+tgl1+"_"+tgl2;
+            console.log(url);
+
+            $(".chart-area").load(url);
+        });
+    });
 
 
-
-
-
+    /*
+var loading_box = "";
+            loading_box += '<div class="loading_box" id="omset_load">';
+            loading_box += '<img  src="<?= base_url('assets/img/loading_barchart.svg'); ?>" alt="loading">';
+            loading_box += '</div>';
+            $("#load_omset_chart").html(loading_box);
+    */
 </script>

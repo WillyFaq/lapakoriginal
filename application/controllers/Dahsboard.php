@@ -330,6 +330,35 @@ class Dahsboard extends CI_Controller {
 						);
 		$this->load->view('chart/omset_view', $data);
 	}
+
+	public function load_history($tgl="")
+	{	
+		$sql = " AND YEAR(a.tgl_order) = ".date("Y")." ";
+		if($tgl!=""){
+			$tgl = explode("_", $tgl);
+			if($tgl[1]==""){
+				$sql = " AND a.tgl_order > '$tgl[0]' ";
+			}else if($tgl[0]==""){
+				$sql = " AND a.tgl_order < '$tgl[1]' ";
+			}else{
+				if(strtotime($tgl[1])<strtotime($tgl[0])){
+					echo 'Tanggal tidal valid!';
+				}else{
+					$sql = " AND a.tgl_order < '$tgl[1]' AND a.tgl_order > '$tgl[0]' ";
+				}
+			}
+		}
+
+		$data = array(
+						'sql' => $sql
+						);
+		$this->load->view('chart/history_so', $data);
+	}
+
+	public function chart_history($sql='')
+	{
+		
+	}
 }
 
 /* End of file Dahsboard.php */
