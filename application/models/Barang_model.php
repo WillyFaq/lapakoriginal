@@ -156,12 +156,15 @@ class Barang_model extends CI_Model {
 		return $this->db->query($sql);
 	}
 
-	public function laporan_bulanan($bln, $thn)
+	public function laporan_bulanan($bln, $thn, $brg)
 	{
 		$whr = "WHERE YEAR(a.tgl_order) = '".$thn."'";
 
 		if($bln!=""){
 			$whr .= " AND MONTH(a.tgl_order) = '$bln' ";
+		}
+		if($brg!=""){
+			$whr .= " AND SUBSTRING_INDEX(a.kode_barang, '.', 1) = '$brg' ";
 		}
 		$sql = "SELECT
 					a.id_transaksi,

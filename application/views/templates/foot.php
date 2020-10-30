@@ -32,7 +32,9 @@
             $('[data-toggle="tooltip"]').tooltip();
             if ($(window).width() < 768) {
                 var table = $(".dataTable").DataTable({
-                    "scrollX": true
+                    "scrollX": true,
+                    "pagingType": "full",
+                    "lengthMenu": [[100, 250, 500, -1], [100, 250, 500, "All"]]
                 });
             }else{
                 var table = $(".dataTable").DataTable();

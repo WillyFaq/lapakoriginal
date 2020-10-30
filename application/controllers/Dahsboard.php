@@ -64,10 +64,10 @@ class Dahsboard extends CI_Controller {
 	}
 
 
-	public function get_all_penjualan($bln="", $thn="")
+	public function get_all_penjualan($bln="", $thn="", $brg="")
 	{
 		$thn = $thn==''?date("Y"):$thn;
-		$query=$this->Barang_model->laporan_bulanan($bln, $thn);
+		$query=$this->Barang_model->laporan_bulanan($bln, $thn, $brg);
 		$res = $query->result();
 		$tot = 0;
 		$laba = 0;
@@ -93,14 +93,14 @@ class Dahsboard extends CI_Controller {
 		return $num_rows;
 	}
 
-	public function get_atasan_chart($thn="")
+	public function get_atasan_chart($thn="", $brg="")
 	{
 		$bln = get_bulan();
 	    //print_pre($bln);
 
 	    $data = [];
 	    foreach ($bln as $k => $v) {
-	        $data[] = $this->get_all_penjualan($k, $thn);
+	        $data[] = $this->get_all_penjualan($k, $thn, $brg);
 	    }
 
 	    //print_pre($data);
@@ -112,14 +112,14 @@ class Dahsboard extends CI_Controller {
 
 
 
-	public function get_atasan_chart_omset($thn="")
+	public function get_atasan_chart_omset($thn="", $brg="")
 	{
 		$bln = get_bulan();
 	    //print_pre($bln);
 
 	    $data = [];
 	    foreach ($bln as $k => $v) {
-	        $data[] = $this->get_all_omset($k, $thn);
+	        $data[] = $this->get_all_omset($k, $thn, $brg);
 	    }
 
 	    //print_pre($data);
@@ -129,9 +129,9 @@ class Dahsboard extends CI_Controller {
 	    			);
 	}
 
-	public function get_all_omset($bln="", $thn="")
+	public function get_all_omset($bln="", $thn="", $brg="")
 	{
-		$query=$this->Barang_model->laporan_bulanan($bln, $thn);
+		$query=$this->Barang_model->laporan_bulanan($bln, $thn, $brg);
 		$res = $query->result();
 		$tot = 0;
 		$laba = 0;
@@ -327,18 +327,18 @@ class Dahsboard extends CI_Controller {
 		$this->load->view('chart/demograpi_view', $data);
 	}
 
-	public function load_profit($thn="")
+	public function load_profit($thn="", $brg="")
 	{
 		$data = array(
-						'chart' => $this->get_atasan_chart($thn)
+						'chart' => $this->get_atasan_chart($thn, $brg)
 						);
 		$this->load->view('chart/profit_view', $data);
 	}
 
-	public function load_omset($thn="")
+	public function load_omset($thn="", $brg="")
 	{
 		$data = array(
-						'omset' => $this->get_atasan_chart_omset($thn)
+						'omset' => $this->get_atasan_chart_omset($thn, $brg)
 						);
 		$this->load->view('chart/omset_view', $data);
 	}

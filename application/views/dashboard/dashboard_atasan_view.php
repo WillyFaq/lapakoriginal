@@ -189,6 +189,26 @@
                         </select>
                     </div>
                 </div>
+                <div class="form-group row cb_product_box">
+                    <label for="filter" class="col-sm-2 col-form-label">Barang</label>
+                    <div class="col-sm-10">
+                        <select name="filter" id="cb_jenis_brg_profit" class="form-control">
+                            <option value="">Semua Jenis Barang</option>
+                            <?php
+                                $sql = "SELECT 
+                                            DISTINCT SUBSTRING_INDEX(kode_barang, '.', 1) AS kode_barang
+                                        FROM barang ";
+                                $q = $this->db->query($sql);
+                                $res = $q->result();
+                                foreach ($res as $row) {
+                                    $sel = '';
+                                    echo '<option value="'.$row->kode_barang.'" '.$sel.'>'.$row->kode_barang.'</option>';
+                                }
+                            ?>
+                        </select>
+                    </div>
+                </div>
+                <hr>
                 <div class="chart-area" id="load_profit_chart">
                     <div class="loading_box" id="profit_load">
                         <img  src="<?= base_url('assets/img/loading_barchart.svg'); ?>" alt="loading">
@@ -229,6 +249,26 @@
                         </select>
                     </div>
                 </div>
+                <div class="form-group row cb_product_box">
+                    <label for="filter" class="col-sm-2 col-form-label">Barang</label>
+                    <div class="col-sm-10">
+                        <select name="filter" id="cb_jenis_brg_omset" class="form-control">
+                            <option value="">Semua Jenis Barang</option>
+                            <?php
+                                $sql = "SELECT 
+                                            DISTINCT SUBSTRING_INDEX(kode_barang, '.', 1) AS kode_barang
+                                        FROM barang ";
+                                $q = $this->db->query($sql);
+                                $res = $q->result();
+                                foreach ($res as $row) {
+                                    $sel = '';
+                                    echo '<option value="'.$row->kode_barang.'" '.$sel.'>'.$row->kode_barang.'</option>';
+                                }
+                            ?>
+                        </select>
+                    </div>
+                </div>
+                <hr>
                 <div class="chart-area" id="load_omset_chart">
                     <div class="loading_box" id="omset_load">
                         <img  src="<?= base_url('assets/img/loading_barchart.svg'); ?>" alt="loading">
@@ -277,24 +317,18 @@
 
         $("#load_profit_chart").load('<?= base_url("dahsboard/load_profit/"); ?>'+$("#cb_thn_profit").val());
         $("#cb_thn_profit").change(function(){
-            var v = $(this).val();
-            var loading_box = "";
-            loading_box += '<div class="loading_box" id="omset_load">';
-            loading_box += '<img  src="<?= base_url('assets/img/loading_barchart.svg'); ?>" alt="loading">';
-            loading_box += '</div>';
-            $("#load_profit_chart").html(loading_box);
-            $("#load_profit_chart").load('<?= base_url("dahsboard/load_profit/"); ?>'+v);
+            filter_profit();
+        });
+        $("#cb_jenis_brg_profit").change(function(){
+            filter_profit();
         });
 
         $("#load_omset_chart").load('<?= base_url("dahsboard/load_omset/"); ?>'+$("#cb_thn_omset").val());
         $("#cb_thn_omset").change(function(){
-            var v = $(this).val();
-            var loading_box = "";
-            loading_box += '<div class="loading_box" id="omset_load">';
-            loading_box += '<img  src="<?= base_url('assets/img/loading_barchart.svg'); ?>" alt="loading">';
-            loading_box += '</div>';
-            $("#load_omset_chart").html(loading_box);
-            $("#load_omset_chart").load('<?= base_url("dahsboard/load_omset/"); ?>'+v);
+            filter_omset();
+        });
+        $("#cb_jenis_brg_omset").change(function(){
+            filter_omset();
         });
 
     });
@@ -319,5 +353,27 @@
             $("#demograpi_load").html(loading_box);
             $("#demograpi_load").load('<?= base_url("dahsboard/load_demografi/"); ?>'+v+"/"+brg);
         }
+    }
+
+    function filter_profit() {
+        var v = $("#cb_thn_profit").val();
+        var br = $("#cb_jenis_brg_profit").val();
+        var loading_box = "";
+        loading_box += '<div class="loading_box" id="omset_load">';
+        loading_box += '<img  src="<?= base_url('assets/img/loading_barchart.svg'); ?>" alt="loading">';
+        loading_box += '</div>';
+        $("#load_profit_chart").html(loading_box);
+        $("#load_profit_chart").load('<?= base_url("dahsboard/load_profit/"); ?>'+v+"/"+br);
+    }
+
+    function filter_omset() {
+        var v = $("#cb_thn_omset").val();
+        var br = $("#cb_jenis_brg_omset").val();
+        var loading_box = "";
+        loading_box += '<div class="loading_box" id="omset_load">';
+        loading_box += '<img  src="<?= base_url('assets/img/loading_barchart.svg'); ?>" alt="loading">';
+        loading_box += '</div>';
+        $("#load_omset_chart").html(loading_box);
+        $("#load_omset_chart").load('<?= base_url("dahsboard/load_omset/"); ?>'+v+"/"+br);
     }
 </script>
