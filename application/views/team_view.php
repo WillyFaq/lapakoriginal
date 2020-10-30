@@ -16,7 +16,7 @@
                 <?= isset($table)?$table:''; ?>
                 <?php if(isset($form)):
                     $hidden = array(
-                                        'id_sales_team' => isset($id_sales_team)?$id_sales_team:'',
+                                    'id_sales_team' => isset($id_sales_team)?$id_sales_team:'',
                                     );
                     echo form_open($form, '', $hidden);
                 ?>

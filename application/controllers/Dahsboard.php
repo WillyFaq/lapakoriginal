@@ -310,7 +310,19 @@ class Dahsboard extends CI_Controller {
                 WHERE 1=1 $whr
                 GROUP BY SUBSTR(b.alamat, 1, 2)";
         $q = $this->db->query($sql);
-
+        if($q->num_rows()==0){
+        	$whr = str_replace(" AND a.kode_barang = '$brg' ", "", $whr);
+        	$whr .= " AND SUBSTRING_INDEX(a.kode_barang, '.', 1) = '$brg' ";
+        	$sql = "SELECT  
+                    SUBSTR(b.alamat, 1, 2) AS prov,
+                    COUNT(*) AS jml
+                FROM sales_order a
+                JOIN pelanggan b ON a.no_pelanggan = b.no_pelanggan
+                WHERE 1=1 $whr
+                GROUP BY SUBSTR(b.alamat, 1, 2)";
+        	$q = $this->db->query($sql);
+        }
+        //echo $this->db->last_query();
         $data["q"] = $q;
 		$this->load->view('chart/demograpi_view', $data);
 	}
@@ -333,24 +345,30 @@ class Dahsboard extends CI_Controller {
 
 	public function load_history($tgl="")
 	{	
-		$sql = " AND YEAR(a.tgl_order) = ".date("Y")." ";
+		$judul = "Order History Bulan ".get_bulan(date("n"));
+		$sql = " AND YEAR(a.tgl_order) = '".date("Y")."' AND MONTH(a.tgl_order) = '".date("m")."' ";
 		if($tgl!=""){
+			$judul = "Order History ";
 			$tgl = explode("_", $tgl);
 			if($tgl[1]==""){
 				$sql = " AND a.tgl_order > '$tgl[0]' ";
+				$judul .= "Mulai Tanggal $tgl[0] ";
 			}else if($tgl[0]==""){
 				$sql = " AND a.tgl_order < '$tgl[1]' ";
+				$judul .= "Sampai Tanggal $tgl[1] ";
 			}else{
 				if(strtotime($tgl[1])<strtotime($tgl[0])){
 					echo 'Tanggal tidal valid!';
 				}else{
 					$sql = " AND a.tgl_order < '$tgl[1]' AND a.tgl_order > '$tgl[0]' ";
+					$judul .= "Mulai Tanggal $tgl[0] Sampai Tanggal $tgl[1] ";
 				}
 			}
 		}
 
 		$data = array(
-						'sql' => $sql
+						'sql' => $sql,
+						'judul' => $judul
 						);
 		$this->load->view('chart/history_so', $data);
 	}
@@ -358,6 +376,29 @@ class Dahsboard extends CI_Controller {
 	public function chart_history($sql='')
 	{
 		
+	}
+
+	public function cb_barang_filter($id='')
+	{
+		$whr = "";
+		if($id!=""){
+			$whr = " WHERE SUBSTRING_INDEX(kode_barang, '.', 1) = '$id' ";
+		}
+		//$ret = '<div class="form-group row"><label for="nama" class="col-sm-2 col-form-label">Barang</label><div class="col-sm-10">';
+		$sql = "SELECT *
+	            FROM barang
+	            $whr
+	            GROUP BY kode_barang";
+	    $q = $this->db->query($sql);
+		$res = $q->result();
+			$opt[$id] = "Semua Barang";
+		foreach ($res as $row) {
+			$opt[$row->kode_barang] = $row->nama_barang;
+		}
+		$js = 'class="form-control" id="cb_brg" onchange="filter_demo()" ';
+		$ret = form_dropdown('kode_barang',$opt,"",$js);
+		//$ret= $ret.'</div></div>';
+		echo $ret;
 	}
 }
 

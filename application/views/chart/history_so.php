@@ -1,33 +1,67 @@
 <canvas id="myAreaChart"></canvas>
 <?php
-$sql = "SELECT 
-           a.id_user,
-           a.kode_barang,
-           b.nama_barang,
-           a.tgl_order,
-           SUM(a.jumlah_order) AS jumlah_order
+
+$dada = [];
+$q = $this->Sales_model->get_data($this->session->userdata('user')->id_user);
+$res = $q->result();
+foreach ($res as $row) {
+    $dada[$row->kode_barang] = $row->nama_barang;
+}
+//print_pre($dada);
+
+$sql1 = "SELECT
+           DATE(a.tgl_order) AS tgl_order
         FROM sales_order a
         JOIN barang b ON a.kode_barang = b.kode_barang
         WHERE a.id_user = ".$this->session->userdata('user')->id_user."
         $sql
-        GROUP BY a.kode_barang, DATE(a.tgl_order)";
-$q = $this->db->query($sql);
+        GROUP BY DATE(a.tgl_order)
+        ORDER BY DATE(a.tgl_order)";
+$q = $this->db->query($sql1);
+
 $res = $q->result();
 $label = [];
 $jml = [];
-$dada = [];
+$tmp_kode = "";
 foreach ($res as $row) {
-    $label[date("d-m-Y", strtotime($row->tgl_order))] = date("d-m-Y", strtotime($row->tgl_order));
-    $jml[$row->kode_barang][] = $row->jumlah_order;
-    $dada[$row->kode_barang] = $row->nama_barang;
+    $tgl = date("d-m-Y", strtotime($row->tgl_order));
+    $tgl2 = date("Y-m-d", strtotime($row->tgl_order));
+    $label[$tgl] = $tgl;
+    foreach ($dada as $k => $va) {
+        $sql = "SELECT 
+               a.id_user,
+               a.kode_barang,
+               b.nama_barang,
+               DATE(a.tgl_order) AS tgl_order,
+               SUM(a.jumlah_order) AS jumlah_order
+            FROM sales_order a
+            JOIN barang b ON a.kode_barang = b.kode_barang
+            WHERE a.id_user = ".$this->session->userdata('user')->id_user."
+            AND DATE(a.tgl_order) = '$tgl2' AND a.kode_barang = '$k'
+            GROUP BY a.kode_barang, DATE(a.tgl_order)
+            ORDER BY a.kode_barang, DATE(a.tgl_order)";
+        $qq = $this->db->query($sql);
+        $ress = $qq->result();
+        if($qq->num_rows()>0){
+            foreach ($ress as $roww) {
+                $jml[$k][$tgl] = $roww->jumlah_order;
+            }
+        }else{
+            $jml[$k][$tgl] = 0;
+        }
+    }
 }
 
-$color = ['red','orange','yellow','green','blue','purple','grey'];
+/*print_pre($label);
+print_pre($jml);
+print_pre($dada);*/
+
+
+$color = ['red','orange','yellow','green','blue','purple','grey', 'black'];
 $data_set = [];
 $i=0;
 foreach ($dada as $key => $value) {
     $ret = '{';
-    //print_pre($jml[$key]);
     $ret .= 'label:"'.$value.'",';
     $ret .= 'backgroundColor:window.chartColors.'.$color[$i].','."\n";
     $ret .= 'borderColor:window.chartColors.'.$color[$i].','."\n";
@@ -36,8 +70,12 @@ foreach ($dada as $key => $value) {
 
     $ret .= '}';
     $i++;
+    if($i>sizeof($color)-1){
+        $i=0;
+    }
     $datasets[] = $ret;
 }
+//print_pre($datasets);
 ?>
 <script type="text/javascript">
         
@@ -52,11 +90,16 @@ var myLineChart = new Chart(ctx, {
     },
     options: {
         maintainAspectRatio: false,
+        title:{
+            display: true,
+            text: '<?= $judul; ?>',
+            fontSize: 20
+        },
         layout: {
             padding: {
                 left: 10,
-                right: 25,
-                top: 25,
+                right: 10,
+                top: 0,
                 bottom: 0
             }
         },
@@ -66,8 +109,8 @@ var myLineChart = new Chart(ctx, {
                     unit: 'date'
                 },
                 gridLines: {
-                    display: false,
-                    drawBorder: false
+                    display: true,
+                    drawBorder: true
                 },
                 ticks: {
                     maxTicksLimit: 7
@@ -81,14 +124,15 @@ var myLineChart = new Chart(ctx, {
                 gridLines: {
                     color: "rgb(234, 236, 244)",
                     zeroLineColor: "rgb(234, 236, 244)",
-                    drawBorder: false,
+                    drawBorder: true,
                     borderDash: [2],
                     zeroLineBorderDash: [2]
                 }
             }],
         },
         legend: {
-            display: "bootom"
+            display: true,
+            position: 'bottom'
         },
         tooltips: {
             backgroundColor: "rgb(255,255,255)",

@@ -3,9 +3,6 @@
     $card = [];
     if(sizeof($semua)>1){
         foreach ($semua as $k => $v) {
-            //echo "$v[barang] (".number_format($v['jml']).")<br>";
-            /*$card[] = array(
-                            );*/
             $card["$v[barang]"] = [
                                 $v['jml'],
                                 $bulan_ini[$k]['jml'],
@@ -14,8 +11,6 @@
                             ];
         }
     }else{
-        //echo number_format($bulan_ini[0]['jml']);
-        //$card[0] = array("0" => $semua[0]['jml']);
         $k = 0;
         $card[0] =  [
                                 $semua[$k]['jml'],
@@ -24,8 +19,16 @@
                                 $target[$k]['jml'],
                             ];
     }
-    //print_pre($card);
 ?>
+<div class="card shadow mb-4">
+    <!-- Card Header - Accordion -->
+    <a href="#collapseCardExample" class="d-block card-header py-3" data-toggle="collapse" role="button" aria-expanded="true" aria-controls="collapseCardExample">
+        <h6 class="m-0 font-weight-bold text-primary">Summary</h6>
+    </a>
+    <!-- Card Content - Collapse -->
+    <div class="collapse show" id="collapseCardExample" style="">
+        <div class="card-body">
+
 <?php foreach($card as $k => $v): ?>
 <div class="row">
     <?php if($k!="0"): ?>
@@ -107,7 +110,10 @@
     </div>
 </div>
 <?php endforeach; ?>
-
+            
+        </div>
+    </div>
+</div>
 <div class="row">
     <!-- Area Chart -->
     <div class="col-xl-12 col-lg-12">
@@ -130,7 +136,9 @@
                     </div>
                 </div>
                 <div class="chart-area">
+                    <div class="loading_box" id="omset_load">
                     <img  src="<?= base_url('assets/img/loading_barchart.svg'); ?>" alt="loading">
+                    </div>
                 </div>
             </div>
         </div>
@@ -145,6 +153,13 @@
             var tgl2 = $("#tgl2").val();
             var url  = '<?= base_url('dahsboard/load_history'); ?>/'+tgl1+"_"+tgl2;
             console.log(url);
+
+            var loading_box = "";
+            loading_box += '<div class="loading_box" id="omset_load">';
+            loading_box += '<img  src="<?= base_url('assets/img/loading_barchart.svg'); ?>" alt="loading">';
+            loading_box += '</div>';
+            $(".chart-area").html(loading_box);
+
 
             $(".chart-area").load(url);
         });

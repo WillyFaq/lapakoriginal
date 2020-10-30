@@ -114,7 +114,23 @@
 
                     <div class="form-group row cb_product_box">
                         <label for="filter" class="col-sm-2 col-form-label">Barang</label>
-                        <div class="col-sm-10">
+                        <div class="col-sm-5">
+                            <select name="filter" id="cb_jenis_brg" class="form-control">
+                                <option value="">Semua Jenis Barang</option>
+                                <?php
+                                    $sql = "SELECT 
+                                                DISTINCT SUBSTRING_INDEX(kode_barang, '.', 1) AS kode_barang
+                                            FROM barang ";
+                                    $q = $this->db->query($sql);
+                                    $res = $q->result();
+                                    foreach ($res as $row) {
+                                        $sel = '';
+                                        echo '<option value="'.$row->kode_barang.'" '.$sel.'>'.$row->kode_barang.'</option>';
+                                    }
+                                ?>
+                            </select>
+                        </div>
+                        <div class="col-sm-5 cb_brg_box">
                             <select name="filter" id="cb_brg" class="form-control">
                                 <option value="">Semua Barang</option>
                                 <?php
@@ -236,8 +252,18 @@
 <script type="text/javascript">
     $(document).ready(function(){
         $("#demograpi_load").load('<?= base_url("dahsboard/load_demografi/1"); ?>');
+        $(".cb_brg_box").load('<?= base_url("dahsboard/cb_barang_filter"); ?>');
         $("#cb_filter").change(function(){
             filter_demo();
+        });
+
+        $("#cb_jenis_brg").change(function(){
+            var val = $(this).val();
+            $(".cb_brg_box").load('<?= base_url("dahsboard/cb_barang_filter/"); ?>'+val, function(){
+                filter_demo();
+            });
+
+            //filter_demo();
         });
 
         $(".cb_tgl").change(function(){
