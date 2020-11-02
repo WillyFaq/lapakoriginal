@@ -229,7 +229,9 @@ class Sales_order extends CI_Controller {
 			    $pesan = str_replace("<transaksi>", $datt, $pesan);
 			}
 			$msg = urlencode($pesan);
-			$not = "62".substr($not, 1, strlen($not));
+			if(substr($not, 1, strlen($not))=="0"){
+				$not = "62".substr($not, 1, strlen($not));
+			}
 			$url = 'whatsapp://send?phone='.$not.'&text='.$msg;
 			if (strpos($_SERVER['HTTP_USER_AGENT'], 'wv') !== false){
 		        //echo "<br> asli android";
