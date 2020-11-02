@@ -82,7 +82,7 @@ class Admin extends CI_Controller {
 		$data['password'] = e_password($data['password']);
 		$data['sts'] = 1;
 		//print_r($data);
-		if($this->User_model->add($data)){
+		if($this->User_model->add_admin($data)){
 			alert_notif("success");
 			redirect('admin');
 		}else{

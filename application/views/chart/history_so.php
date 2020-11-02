@@ -18,7 +18,6 @@ $sql1 = "SELECT
         GROUP BY DATE(a.tgl_order)
         ORDER BY DATE(a.tgl_order)";
 $q = $this->db->query($sql1);
-
 $res = $q->result();
 $label = [];
 $jml = [];
@@ -58,22 +57,25 @@ print_pre($dada);*/
 
 
 $color = ['red','orange','yellow','green','blue','purple','grey', 'black'];
-$data_set = [];
+$datasets = [];
 $i=0;
-foreach ($dada as $key => $value) {
-    $ret = '{';
-    $ret .= 'label:"'.$value.'",';
-    $ret .= 'backgroundColor:window.chartColors.'.$color[$i].','."\n";
-    $ret .= 'borderColor:window.chartColors.'.$color[$i].','."\n";
-    $ret .= 'data:['.join(', ', $jml[$key]).'],'."\n";
-    $ret .= 'fill:false,'."\n";
+if(!empty($jml)){
 
-    $ret .= '}';
-    $i++;
-    if($i>sizeof($color)-1){
-        $i=0;
+    foreach ($dada as $key => $value) {
+        $ret = '{';
+        $ret .= 'label:"'.$value.'",';
+        $ret .= 'backgroundColor:window.chartColors.'.$color[$i].','."\n";
+        $ret .= 'borderColor:window.chartColors.'.$color[$i].','."\n";
+        $ret .= 'data:['.join(', ', $jml[$key]).'],'."\n";
+        $ret .= 'fill:false,'."\n";
+
+        $ret .= '}';
+        $i++;
+        if($i>sizeof($color)-1){
+            $i=0;
+        }
+        $datasets[] = $ret;
     }
-    $datasets[] = $ret;
 }
 //print_pre($datasets);
 ?>

@@ -231,7 +231,7 @@ class Sales_order extends CI_Controller {
 			$msg = urlencode($pesan);
 			$not = "62".substr($not, 1, strlen($not));
 			$url = 'https://api.whatsapp.com/send?phone='.$not.'&text='.$msg;
-			$data['feedback'] =  anchor($url,'<span class="fab fa-whatsapp"></span> &nbsp; Feedback',array( 'title' => 'Feedback', 'class' => 'btn btn-success', 'data-toggle' => 'tooltip', 'target' => 'blank'));
+			$data['feedback'] =  anchor($url,'<span class="fab fa-whatsapp"></span> &nbsp; Feedback',array( 'title' => 'Feedback', 'class' => 'btn btn-success', 'data-toggle' => 'tooltip', 'target' => 'blank', "data-action" => "share/whatsapp/share"));
 			
 		}
 		$this->load->view('index', $data);

@@ -11,9 +11,11 @@ class Gudang_user_model extends CI_Model {
 	var $table = 'gudang_user';
 	var $join1 = 'gudang';
 	var $join2 = 'user';
+	var $join3 = 'jabatan';
 	var $pk = 'id_gudang_user';
 	var $fk1 = 'id_gudang';
 	var $fk2 = 'id_user';
+	var $fk3 = 'id_jabatan';
 
 	public function get_all()
 	{
@@ -21,7 +23,8 @@ class Gudang_user_model extends CI_Model {
 		$this->db->from($this->table);
 		$this->db->join($this->join1, "$this->join1.$this->fk1 = $this->table.$this->fk1");
 		$this->db->join($this->join2, "$this->join2.$this->fk2 = $this->table.$this->fk2");
-		$this->db->where('user.id_user !=', 1);
+		$this->db->join($this->join3, "$this->join2.$this->fk3 = $this->join3.$this->fk3");
+		$this->db->where('jabatan.level !=', 1);
 		return $this->db->get();
 	}
 
