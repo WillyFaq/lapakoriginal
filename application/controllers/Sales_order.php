@@ -230,7 +230,7 @@ class Sales_order extends CI_Controller {
 			}
 			$msg = urlencode($pesan);
 			$not = "62".substr($not, 1, strlen($not));
-			$url = 'https://api.whatsapp.com/send?phone='.$not.'&text='.$msg;
+			$url = 'whatsapp://send?phone='.$not.'&text='.$msg;
 			if (strpos($_SERVER['HTTP_USER_AGENT'], 'wv') !== false){
 		        //echo "<br> asli android";
 				$data['feedback'] =  anchor($url,'<span class="fab fa-whatsapp"></span> &nbsp; Feedback',array( 'title' => 'Feedback', 'class' => 'btn btn-success', 'data-toggle' => 'tooltip', "data-action" => "share/whatsapp/share"));
