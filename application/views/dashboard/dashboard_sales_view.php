@@ -1,5 +1,25 @@
 <!-- Content Row -->
-<h3><?= $_SERVER['HTTP_USER_AGENT']; ?></h3>
+<p><?php
+    $isWebView = false;
+    if((strpos($_SERVER['HTTP_USER_AGENT'], 'Mobile/') !== false) && (strpos($_SERVER['HTTP_USER_AGENT'], 'Safari/') == false)) :
+        $isWebView = true;
+    elseif(isset($_SERVER['HTTP_X_REQUESTED_WITH'])) :
+        $isWebView = true;
+    endif;
+
+    if(!$isWebView) : 
+        echo "ini android";
+    else :
+        echo "ini browser";
+        // Normal Browser
+    endif;
+
+    if (strpos($_SERVER['HTTP_USER_AGENT'], 'wv') !== false){
+        echo "<br> asli android";
+    }else{
+        echo "<br> asli browser";
+    }
+?></p>
 <?php
     $card = [];
     if(sizeof($semua)>1){
