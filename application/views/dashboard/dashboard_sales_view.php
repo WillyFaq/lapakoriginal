@@ -1,4 +1,5 @@
 <!-- Content Row -->
+<h3><?= $_SERVER['HTTP_USER_AGENT']; ?></h3>
 <?php
     $card = [];
     if(sizeof($semua)>1){
