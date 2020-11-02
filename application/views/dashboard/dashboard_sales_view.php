@@ -1,6 +1,6 @@
 <!-- Content Row -->
-<p><?php
-    $isWebView = false;
+<?php
+    /*$isWebView = false;
     if((strpos($_SERVER['HTTP_USER_AGENT'], 'Mobile/') !== false) && (strpos($_SERVER['HTTP_USER_AGENT'], 'Safari/') == false)) :
         $isWebView = true;
     elseif(isset($_SERVER['HTTP_X_REQUESTED_WITH'])) :
@@ -18,8 +18,8 @@
         echo "<br> asli android";
     }else{
         echo "<br> asli browser";
-    }
-?></p>
+    }*/
+?>
 <?php
     $card = [];
     if(sizeof($semua)>1){
@@ -156,7 +156,7 @@
                         <input type="date" class="form-control cb_tgl" id="tgl2" format="Y-m-d">
                     </div>
                 </div>
-                <div class="chart-area">
+                <div class="chart-area"  style="min-height: 500px;">
                     <div class="loading_box" id="omset_load">
                     <img  src="<?= base_url('assets/img/loading_barchart.svg'); ?>" alt="loading">
                     </div>
