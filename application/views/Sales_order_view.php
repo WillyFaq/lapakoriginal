@@ -59,7 +59,7 @@
                                     <div class="input-group-prepend">
                                         <span class="input-group-text" id="addon-rp">Rp.</span>
                                     </div>
-                                    <input type="number" min="0" class="form-control" name="harga_barang" id="harga_barang" placeholder="Harga Barang" <?= isset($harga_barang)?"value='$harga_barang'":''; ?> required aria-describedby="addon-rp" readonly >
+                                    <input type="number" min="0" class="form-control" name="harga_barang" id="harga_barang" placeholder="Harga Barang" <?= isset($harga_barang)?"value='$harga_barang'":''; ?> required aria-describedby="addon-rp" >
                                 </div>
                             </div>
                         </div>
@@ -77,7 +77,7 @@
                                     <div class="input-group-prepend">
                                         <span class="input-group-text" id="addon-rp-total">Rp.</span>
                                     </div>
-                                    <input type="number" min="0" class="form-control" name="total" id="total" placeholder="Total" <?= isset($total)?"value='$total'":''; ?> required aria-describedby="addon-rp-total" readonly >
+                                    <input type="number" min="0" class="form-control" name="total" id="total" placeholder="Total" <?= isset($total)?"value='$total'":''; ?> required aria-describedby="addon-rp-total" >
                                 </div>
                             </div>
                         </div>
