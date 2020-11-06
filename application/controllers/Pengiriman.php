@@ -155,7 +155,7 @@ class Pengiriman extends CI_Controller {
 				$detail["Alamat"] = $alamat[3].", $kec, $kot, $prov";
 			}
 
-			$data["kode_barang"] = $row->kode_barang;
+			$data["kode_barang"] = trim($row->kode_barang);
 			$detail["Nama Barang"] = $row->nama_barang;
 			$detail["Harga Barang"] = "Rp. ".number_format($row->harga_order);
 			$data["jumlah"] = $row->jumlah_order;
