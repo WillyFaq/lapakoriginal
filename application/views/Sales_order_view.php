@@ -181,7 +181,7 @@
     function load_harga(kode_barang) {
         $.ajax({
             type : 'POST',
-            url : '<?= base_url("sales_order/get_harga");?>/'+kode_barang,
+            url : '<?= base_url("pengiriman/get_harga");?>/'+kode_barang,
             success : function(response){
                 $("#harga_barang").val(response);
                 var jml = $("#jumlah_beli").val();

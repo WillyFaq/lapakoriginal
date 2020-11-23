@@ -170,8 +170,39 @@
 </div>
 
 
+<div class="modal fade" id="modalTransaksi" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Ubah Data Transaksi</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body ">
+                <div class="container load-modal-transaksi"></div>
+            </div>
+                <!-- 
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary">Save changes</button> 
+            </div>
+                -->
+        </div>
+    </div>
+</div>
+
+
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/js/select2.min.js"></script>
 <script type="text/javascript">
     $(document).ready(function(){
+        $(".btn_ubah_trans").click(function(e){
+            e.preventDefault();
+            var v = $(this).attr("id");
+            $(".load-modal-transaksi").load('<?= base_url("pengiriman/ubah_ajax/"); ?>'+v);
+            $('#modalTransaksi').modal('show');
+        });
 
         $("#nama_gudang").focus(function(){
             var kode = '<?= isset($kode_barang)?$kode_barang:''; ?>';

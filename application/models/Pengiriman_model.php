@@ -117,6 +117,25 @@ class Pengiriman_model extends CI_Model {
 		return $this->db->delete($this->table, array($this->pk => $id));
 	}
 
+
+	public function ubah_transaksi($idp, $pelanggan, $idt, $transaksi)
+	{
+		$this->db->trans_begin();
+
+		$this->db->where("no_pelanggan", $idp);
+		$this->db->update("pelanggan", $pelanggan);
+
+		$this->db->where("id_transaksi", $idt);
+		$this->db->update("sales_order", $transaksi);
+
+		if ($this->db->trans_status() === FALSE){
+		    $this->db->trans_rollback();
+		    return false;
+		}else{
+		    $this->db->trans_commit();
+		    return true;
+		}
+	}
 }
 
 /* End of file Pengiriman_model.php */

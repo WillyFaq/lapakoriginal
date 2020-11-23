@@ -9,6 +9,8 @@ class Pengiriman extends CI_Controller {
 		$this->load->model("Pengiriman_model", "", TRUE);
 		$this->load->model("Gudang_barang_model", "", TRUE);
 		$this->load->model("Gudang_user_model", "", TRUE);
+		$this->load->model("Sales_model", "", TRUE);
+		$this->load->model("Barang_model", "", TRUE);
 	}
 
 	public function gen_table()
@@ -127,14 +129,156 @@ class Pengiriman extends CI_Controller {
 		$this->load->view('index', $data);
 	}
 
+	public function cb_barang($id, $sel='')
+	{
+		$ret = '<div class="form-group row"><label for="nama" class="col-sm-2 col-form-label">Barang</label><div class="col-sm-10">';
+		//$id = $this->session->userdata("user")->id_user;
+		$q = $this->Sales_model->get_data($id);
+		$res = $q->result();
+		foreach ($res as $row) {
+			$opt[$row->kode_barang] = $row->nama_barang;
+		}
+		$js = 'class="form-control" id="kode_barang"';
+		$ret= $ret.''.form_dropdown('kode_barang',$opt,$sel,$js);
+		$ret= $ret.'</div></div>';
+		return $ret;
+	}
 
+
+
+	public function cb_provinsi($sel='')
+	{
+		$ret = '<div class="form-group row"><label for="provinsi" class="col-sm-2 col-form-label">Provinsi</label><div class="col-sm-10">';
+		$res = get_provinsi();
+		foreach ($res as $k => $row) {
+			$opt[$row['id']] = $row['nama'];
+		}
+		$js = 'class="form-control cb_provinsi" id="provinsi"';
+		$ret= $ret.''.form_dropdown('provinsi',$opt,$sel,$js);
+		$ret= $ret.'</div></div>';
+		return $ret;
+	}
+
+	public function cb_kota($id='', $sel='')
+	{
+		$ret = '<div class="form-group row"><label for="kota" class="col-sm-2 col-form-label">Kabupaten/Kota</label><div class="col-sm-10">';
+		$res = get_kota($id);
+		foreach ($res as $k => $row) {
+			$opt[$row['id']] = $row['nama'];
+		}
+		$js = 'class="form-control cb_kota" id="kota"';
+		$ret= $ret.''.form_dropdown('kota',$opt,$sel,$js);
+		$ret= $ret.'</div></div>';
+		echo $ret;
+	}
+
+	public function cb_kecamatan($id='', $sel='')
+	{
+		$ret = '<div class="form-group row"><label for="kecamatan" class="col-sm-2 col-form-label">Kecamatan/Kota</label><div class="col-sm-10">';
+		$res = get_kecamatan($id);
+		foreach ($res as $k => $row) {
+			$opt[$row['id']] = $row['nama'];
+		}
+		$js = 'class="form-control cb_kecamatan" id="kecamatan"';
+		$ret= $ret.''.form_dropdown('kecamatan',$opt,$sel,$js);
+		$ret= $ret.'</div></div>';
+		echo $ret;
+	}
+
+	public function get_harga()
+	{
+		$kode = $this->input->post('kode_barang');
+		$q = $this->Barang_model->get_data($kode)->row();
+		echo $q->harga_jual;
+	}
+
+	public function ubah_ajax($v='')
+	{
+		$v = d_url($v);
+		$data = array(
+						"page" => "ajax_ubah_trans",
+						"ket"  => "Acc",
+						"form" => "pengiriman/update_ajax",
+						);
+		$q = $this->Sales_order_model->get_data($v);
+		$res = $q->result();
+		$detail = [];
+		foreach ($res as $row) {
+			$data["cb_barang"] = $this->cb_barang($row->id_user, $row->kode_barang);
+			$data["id_transaksi"] = $row->id_transaksi;
+			$data["no_pelanggan"] = $row->no_pelanggan;
+			$data["nama_pelanggan"] = $row->nama_pelanggan;
+			$data["notelp"] = $row->notelp;
+
+			$alamat = explode("|", $row->alamat);
+
+			if(sizeof($alamat)==1){
+				$data["alamat"] = $row->alamat;
+			}else{
+				
+				$data["alamat"] = $alamat[3];
+				$data["cb_provinsi"] = $this->cb_provinsi($alamat[0]);
+				$data["provinsi"] = $alamat[0];
+				$data["kota"] = $alamat[1];
+				$data["kecamatan"] = $alamat[2];
+			}
+			
+
+			$data["kode_barang"] = trim($row->kode_barang);
+			$data["harga_barang"] = $row->harga_order;
+			$data["jumlah_beli"] = $row->jumlah_order;
+			$data["total"] = $row->total_order;
+			$data["keterangan"] = $row->keterangan;
+		}
+
+		$this->load->view('ajax_ubah_trans', $data);
+	}
+
+	public function update_ajax()
+	{
+		$data = $this->input->post();
+		//print_r($data);
+		$id_transaksi = $data['id_transaksi'];
+		$no_pelanggan = $data['no_pelanggan'];
+		unset($data['id_transaksi']);
+		unset($data['no_pelanggan']);
+
+		$provinsi = $data["provinsi"];
+		$kota = $data["kota"];
+		$kecamatan = $data["kecamatan"];
+		$alamat = "$provinsi|$kota|$kecamatan|".$data["alamat"];
+
+		$pelanggan = array(
+							'nama_pelanggan' => $data['nama_pelanggan'],
+							'notelp' => $data['notelp'],
+							'alamat' => $alamat,
+							);
+		$transaksi = array(
+						
+						"kode_barang" => $data["kode_barang"],
+						"harga_order" => $data["harga_barang"],
+						"jumlah_order" => $data["jumlah_beli"],
+						"total_order" => $data["harga_barang"] * $data["jumlah_beli"],
+						"keterangan" => $data["keterangan"],
+						);
+
+		//print_pre($transaksi);
+		if($this->Pengiriman_model->ubah_transaksi($no_pelanggan, $pelanggan, $id_transaksi, $transaksi)){
+			alert_notif("success");
+			redirect('pengiriman/acc/'.e_url($id_transaksi));
+		}else{
+			alert_notif("danger");
+			redirect('pengiriman/acc/'.e_url($id_transaksi));
+		}
+	}
 
 	public function acc($v=""){
 		
 		$data = array(
 						"page" => "pengiriman_view",
 						"ket"  => "Acc",
-						"form" => "pengiriman/acc_add"
+						"form" => "pengiriman/acc_add",
+						"add" => anchor('', '<i class="fas fa-pencil-alt"></i>', array("class" => "btn btn-success btn_ubah_trans", "id" => $v, "data-toggle" => "tooltip", "data-placement" => "top", "title" => "Ubah Data")),
 						);
 		$v = d_url($v);
 		$q = $this->Sales_order_model->get_data($v);
