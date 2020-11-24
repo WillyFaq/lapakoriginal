@@ -87,7 +87,6 @@ class Pengiriman extends CI_Controller {
 		$query=$this->Sales_order_model->get_where(["status_order" => "0"]);
 		$res = $query->result();
 		$num_rows = $query->num_rows();
-
 		$tmpl = array(  'table_open'    => '<table class="table table-striped table-hover dataTable">',
 				'row_alt_start'  => '<tr>',
 				'row_alt_end'    => '</tr>'
@@ -95,7 +94,7 @@ class Pengiriman extends CI_Controller {
 
 		$this->table->set_template($tmpl);
 		$this->table->set_empty("&nbsp;");
-		$this->table->set_heading('No', 'Id Transaksi', 'Nama Pelanggan', 'Nama Barang', 'Jumlah', 'Total', 'Status', 'Aksi');
+		$this->table->set_heading('No', 'Id Transaksi', 'Nama Sales', 'Nama Pelanggan', 'Nama Barang', 'Jumlah', 'Total', 'Status', 'Aksi');
 
 		if ($num_rows > 0)
 		{
@@ -108,6 +107,7 @@ class Pengiriman extends CI_Controller {
 				}
 				$this->table->add_row(	++$i,
 							$row->id_transaksi,
+							$row->nama,
 							$row->nama_pelanggan,
 							$row->nama_barang,
 							number_format($row->jumlah_order),
