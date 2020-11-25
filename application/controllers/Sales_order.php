@@ -16,7 +16,7 @@ class Sales_order extends CI_Controller {
 
 	public function gen_table()
 	{
-		$query=$this->Sales_order_model->get_where(["id_user" => $this->session->userdata("user")->id_user]);
+		$query=$this->Sales_order_model->get_where(["user.id_user" => $this->session->userdata("user")->id_user]);
 		$res = $query->result();
 		$num_rows = $query->num_rows();
 

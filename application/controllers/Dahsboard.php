@@ -43,6 +43,7 @@ class Dahsboard extends CI_Controller {
 												"barang" => $row->nama_barang,
 												"jml" => $row->minimal_sale,
 											);
+
 			}
 
 			//$data['bulan_ini'] = 
