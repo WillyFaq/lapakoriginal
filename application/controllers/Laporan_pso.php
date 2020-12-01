@@ -111,14 +111,14 @@ class Laporan_pso extends CI_Controller {
 				if(sizeof($alamat)==1){
 					$res_alamat = $row->alamat;
 				}else{
-					$prov = $alm->get_provinsi((int)$alamat[0])['nama'];
+					$prov = $alm->get_provinsi((int)$alamat[0]);
 					$kot = '';
 					$kec = '';
 					if(isset($alamat[1]) && strlen($alamat[1])==4){
-						$kot = $alm->get_kota($alamat[1])['nama'];
+						$kot = $alm->get_kota($alamat[1]);
 					}
 					if(isset($alamat[2]) && strlen($alamat[2])==7){
-						$kec = $alm->get_kecamatan($alamat[2])['nama'];
+						$kec = $alm->get_kecamatan($alamat[2]);
 					}
 
 					
