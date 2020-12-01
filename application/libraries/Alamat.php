@@ -28,7 +28,7 @@ class Alamat{
 	public function get_provinsi($id='')
 	{
 		if($id!=""){
-			return isset($this->provinsi[$id])?$this->provinsi[$id]['nama']:'';
+			return isset($this->provinsi[$id])?$this->provinsi[$id]:'';
 		}
 		return $this->provinsi;
 	}
@@ -36,7 +36,7 @@ class Alamat{
 	public function get_kota($id='')
 	{
 		if($id!=""){
-			return isset($this->kota[$id])?$this->kota[$id]['nama']:'';
+			return isset($this->kota[$id])?$this->kota[$id]:'';
 		}
 		return $this->kota;
 	}
@@ -44,7 +44,7 @@ class Alamat{
 	public function get_kecamatan($id='')
 	{
 		if($id!=""){
-			return isset($this->kecamatan[$id])?$this->kecamatan[$id]['nama']:'';
+			return isset($this->kecamatan[$id])?$this->kecamatan[$id]:'';
 		}
 		return $this->kecamatan;
 	}
