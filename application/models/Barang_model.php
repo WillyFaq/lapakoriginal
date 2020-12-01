@@ -127,7 +127,7 @@ class Barang_model extends CI_Model {
 
 	public function laporan_harian($tgl1, $tgl2)
 	{
-		$whr = "WHERE 1 = 1 ";
+		$whr = "WHERE e.status_pengiriman = 2 ";
 		if($tgl1 != ""){
 			$whr .= " AND a.tgl_order >= '$tgl1' ";
 		}
@@ -152,6 +152,7 @@ class Barang_model extends CI_Model {
 				JOIN user b ON a.id_user = b.id_user
 				JOIN pelanggan c ON a.no_pelanggan = c.no_pelanggan
 				JOIN barang d ON a.kode_barang = d.kode_barang
+				JOIN pengiriman e ON e.id_transaksi = a.id_transaksi
 				$whr";
 		return $this->db->query($sql);
 	}
@@ -213,7 +214,7 @@ class Barang_model extends CI_Model {
 				JOIN barang d ON a.kode_barang = d.kode_barang
 				JOIN pengiriman e ON a.id_transaksi = e.id_transaksi
 				WHERE MONTH(a.tgl_order) = '$bln'  AND  d.kode_barang = '$id' AND YEAR(a.tgl_order) = ".date("Y")."
-				AND e.status_pengiriman = 1	
+				AND e.status_pengiriman = 2
 				GROUP BY a.kode_barang, MONTH(a.tgl_order)";
 		return $this->db->query($sql);
 	}

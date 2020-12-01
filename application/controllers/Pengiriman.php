@@ -13,27 +13,72 @@ class Pengiriman extends CI_Controller {
 		$this->load->model("Barang_model", "", TRUE);
 	}
 
-	public function gen_table()
+	public function gen_table($aj = "")
 	{
-		$query=$this->Pengiriman_model->get_all();
-		$res = $query->result();
-		$num_rows = $query->num_rows();
-
-		$tmpl = array(  'table_open'    => '<table class="table table-striped table-hover dataTable">',
+		
+		$tmpl = array(  'table_open'    => '<table class="table table-striped table-hover dtTable">',
 				'row_alt_start'  => '<tr>',
 				'row_alt_end'    => '</tr>'
 			);
 
 		$this->table->set_template($tmpl);
-
 		$this->table->set_empty("&nbsp;");
-
 		$this->table->set_heading('No', 'Id Transaksi', 'Nama Pelanggan', 'Nama Barang', 'Jasa Pengiriman', 'No Resi', 'Tgl Pengiriman', 'Status', 'Aksi');
 
-		if ($num_rows > 0)
-		{
-			$i = 0;
+		if($aj==""){
 
+			$data = $this->get_table();
+
+			foreach ($data['data'] as $k => $v) {
+				$this->table->add_row(
+										$v
+									);
+			}
+		}
+
+		return  $this->table->generate();
+	}
+
+	public function get_table($aj = "1")
+	{
+		$ret = [];
+		$totalRecords = 0;
+		$totalRecordwithFilter = 0;
+		$query = $this->Pengiriman_model->get_all();
+		$totalRecords = $query->num_rows();
+		if($this->input->post("cariSts")){
+			$sts = $this->input->post("cariSts");
+			$sts = $sts=="ac"?"0":$sts;
+			
+			if($sts == "3"){
+				$query = $this->Pengiriman_model->get_where_like(array(
+																"pengiriman.status_pengiriman" => "3",
+																"pengiriman.status_pengiriman" => "4",
+															));
+			}else{
+				$query = $this->Pengiriman_model->get_where(array("pengiriman.status_pengiriman" => $sts));
+			}
+
+		}else if($this->input->post("search")){
+			$sts = $this->input->post("search")['value'];
+			$query = $this->Pengiriman_model->get_where_like(
+														array(
+															"pengiriman.id_transaksi" => $sts,
+															"pelanggan.nama_pelanggan" => $sts,
+															"barang.nama_barang" => $sts,
+															"pengiriman.jasa_pengiriman" => $sts,
+															"pengiriman.no_resi" => $sts,
+															"pengiriman.tgl_kirim" => $sts,
+														)
+													);
+		}
+		$res = $query->result();
+
+		$num_rows = $query->num_rows();
+		$totalRecordwithFilter = $num_rows;
+
+		if ($num_rows > 0){
+			$i = 0;
 			foreach ($res as $row){
 				$sts = '<span class="badge badge-warning">Sudah di acc</span>';
 				$btn_update = anchor('pengiriman/tambah/'.e_url($row->id_pengiriman),'<span class="fas fa-paper-plane"></span>',array( 'title' => 'Kirim', 'class' => 'btn btn-success btn-xs', 'data-toggle' => 'tooltip'));
@@ -54,7 +99,8 @@ class Pengiriman extends CI_Controller {
 				if($row->tgl_kirim!=null){
 					$tgl = date("d-m-Y", strtotime($row->tgl_kirim));
 				}
-				$this->table->add_row(	++$i,
+				$ret[] = [
+							++$i,
 							$row->id_transaksi,
 							$row->nama_pelanggan,
 							$row->nama_barang,
@@ -65,11 +111,32 @@ class Pengiriman extends CI_Controller {
 							anchor('pengiriman/detail/'.e_url($row->id_pengiriman),'<span class="fa fa-eye"></span>',array( 'title' => 'Detail', 'class' => 'btn btn-warning btn-xs', 'data-toggle' => 'tooltip'))
 							.'&nbsp;'.
 							$btn_update
-						);
-				if($i>=1000){break;}
+							];
+				//if($i>=1000){break;}
 			}
 		}
-		return  $this->table->generate();
+		if($aj=="1"){
+			return $ret;
+		}else{
+
+			## Read value
+			$draw = $this->input->post('draw');
+			$row = $this->input->post('start');
+			$rowperpage = $this->input->post('length'); // Rows display per page
+			$columnIndex = $this->input->post('order')[0]['column']; // Column index
+			$columnName = $this->input->post('columns')[$columnIndex]['data']; // Column name
+			$columnSortOrder = $this->input->post('order')[0]['dir']; // asc or desc
+			$searchValue = $this->input->post('search')['value']; // Search value
+
+			$response = array(
+			  	"draw" => intval($draw),
+			  	"iTotalRecords" => $totalRecords,
+			  	"iTotalDisplayRecords" => $totalRecordwithFilter,
+			  	"aaData" => $ret,
+			  	"db_last" => $this->db->last_query()
+			);
+			echo json_encode($response);
+		}
 	}
 
 	public function index()
@@ -77,7 +144,8 @@ class Pengiriman extends CI_Controller {
 		$data = array(
 						"page" => "pengiriman_view",
 						"ket"  => "Data",
-						"table" => $this->gen_table()
+						"table" => $this->gen_table("ajax"),
+						"utama" => 1
 						);
 		$this->load->view('index', $data);
 	}
@@ -114,10 +182,24 @@ class Pengiriman extends CI_Controller {
 							'Rp. '.number_format($row->total_order),
 							$sts,
 							anchor('pengiriman/acc/'.e_url($row->id_transaksi),'<span class="fa fa-box"></span>',array( 'title' => 'Kirim', 'class' => 'btn btn-success btn-xs', 'data-toggle' => 'tooltip'))
+							.'&nbsp;'.
+							anchor('pengiriman/tolak_so/'.e_url($row->id_transaksi),'<span class="fa fa-ban"></span>',array( 'title' => 'Batalkan', 'class' => 'btn btn-danger btn-xs', 'data-toggle' => 'tooltip'))
 						);
 			}
 		}
 		return  $this->table->generate();
+	}
+
+	public function tolak_so($v='')
+	{
+		$v = d_url($v);
+		if($this->Sales_order_model->update(array("status_order" => 2), $v )){
+			alert_notif("success");
+			redirect('');
+		}else{
+			alert_notif("danger");
+			redirect('pengiriman/belum/');
+		}
 	}
 
 	public function belum(){
@@ -374,7 +456,7 @@ class Pengiriman extends CI_Controller {
 		
 		if($this->Pengiriman_model->add($data)){
 			alert_notif("success");
-			redirect('pengiriman');
+			redirect('');
 		}else{
 			alert_notif("danger");
 			redirect('pengiriman/tambah/'.e_url($data['id_transaksi']));
@@ -538,10 +620,42 @@ class Pengiriman extends CI_Controller {
 	public function tolak($id='')
 	{
 		$id_pengiriman = d_url($id);
-		$data = ["status_pengiriman" => 3];
+		
+		$ids = $this->session->userdata('user')->id_user;
+		$sql = "SELECT * FROM gudang_user WHERE id_user = '$ids'";
+		$q = $this->db->query($sql);
+		$res = $q->result();
+		$id_gudang_user = $res[0]->id_gudang_user;
+
+
+		$sql = "SELECT * FROM pengiriman a JOIN sales_order b ON a.id_transaksi = b.id_transaksi WHERE a.id_pengiriman = '$id_pengiriman'";
+		$q = $this->db->query($sql);
+		$res = $q->result();
+		$kode_barang = $res[0]->kode_barang;
+		$jumlah_order = $res[0]->jumlah_order;
+		
+		echo $id_gudang_user.'<br>';
+		echo $kode_barang.'<br>';
+		echo $jumlah_order.'<br>';
+
+		$data_gb = array(
+						'id_gudang_user' => $id_gudang_user,
+						'kode_barang' => $kode_barang,
+						'tgl_gb' => date("Y-m-d H:i:s"),
+						'jumlah_gb' => $jumlah_order,
+						'ket_gb' => 3,
+					);
+
+		$data = ["status_pengiriman" => 4];
 		if($this->Pengiriman_model->update($data, $id_pengiriman)){
-			alert_notif("success");
-			redirect('pengiriman');
+			if($this->Gudang_barang_model->add($data_gb)){
+			
+				alert_notif("success");
+				redirect('pengiriman');
+			}else{
+				alert_notif("danger");
+				redirect('pengiriman/ubah/'.e_url($id_pengiriman));
+			}
 		}else{
 			alert_notif("danger");
 			redirect('pengiriman/ubah/'.e_url($id_pengiriman));

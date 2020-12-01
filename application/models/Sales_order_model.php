@@ -121,6 +121,10 @@ class Sales_order_model extends CI_Model {
 		    $this->db->trans_commit();
 		    return true;
 		}*/
+
+		$this->db->set($data);
+		$this->db->where($this->pk, $_id);
+		return $this->db->update($this->table);
 	}
 
 

@@ -13,7 +13,36 @@
                 </div>
             </div>
             <div class="card-body">
-                <?= isset($table)?$table:''; ?>
+                <?php 
+                    if(isset($table)){ 
+                        if(isset($utama)){ 
+                ?>
+                <div class="container filter">
+                    <div class="form-group row cb_tgl_box">
+                        <label for="filter" class="col-sm-2 col-form-label">Status</label>
+                        <div class="col-sm-10">
+                            <select class="form-control" name="sts_pengiriman" id="sts_pengiriman" >
+                                <option value="">[Semua Status]</option>
+                                <?php
+                                    $sts_arr = array(
+                                        "ac" => "acc",
+                                        "1" => "dikirim",
+                                        "2" => "diterima",
+                                        "3" => "ditolak"
+                                        );
+                                    foreach ($sts_arr as $k => $row) {
+                                        echo "<option value='$k'>$row</option>";
+                                    }
+                                ?>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <?php
+                        }
+                        echo $table;
+                    }
+                ?>
                 <?php if(isset($detail)): 
                         //print_pre($detail);
                         echo '<table class="table"><tbody>';
@@ -210,7 +239,27 @@
             $(".load-modal").load('<?= base_url("pengiriman/gen_table_gudang/"); ?>'+kode+"/"+bth);
             $('#modalGudang').modal('show');
         });
+        var table = $(".dtTable").DataTable({
+            "scrollX": true,
+            "pagingType": "full",
+            "lengthMenu": [[100, 250, 500, -1], [100, 250, 500, "All"]],
+            'processing': true,
+            'serverSide': true,
+            'serverMethod': 'post',
+            "ajax": {
+                'url' : '<?= base_url('pengiriman/get_table/ajax'); ?>',
+                'data' : function(data){
+                    var sts = $('#sts_pengiriman').val();
+                    
+                    data.cariSts = sts;
+                }
+            }
+        });
 
+        $('#sts_pengiriman').change(function(){
+            table.draw();
+        });
+       //
     });
 
     function pilih_gudang(kode_barang, nama_barang, kt) {

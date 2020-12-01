@@ -56,10 +56,28 @@ class Pengiriman_model extends CI_Model {
 		}
 		$q .= " ORDER BY tgl_kirim DESC "; 
 		return $this->db->query($q);
-		/*
-		$this->db->where($id);
-		return $this->db->get();
-		*/
+	}
+
+	public function get_where_like($id)
+	{
+		$this->db->select('*');
+		$this->db->from($this->table);
+		$this->db->join($this->join1, $this->table.'.'.$this->fk1.' = '.$this->join1.'.'.$this->fk1);
+		$this->db->join($this->join2, $this->table.'.'.$this->fk2.' = '.$this->join2.'.'.$this->fk2);
+		$this->db->join($this->join3, $this->table.'.'.$this->fk3.' = '.$this->join3.'.'.$this->fk3);
+		$q =  $this->db->get_compiled_select();
+		$q .= " ".$this->Sales_order_model->get_all_query();
+		$q .=  " WHERE ";
+		$j=0;
+		foreach ($id as $k => $v) {
+			if($j!=0){
+				$q .= " OR ";
+			}
+			$q .= "$k LIKE '%$v%' ";
+			$j++;
+		}
+		$q .= " ORDER BY tgl_kirim DESC "; 
+		return $this->db->query($q);
 	}
 
 	public function add($da)

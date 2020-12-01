@@ -56,7 +56,7 @@ class Laporan_penjualan extends CI_Controller {
 
 	public function gen_table_bulanan($thn="", $bln="")
 	{
-		$query=$this->Barang_model->laporan_bulanan($bln, $thn);
+		$query=$this->Barang_model->laporan_bulanan($bln, $thn, "");
 		//echo $query;
 		//echo $this->db->last_query();
 		$res = $query->result();
@@ -120,6 +120,7 @@ class Laporan_penjualan extends CI_Controller {
 		$bln = d_url($bln);
 		$id = d_url($id);
 		$q = $this->Barang_model->laporan_bulanan_id($bln, $id);
+		//echo $this->db->last_query();
 		$res = $q->result();
 		foreach ($res as $row) {
 			$data['kode_barang'] = $row->kode_barang;
@@ -139,6 +140,8 @@ class Laporan_penjualan extends CI_Controller {
 			$data['beban'][$row->id_beban]['nama_beban'] = $row->nama_beban;
 			$data['beban'][$row->id_beban]['nominal'] = $row->nominal;
 		}
+
+		//print_pre($data);
 		$this->load->view('index', $data);
 	}
 

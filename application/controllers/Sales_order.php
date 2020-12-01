@@ -39,6 +39,8 @@ class Sales_order extends CI_Controller {
 				$sts = '<span class="badge badge-danger">Belum dikirim</span>';
 				if($row->status_order==1){
 					$sts = '<span class="badge badge-warning">Sudah diproses</span>';
+				}else if($row->status_order==2){
+					$sts = '<span class="badge badge-danger">Dibatalkan</span>';
 				}
 				$png = $this->Sales_order_model->cek_laporan($row->id_transaksi);
 				if($png==1){
@@ -174,7 +176,13 @@ class Sales_order extends CI_Controller {
 			$detail["Jumlah"] = number_format($row->jumlah_order);
 			$detail["Total"] = "Rp. ".number_format($row->total_order);
 			$detail["Keterangan"] = $row->keterangan;
-			$detail["Status"] = $row->status_order==1?'<span class="badge badge-warning">Sudah diporses</span>':'<span class="badge badge-danger">Belum diproses</span>';
+			if($row->status_order==1){
+				$detail['Status'] = '<span class="badge badge-warning">Sudah diporses</span>';	
+			}else if($row->status_order==2){
+				$detail['Status'] = '<span class="badge badge-danger">Dibatalkan</span>';	
+			}else{
+				$detail['Status'] = '<span class="badge badge-danger">Belum diproses</span>';	
+			}
 			$fb = $row->status_order==1?0:'-1';
 		}
 		$data["detail"] = $detail;
