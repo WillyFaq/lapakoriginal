@@ -50,10 +50,17 @@ class Laporan_barang extends CI_Controller {
 				}elseif($row->ket_gb == 3){
 					$ket = '<span class="badge badge-danger">Ditolak</span>';
 				}
+				$kd = explode(".", $row->kode_brg);
+				$nama_barang = $row->nama_barang;
+				if(sizeof($kd)>1){
+					$nama_barang .= isset($kd[1])?"<br>($kd[1]":"";
+					$nama_barang .= isset($kd[2])?" - $kd[2]":"";
+					$nama_barang .= ")";
+				}
 				$this->table->add_row(	++$i,
 							$row->nama_gudang,
 							$row->kode_barang,
-							$row->nama_barang,
+							$nama_barang,
 							date("d-m-Y", strtotime($row->tgl_gb)),
 							$ket,
 							number_format($row->jumlah_gb)

@@ -20,6 +20,11 @@ class Gudang_barang_model extends CI_Model {
 		return $this->db->get($this->table);
 	}
 
+	public function get_all_gudang()
+	{
+		return $this->db->get($this->table);
+	}
+
 	public function get_all_by_user($idu)
 	{
 		$this->db->select('*');
@@ -40,7 +45,7 @@ class Gudang_barang_model extends CI_Model {
 							SUM(b.jumlah_gb) AS stok
 						FROM gudang_barang b
 						JOIN gudang_user c ON b.id_gudang_user = c.id_gudang_user
-						WHERE c.id_gudang = a.id_gudang AND b.kode_barang = '$kode'
+						WHERE c.id_gudang = a.id_gudang AND b.kode_barang IN ($kode)
 						GROUP BY c.id_gudang, b.kode_barang
 					),0) AS stok
 				FROM gudang a";
@@ -90,7 +95,7 @@ class Gudang_barang_model extends CI_Model {
 		if(!empty($w)){
 			$this->db->where($w);
 		}
-		$this->db->order_by('tgl_gb', 'desc');
+		$this->db->order_by('id_gb', 'desc');
 		return $this->db->get();
 	}
 

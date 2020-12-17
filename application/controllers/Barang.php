@@ -68,6 +68,7 @@ class Barang extends CI_Controller {
 
 	public function add()
 	{
+		//print_pre($this->input->post());
 		if($this->Barang_model->add($this->input->post())){
 			alert_notif("success");
 			redirect('barang');
@@ -90,6 +91,9 @@ class Barang extends CI_Controller {
 		foreach ($res as $row) {
 			$data['kode_barang'] = $row->kode_barang;
 			$data['nama_barang'] = $row->nama_barang;
+			$data['warna_barang'] = $row->warna_barang;
+			$data['ukuran_barang'] = $row->ukuran_barang;
+			$data['setting_harga'] = $row->setting_harga;
 			$data['harga_jual'] = $row->harga_jual;
 			$data['laba_barang'] = $row->laba_barang;
 			$data['beban'][$row->id_beban]['id'] = $row->id_beban;
@@ -127,6 +131,9 @@ class Barang extends CI_Controller {
 		foreach ($res as $row) {
 			$data['kode_barang'] = $row->kode_barang;
 			$data['nama_barang'] = $row->nama_barang;
+			$data['warna_barang'] = $row->warna_barang;
+			$data['ukuran_barang'] = $row->ukuran_barang;
+			$data['setting_harga'] = $row->setting_harga;
 			$data['harga_jual'] = $row->harga_jual;
 			$data['laba_barang'] = $row->laba_barang;
 			$data['beban'][$row->id_beban]['id'] = $row->id_beban;

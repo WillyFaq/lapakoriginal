@@ -13,7 +13,7 @@
                 </div>
             </div>
             <div class="card-body">
-                <?php 
+                <?php
                     if(isset($table)){ 
                         if(isset($utama)){ 
                 ?>
@@ -44,21 +44,76 @@
                     }
                 ?>
                 <?php if(isset($detail)): 
-                        //print_pre($detail);
-                        echo '<table class="table"><tbody>';
-                        foreach ($detail as $k => $v):
-                            echo "<tr><td></td><td></td><th>$k</th></tr>";
-                            foreach ($v as $a => $b):
+                    //print_pre($detail);
                 ?>
+                    <h3>Data Transaksi</h3>
+                    <table class="table"><tbody>
+                    <?php
+                        foreach ($detail["Data Transaksi"] as $a => $b) {
+                            if(!is_array($b) && $a!="total_order"){
+                    ?>
                             <tr>
                                 <th style="width:20%;"><?= $a; ?></th>
                                 <td style="width:1%;">:</td>
                                 <td><?= $b; ?></td>
                             </tr>
-                <?php 
-                            endforeach; 
-                        endforeach; 
-                        echo '</tbody></table>';
+                    <?php
+                            }
+                        }
+                    ?>
+                    </tbody></table>
+                    <hr>
+                    <table class="table dataTable">
+                        <thead>
+                            <tr>
+                                <th>No</th>
+                                <th>Barang</th>
+                                <th>Jumlah</th>
+                                <th>Harga</th>
+                                <th>Potongan</th>
+                                <th>Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php
+                                $i=0;
+                                foreach($detail['Detail Transaksi'] as $k => $v):
+                            ?>
+                            <tr>
+                                <td><?= ++$i; ?></td>
+                                <td><?= $v['barang']; ?></td>
+                                <td><?= $v['jumlah_order']; ?></td>
+                                <td><?= $v['harga_barang']; ?></td>
+                                <td><?= $v['potongan']; ?></td>
+                                <td><?= $v['subtotal']; ?></td>
+                            </tr>
+                            <?php endforeach;?>
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <th colspan="5">Total</th>
+                                <th><?= $detail["Data Transaksi"]['total_order']; ?></th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                    <hr>
+                    <h3>Data Pengiriman</h3>
+                    <table class="table"><tbody>
+                    <?php
+                        foreach ($detail["Data Pengiriman"] as $a => $b) {
+                            if(!is_array($b) && $a!="total_order"){
+                    ?>
+                            <tr>
+                                <th style="width:20%;"><?= $a; ?></th>
+                                <td style="width:1%;">:</td>
+                                <td><?= $b; ?></td>
+                            </tr>
+                    <?php
+                            }
+                        }
+                    ?>
+                    </tbody></table>
+                <?php
                     endif; 
                 ?>
                 <?php if(isset($form)):
@@ -75,6 +130,7 @@
                                     if($key=="Id Transaksi"){
                                         echo "<input type=\"hidden\" name=\"id_transaksi\" value=\"$value\">";
                                     }
+                                    if(!is_array($value) && $key!="total_order"){
                             ?>
                                 <tr>
                                     <th style="width:20%;"><?= $key; ?></th>
@@ -83,8 +139,45 @@
                                 </tr>
                             <?php
                                 }
+                                }
                             ?>
                             </tbody>
+                        </table>
+                        <table class="table dataTable">
+                            <thead>
+                                <tr>
+                                    <th>No</th>
+                                    <th>Barang</th>
+                                    <th>Jumlah</th>
+                                    <th>Harga</th>
+                                    <th>Potongan</th>
+                                    <th>Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php
+                                    $i=0;
+                                    foreach($transaksi['order'] as $k => $v):
+                                ?>
+                                <tr>
+                                    <td><?= ++$i; ?></td>
+                                    <td><?= $v['barang']; ?></td>
+                                    <td><?= $v['jumlah_order']; ?></td>
+                                    <td><?= $v['harga_barang']; ?></td>
+                                    <td><?= $v['potongan']; ?></td>
+                                    <td><?= $v['subtotal']; ?></td>
+                                </tr>
+                                <input type="text" style="display:none" name="kode_barang[]" value="<?= $v['kode_barang']; ?>" >
+                                <input type="text" style="display:none" name="kode_brg[]" value="<?= $v['kode_brg']; ?>" >
+                                <input type="text" style="display:none" name="jmlh[]" value="<?= $v['jmlh']; ?>" >
+                                <?php endforeach;?>
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <th colspan="5">Total</th>
+                                    <th><?= $transaksi['total_order']; ?></th>
+                                </tr>
+                            </tfoot>
                         </table>
                     </fieldset>
                     <?php
@@ -102,15 +195,22 @@
                         </div>
                     </fieldset>
 
+                    <input type="hidden" name="kode_barang" value="<?= isset($kode_barang)?$kode_barang:''; ?>">
+                    <input type="hidden" name="jumlah" value="<?= isset($jumlah)?$jumlah:''; ?>">
+                    <input type="hidden" name="id_gudang_user" value="<?= isset($id_gudang_user)?$id_gudang_user:''; ?>">
                     <?php
                     else:
                     ?>
 
-                    <input type="hidden" name="kode_barang" value="<?= isset($kode_barang)?$kode_barang:''; ?>">
-                    <input type="hidden" name="jumlah" value="<?= isset($jumlah)?$jumlah:''; ?>">
-                    <input type="hidden" name="id_gudang_user" value="<?= isset($id_gudang_user)?$id_gudang_user:''; ?>">
                     <fieldset>
                         <legend>Form Pengiriman</legend>
+                        <div class="form-group row">
+                            <label for="gudang" class="col-sm-2 col-form-label">Gudang</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" name="nama_gudang" id="nama_gudang" placeholder="Nama Gudang" <?= isset($nama_gudang)?"value='$nama_gudang' readonly":'required'; ?>  >
+                                <input type="hidden" id="id_gudang" name="id_gudang" <?= isset($id_gudang)?"value='$id_gudang'":'required'; ?>>
+                            </div>
+                        </div>
                         <div class="form-group row">
                             <label for="jasa_pengiriman" class="col-sm-2 col-form-label">Jasa Pengiriman</label>
                             <div class="col-sm-10">

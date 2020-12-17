@@ -7,6 +7,7 @@ class Pengiriman extends CI_Controller {
 	{
 		parent::__construct();
 		$this->load->model("Pengiriman_model", "", TRUE);
+		$this->load->model("Gudang_model", "", TRUE);
 		$this->load->model("Gudang_barang_model", "", TRUE);
 		$this->load->model("Gudang_user_model", "", TRUE);
 		$this->load->model("Sales_model", "", TRUE);
@@ -23,7 +24,7 @@ class Pengiriman extends CI_Controller {
 
 		$this->table->set_template($tmpl);
 		$this->table->set_empty("&nbsp;");
-		$this->table->set_heading('No', 'Id Transaksi', 'Nama Pelanggan', 'Nama Barang', 'Jasa Pengiriman', 'No Resi', 'Tgl Pengiriman', 'Status', 'Aksi');
+		$this->table->set_heading('No', 'Id Transaksi', 'Nama Pelanggan', 'Jasa Pengiriman', 'No Resi', 'Tgl Pengiriman', 'Status', 'Aksi');
 
 		if($aj==""){
 
@@ -65,7 +66,6 @@ class Pengiriman extends CI_Controller {
 														array(
 															"pengiriman.id_transaksi" => $sts,
 															"pelanggan.nama_pelanggan" => $sts,
-															"barang.nama_barang" => $sts,
 															"pengiriman.jasa_pengiriman" => $sts,
 															"pengiriman.no_resi" => $sts,
 															"pengiriman.tgl_kirim" => $sts,
@@ -93,7 +93,11 @@ class Pengiriman extends CI_Controller {
 					$btn_update = '';
 				}else if($row->status_pengiriman>=3){
 					$sts = '<span class="badge badge-danger">Ditolak</span>';
+					$c = $this->Pengiriman_model->get_where(['pengiriman.id_transaksi' => $row->id_transaksi]);
 					$btn_update = '';
+					if($c->num_rows()<2){
+						$btn_update = anchor('pengiriman/kirim_ulang/'.e_url($row->id_transaksi),'<span class="fas fa-paper-plane"></span>',array( 'title' => 'Kirim Ulang', 'class' => 'btn btn-success btn-xs', 'data-toggle' => 'tooltip'));
+					}
 				}
 				$tgl = '';
 				if($row->tgl_kirim!=null){
@@ -103,7 +107,6 @@ class Pengiriman extends CI_Controller {
 							++$i,
 							$row->id_transaksi,
 							$row->nama_pelanggan,
-							$row->nama_barang,
 							$row->jasa_pengiriman,
 							$row->no_resi,
 							$tgl,
@@ -152,7 +155,7 @@ class Pengiriman extends CI_Controller {
 
 	public function gen_table_belum()
 	{
-		$query=$this->Sales_order_model->get_where(["status_order" => "0"]);
+		$query=$this->Sales_order_model->get_where2(["status_order" => "0"]);
 		$res = $query->result();
 		$num_rows = $query->num_rows();
 		$tmpl = array(  'table_open'    => '<table class="table table-striped table-hover dataTable">',
@@ -162,7 +165,7 @@ class Pengiriman extends CI_Controller {
 
 		$this->table->set_template($tmpl);
 		$this->table->set_empty("&nbsp;");
-		$this->table->set_heading('No', 'Id Transaksi', 'Nama Sales', 'Nama Pelanggan', 'Nama Barang', 'Jumlah', 'Total', 'Status', 'Aksi');
+		$this->table->set_heading('No', 'Id Transaksi', 'Nama Sales', 'Nama Pelanggan', 'Total', 'Status', 'Aksi');
 
 		if ($num_rows > 0)
 		{
@@ -177,11 +180,9 @@ class Pengiriman extends CI_Controller {
 							$row->id_transaksi,
 							$row->nama,
 							$row->nama_pelanggan,
-							$row->nama_barang,
-							number_format($row->jumlah_order),
 							'Rp. '.number_format($row->total_order),
 							$sts,
-							anchor('pengiriman/acc/'.e_url($row->id_transaksi),'<span class="fa fa-box"></span>',array( 'title' => 'Kirim', 'class' => 'btn btn-success btn-xs', 'data-toggle' => 'tooltip'))
+							anchor('pengiriman/kirimkan/'.e_url($row->id_transaksi),'<span class="fa fa-box"></span>',array( 'title' => 'Kirim', 'class' => 'btn btn-success btn-xs', 'data-toggle' => 'tooltip'))
 							.'&nbsp;'.
 							anchor('pengiriman/tolak_so/'.e_url($row->id_transaksi),'<span class="fa fa-ban"></span>',array( 'title' => 'Batalkan', 'class' => 'btn btn-danger btn-xs', 'data-toggle' => 'tooltip'))
 						);
@@ -193,7 +194,7 @@ class Pengiriman extends CI_Controller {
 	public function tolak_so($v='')
 	{
 		$v = d_url($v);
-		if($this->Sales_order_model->update(array("status_order" => 2), $v )){
+		if($this->Sales_order_model->update(array("status_order" => 4), $v )){
 			alert_notif("success");
 			redirect('');
 		}else{
@@ -366,6 +367,7 @@ class Pengiriman extends CI_Controller {
 		$q = $this->Sales_order_model->get_data($v);
 		$res = $q->result();
 		$detail = [];
+		$kde = [];
 		foreach ($res as $row) {
 			$detail["Id Transaksi"] = $row->id_transaksi;
 			$detail["Nama Pelanggan"] = $row->nama_pelanggan;
@@ -380,15 +382,31 @@ class Pengiriman extends CI_Controller {
 				$kec = get_kecamatan($alamat[2])['nama'];
 				$detail["Alamat"] = $alamat[3].", $kec, $kot, $prov";
 			}
+			$detail["total_order"] = "Rp. ".number_format($row->total_order);
+			$nama_barang = $row->nama_barang;
+			$kd = explode(".", $row->kode_brg);
+			if(sizeof($kd)>1){
+				$nama_barang .= isset($kd[1])?"<br>($kd[1]":"";
+				$nama_barang .= isset($kd[2])?" - $kd[2]":"";
+				$nama_barang .= ")";
+			}
+			$kde[] = $row->kode_barang;
+			$detail["order"][] = array(
+										"barang" => $nama_barang,
+										"harga_barang" => "Rp. ".number_format($row->harga_order),
+										"potongan" => "Rp. ".number_format($row->potongan_order),
+										"jumlah_order" => number_format($row->jumlah_order),
+										"subtotal" => "Rp. ".number_format($row->subtotal_order),
+										);
 
-			$data["kode_barang"] = trim($row->kode_barang);
+			/*$data["kode_barang"] = trim($row->kode_barang);
 			$detail["Nama Barang"] = $row->nama_barang;
 			$detail["Harga Barang"] = "Rp. ".number_format($row->harga_order);
 			$data["jumlah"] = $row->jumlah_order;
 			$detail["Jumlah"] = number_format($row->jumlah_order);
-			$detail["Total"] = "Rp. ".number_format($row->total_order);
-			$detail["Keterangan"] = $row->keterangan;
+			$detail["Total"] = "Rp. ".number_format($row->total_order);*/
 		}
+		$data['kode_barang'] = e_url("'".join("', '", $kde)."'");
 		$data["transaksi"] = $detail;
 		$this->load->view('index', $data);
 	}
@@ -516,10 +534,31 @@ class Pengiriman extends CI_Controller {
 
 				$detail['Data Transaksi']["Alamat"] = $alm.", $kec, $kot, $prov";
 			}
-			$detail['Data Transaksi']["Nama Barang"] = $row->nama_barang;
+			/*$detail['Data Transaksi']["Nama Barang"] = $row->nama_barang;
 			$detail['Data Transaksi']["Harga Barang"] = "Rp. ".number_format($row->harga_order);
 			$detail['Data Transaksi']["Jumlah"] = number_format($row->jumlah_order);
 			$detail['Data Transaksi']["Total"] = "Rp. ".number_format($row->total_order);
+			*/
+			$detail['Data Transaksi']["total_order"] = "Rp. ".number_format($row->total_order);
+			$nama_barang = $row->nama_barang;
+			$kd = explode(".", $row->kode_brg);
+			if(sizeof($kd)>1){
+				$nama_barang .= isset($kd[1])?"<br>($kd[1]":"";
+				$nama_barang .= isset($kd[2])?" - $kd[2]":"";
+				$nama_barang .= ")";
+			}
+			$kde[] = $row->kode_barang;
+			$detail['Detail Transaksi'][] = array(
+										"kode_barang" => $row->kode_barang,
+										"kode_brg" => $row->kode_brg,
+										"jmlh" => $row->jumlah_order,
+										"barang" => $nama_barang,
+										"harga_barang" => "Rp. ".number_format($row->harga_order),
+										"potongan" => "Rp. ".number_format($row->potongan_order),
+										"jumlah_order" => number_format($row->jumlah_order),
+										"subtotal" => "Rp. ".number_format($row->subtotal_order),
+										);
+
 			if($row->status_order!=1){
 				$detail['Data Transaksi']["Status"] = '<span class="badge badge-danger">Belum diproses</span>';
 			}
@@ -620,7 +659,6 @@ class Pengiriman extends CI_Controller {
 	public function tolak($id='')
 	{
 		$id_pengiriman = d_url($id);
-		
 		$ids = $this->session->userdata('user')->id_user;
 		$sql = "SELECT * FROM gudang_user WHERE id_user = '$ids'";
 		$q = $this->db->query($sql);
@@ -628,10 +666,44 @@ class Pengiriman extends CI_Controller {
 		$id_gudang_user = $res[0]->id_gudang_user;
 
 
-		$sql = "SELECT * FROM pengiriman a JOIN sales_order b ON a.id_transaksi = b.id_transaksi WHERE a.id_pengiriman = '$id_pengiriman'";
+		$sql = "SELECT * FROM pengiriman a 
+				JOIN sales_order b ON a.id_transaksi = b.id_transaksi 
+				JOIN Sales_order_detail c ON b.id_transaksi = c.id_transaksi
+				WHERE a.id_pengiriman = '$id_pengiriman'";
 		$q = $this->db->query($sql);
 		$res = $q->result();
-		$kode_barang = $res[0]->kode_barang;
+		$data_gb = [];
+		foreach ($res as $row) {
+			$data_gb[] = array(
+						'id_gudang_user' => $id_gudang_user,
+						'kode_barang' => $row->kode_barang,
+						'kode_brg' => $row->kode_brg,
+						'tgl_gb' => date("Y-m-d H:i:s"),
+						'jumlah_gb' => $row->jumlah_order,
+						'ket_gb' => 3,
+					);
+		}
+		//print_pre($data_gb);
+
+		$this->db->trans_begin();
+
+		$this->db->set(['status_pengiriman' => 4]);
+		$this->db->where("id_pengiriman", $id_pengiriman);
+		$this->db->update("pengiriman");
+
+		$this->db->insert_batch("gudang_barang", $data_gb);
+		
+		if ($this->db->trans_status() === FALSE){
+		    $this->db->trans_rollback();
+		    alert_notif("danger");
+			redirect('pengiriman/ubah/'.e_url($id_pengiriman));
+		}else{
+		    $this->db->trans_commit();
+		    alert_notif("success");
+			redirect('pengiriman');
+		}
+
+		/*$kode_barang = $res[0]->kode_barang;
 		$jumlah_order = $res[0]->jumlah_order;
 		
 		echo $id_gudang_user.'<br>';
@@ -645,8 +717,8 @@ class Pengiriman extends CI_Controller {
 						'jumlah_gb' => $jumlah_order,
 						'ket_gb' => 3,
 					);
-
-		$data = ["status_pengiriman" => 4];
+		print_pre($data_gb);*/
+		/*$data = ["status_pengiriman" => 4];
 		if($this->Pengiriman_model->update($data, $id_pengiriman)){
 			if($this->Gudang_barang_model->add($data_gb)){
 			
@@ -659,12 +731,13 @@ class Pengiriman extends CI_Controller {
 		}else{
 			alert_notif("danger");
 			redirect('pengiriman/ubah/'.e_url($id_pengiriman));
-		}
+		}*/
 	}
 
-	public function gen_table_gudang($kode, $bth)
+	public function gen_table_gudang($kode, $bth=0)
 	{
-		$query=$this->Gudang_barang_model->get_gudang_barang($kode);
+		$kode = d_url($kode);
+		$query=$this->Gudang_model->get_all();
 		$res = $query->result();
 		$num_rows = $query->num_rows();
 
@@ -674,33 +747,189 @@ class Pengiriman extends CI_Controller {
 			);
 
 		$this->table->set_template($tmpl);
-
 		$this->table->set_empty("&nbsp;");
-
-		$this->table->set_heading('No', 'Nama Gudang', 'Stok', 'Ket', 'Aksi');
+		$this->table->set_heading('No', 'Nama Gudang', 'Aksi');
 
 		if ($num_rows > 0)
 		{
 			$i = 0;
 			
 			foreach ($res as $row){
-				$ket = "";
 				$kt = 1;
+				/*$ket = "";
 				if($row->stok<$bth){
 					$ket = '<span class="badge badge-warning">Stok kurang</span>';
 					$kt = 0;
-				}
+				}*/
 				$this->table->add_row(	++$i,
 							$row->nama_gudang,
-							$row->stok,
-							$ket,
 							'<button type="button" onclick="pilih_gudang(\''.$row->id_gudang.'\', \''.$row->nama_gudang.'\', '.$kt.')" class="btn btn-xs btn-success" data-toggle="tooltip" title="Pilih"><i class="fa fa-check"></i></button>'
 				);
+				/*
+$row->stok,
+							$ket,
+				*/
 			}
 		}
 		echo $this->table->generate();
 		init_datatable_tooltips();
 	}
+
+	public function kirimkan($v=""){
+		
+		$data = array(
+						"page" => "pengiriman_view",
+						"ket"  => "Kirim",
+						"form" => "pengiriman/kirmkan_add",
+						//"add" => anchor('', '<i class="fas fa-pencil-alt"></i>', array("class" => "btn btn-success btn_ubah_trans", "id" => $v, "data-toggle" => "tooltip", "data-placement" => "top", "title" => "Ubah Data")),
+						);
+		$v = d_url($v);
+		$q = $this->Sales_order_model->get_data($v);
+		$res = $q->result();
+		$detail = [];
+		$kde = [];
+		foreach ($res as $row) {
+			$detail["Id Transaksi"] = $row->id_transaksi;
+			$detail["Nama Pelanggan"] = $row->nama_pelanggan;
+			$detail["No Telp"] = $row->notelp;
+			$data["jasa_pengiriman"] = $row->jasa_pengiriman;
+			
+			$alamat = explode("|", $row->alamat);
+			if(sizeof($alamat)==1){
+				$detail["Alamat"] = $row->alamat;
+			}else{
+				$prov = get_provinsi($alamat[0])['nama'];
+				$kot = get_kota($alamat[1])['nama'];
+				$kec = get_kecamatan($alamat[2])['nama'];
+				$detail["Alamat"] = $alamat[3].", $kec, $kot, $prov";
+			}
+			$detail["total_order"] = "Rp. ".number_format($row->total_order);
+			$nama_barang = $row->nama_barang;
+			$kd = explode(".", $row->kode_brg);
+			if(sizeof($kd)>1){
+				$nama_barang .= isset($kd[1])?"<br>($kd[1]":"";
+				$nama_barang .= isset($kd[2])?" - $kd[2]":"";
+				$nama_barang .= ")";
+			}
+			$kde[] = $row->kode_barang;
+			$detail["order"][] = array(
+										"kode_barang" => $row->kode_barang,
+										"kode_brg" => $row->kode_brg,
+										"jmlh" => $row->jumlah_order,
+										"barang" => $nama_barang,
+										"harga_barang" => "Rp. ".number_format($row->harga_order),
+										"potongan" => "Rp. ".number_format($row->potongan_order),
+										"jumlah_order" => number_format($row->jumlah_order),
+										"subtotal" => "Rp. ".number_format($row->subtotal_order),
+										);
+
+			/*$data["kode_barang"] = trim($row->kode_barang);
+			$detail["Nama Barang"] = $row->nama_barang;
+			$detail["Harga Barang"] = "Rp. ".number_format($row->harga_order);
+			$data["jumlah"] = $row->jumlah_order;
+			$detail["Jumlah"] = number_format($row->jumlah_order);
+			$detail["Total"] = "Rp. ".number_format($row->total_order);*/
+		}
+		$data['kode_barang'] = e_url("'".join("', '", $kde)."'");
+		$data["transaksi"] = $detail;
+		$this->load->view('index', $data);
+	}
+
+	public function kirmkan_add()
+	{
+		$data = $this->input->post();
+		print_pre($data);
+		$id_user = $this->session->userdata("user")->id_user;
+		$pengiriman = array(
+							"id_user" => $id_user,
+							"id_transaksi" => $data['id_transaksi'],
+							"id_gudang" => $data['id_gudang'],
+							"tgl_kirim" => $data['tgl_kirim'],
+							"jasa_pengiriman" => $data['jasa_pengiriman'],
+							"no_resi" => $data['no_resi'],
+							"status_pengiriman" => 1,
+							);
+
+		$q = $this->Gudang_user_model->get_where(array("id_user" => $id_user, "id_gudang" => $data['id_gudang']));
+		$res = $q->result();
+		$igu = $res[0]->id_gudang_user;
+		$gudang = [];
+		foreach($data['kode_barang'] as $k => $v){
+
+			$gudang[] = array(
+							"id_gudang_user" => $igu,
+							"kode_barang" => $v,
+							"kode_brg" => $data["kode_brg"][$k],
+							"jumlah_gb" => $data["jmlh"][$k],
+							"tgl_gb" => $data["tgl_kirim"],
+							"ket_gb" => 2,
+							);
+
+		}
+		/*print_pre($pengiriman);
+		print_pre($gudang);*/
+		if($this->Pengiriman_model->kirimkan($pengiriman, $gudang)){
+			alert_notif("success");
+			redirect('');
+		}else{
+			alert_notif("danger");
+			redirect('pengiriman/belum/');
+		}
+	}
+
+	public function kirim_ulang($v='')
+	{
+		$data = array(
+						"page" => "pengiriman_view",
+						"ket"  => "Kirim Ulang",
+						"form" => "pengiriman/kirmkan_add",
+						//"add" => anchor('', '<i class="fas fa-pencil-alt"></i>', array("class" => "btn btn-success btn_ubah_trans", "id" => $v, "data-toggle" => "tooltip", "data-placement" => "top", "title" => "Ubah Data")),
+						);
+		$v = d_url($v);
+		$q = $this->Sales_order_model->get_data($v);
+		$res = $q->result();
+		$detail = [];
+		$kde = [];
+		foreach ($res as $row) {
+			$detail["Id Transaksi"] = $row->id_transaksi;
+			$detail["Nama Pelanggan"] = $row->nama_pelanggan;
+			$detail["No Telp"] = $row->notelp;
+			$data["jasa_pengiriman"] = $row->jasa_pengiriman;
+			
+			$alamat = explode("|", $row->alamat);
+			if(sizeof($alamat)==1){
+				$detail["Alamat"] = $row->alamat;
+			}else{
+				$prov = get_provinsi($alamat[0])['nama'];
+				$kot = get_kota($alamat[1])['nama'];
+				$kec = get_kecamatan($alamat[2])['nama'];
+				$detail["Alamat"] = $alamat[3].", $kec, $kot, $prov";
+			}
+			$detail["total_order"] = "Rp. ".number_format($row->total_order);
+			$nama_barang = $row->nama_barang;
+			$kd = explode(".", $row->kode_brg);
+			if(sizeof($kd)>1){
+				$nama_barang .= isset($kd[1])?"<br>($kd[1]":"";
+				$nama_barang .= isset($kd[2])?" - $kd[2]":"";
+				$nama_barang .= ")";
+			}
+			$kde[] = $row->kode_barang;
+			$detail["order"][] = array(
+										"kode_barang" => $row->kode_barang,
+										"kode_brg" => $row->kode_brg,
+										"jmlh" => $row->jumlah_order,
+										"barang" => $nama_barang,
+										"harga_barang" => "Rp. ".number_format($row->harga_order),
+										"potongan" => "Rp. ".number_format($row->potongan_order),
+										"jumlah_order" => number_format($row->jumlah_order),
+										"subtotal" => "Rp. ".number_format($row->subtotal_order),
+										);
+		}
+		$data['kode_barang'] = e_url("'".join("', '", $kde)."'");
+		$data["transaksi"] = $detail;
+		$this->load->view('index', $data);
+	}
+
 }
 
 /* End of file Pengiriman.php */

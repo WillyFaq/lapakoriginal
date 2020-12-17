@@ -33,9 +33,16 @@ class Restok extends CI_Controller {
 			$i = 0;
 
 			foreach ($res as $row){
+				$kd = explode(".", $row->kode_brg);
+				$nama_barang = $row->nama_barang;
+				if(sizeof($kd)>1){
+					$nama_barang .= isset($kd[1])?"<br>($kd[1]":"";
+					$nama_barang .= isset($kd[2])?" - $kd[2]":"";
+					$nama_barang .= ")";
+				}
 				$this->table->add_row(	++$i,
 							$row->kode_barang,
-							$row->nama_barang,
+							$nama_barang,
 							date("d-m-Y", strtotime($row->tgl_gb)),
 							number_format($row->jumlah_gb),
 							anchor('restok/ubah/'.e_url($row->id_gb),'<span class="fa fa-pencil-alt"></span>',array( 'title' => 'Ubah', 'class' => 'btn btn-primary btn-xs', 'data-toggle' => 'tooltip'))
@@ -84,9 +91,7 @@ class Restok extends CI_Controller {
 			);
 
 		$this->table->set_template($tmpl);
-
 		$this->table->set_empty("&nbsp;");
-
 		$this->table->set_heading('No', 'Kode Barang', 'Nama Barang', 'Harga Jual', 'Aksi');
 
 		if ($num_rows > 0)
@@ -98,7 +103,7 @@ class Restok extends CI_Controller {
 							$row->kode_barang,
 							$row->nama_barang,
 							'Rp. '.number_format($row->harga_jual),
-							'<button type="button" onclick="pilih_barang(\''.$row->kode_barang.'\', \''.$row->nama_barang.'\')" class="btn btn-xs btn-success" data-toggle="tooltip" title="Pilih"><i class="fa fa-check"></i></button>'
+							'<button type="button" onclick="pilih_barang(\''.$row->kode_barang.'\', \''.$row->nama_barang.'\', \''.$row->warna_barang.'\', \''.$row->ukuran_barang.'\')" class="btn btn-xs btn-success" data-toggle="tooltip" title="Pilih"><i class="fa fa-check"></i></button>'
 				);
 			}
 		}
@@ -110,9 +115,13 @@ class Restok extends CI_Controller {
 	{
 		$data = $this->input->post();
 		$data['ket_gb'] = '1';
+		$data['kode_brg'] = $data['kode_barang'].($data['warna_barang']!=""?".$data[warna_barang]":"").($data['ukuran_barang']!=""?".$data[ukuran_barang]":"");
 		unset($data['id_gb']);
 		unset($data['nama_barang']);
+		unset($data['warna_barang']);
+		unset($data['ukuran_barang']);
 		unset($data['btnSimpan']);
+		//print_pre($data);
 		if($this->Gudang_barang_model->add($data)){
 			alert_notif("success");
 			redirect('restok');
@@ -130,13 +139,18 @@ class Restok extends CI_Controller {
 						"ket" => "Ubah Data ",
 						"form" => "restok/update"
 						);
-		$q = $this->Gudang_barang_model->get_all_by_user($this->session->userdata("user")->id_user);
+		//$q = $this->Gudang_barang_model->get_all_by_user($this->session->userdata("user")->id_user);
+		$q = $this->Gudang_barang_model->get_where(array("id_gb" => $id));
+		//echo $this->db->last_query();
 		$res = $q->result();
 		foreach ($res as $row) {
 			$data['id_gb'] = $row->id_gb;
 			$data['id_gudang_user'] = $row->id_gudang_user;
 			$data['kode_barang'] = $row->kode_barang;
 			$data['nama_barang'] = $row->nama_barang;
+			$kd = explode(".", $row->kode_brg);
+			$data['warna_barang'] = isset($kd[1])?$kd[1]:"";
+			$data['ukuran_barang'] = isset($kd[2])?$kd[2]:"";
 			$data['tgl_gb'] = $row->tgl_gb;
 			$data['jumlah_gb'] = $row->jumlah_gb;
 		}
@@ -149,8 +163,11 @@ class Restok extends CI_Controller {
 		$id_gb = $this->input->post('id_gb'); 
 		$data = $this->input->post();
 		$data['ket_gb'] = '1';
+		$data['kode_brg'] = $data['kode_barang'].($data['warna_barang']!=""?".$data[warna_barang]":"").($data['ukuran_barang']!=""?".$data[ukuran_barang]":"");
 		unset($data['id_gb']);
 		unset($data['nama_barang']);
+		unset($data['warna_barang']);
+		unset($data['ukuran_barang']);
 		unset($data['btnSimpan']);
 		if($this->Gudang_barang_model->update($data, $id_gb)){
 			alert_notif("success");

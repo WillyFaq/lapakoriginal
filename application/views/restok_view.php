@@ -29,6 +29,23 @@
                         </div>
                     </div>
 
+                    <div class="form-group row" id="warna_barang_box" style="display: none;">
+                        <label for="warna_barang" class="col-sm-2 col-form-label">Warna Barang</label>
+                        <div class="col-sm-10">
+                            <input type="text" list="warna_barang_list" class="form-control" name="warna_barang" id="warna_barang" placeholder="Warna Barang" <?= isset($warna_barang)?"value='$warna_barang'":''; ?> >
+                            <datalist id="warna_barang_list">
+                            </datalist>
+                        </div>
+                    </div> 
+                    <div class="form-group row" id="ukuran_barang_box" style="display: none;">
+                        <label for="ukuran_barang" class="col-sm-2 col-form-label">Ukuran Barang</label>
+                        <div class="col-sm-10">
+                            <input type="text" list="ukuran_barang_list" class="form-control" name="ukuran_barang" id="ukuran_barang" placeholder="Ukuran Barang" <?= isset($ukuran_barang)?"value='$ukuran_barang'":''; ?> >
+                            <datalist id="ukuran_barang_list">
+                            </datalist>
+                        </div>
+                    </div> 
+
                     <div class="form-group row">
                         <label for="tgl_gb" class="col-sm-2 col-form-label">Tgl Restok </label>
                         <div class="col-sm-10">
@@ -83,12 +100,57 @@
             $('#modalBarang').modal('show');
         });
 
+        <?php
+            if(isset($warna_barang)){
+                echo "add_warna('$warna_barang', true);";
+                echo 'console.log("warna");';
+            }
+            if(isset($ukuran_barang)){
+                echo "add_ukuran('$ukuran_barang', true);";
+                echo 'console.log("ukuran");';
+            }
+        ?>
+
     });
 
-    function pilih_barang(kode_barang, nama_barang) {
+    function pilih_barang(kode_barang, nama_barang, warna_barang, ukuran_barang) {
         $('#modalBarang').modal('hide');
         $("#kode_barang").val(kode_barang);
         $("#nama_barang").val(nama_barang);
+        add_warna(warna_barang, false);
+        add_ukuran(ukuran_barang, false);
+    }
+
+    function add_warna(warna_barang, ro) {
+        if(warna_barang!=""){
+            $("#warna_barang_box").show();
+            $("#warna_barang").attr("readonly", ro);
+
+            $("#warna_barang_list").html("");
+            var war = warna_barang.split(",");
+            war.forEach(function(t, i){
+                $("#warna_barang_list").append("<option>"+t+"</option>");
+            });
+        }else{
+            $("#warna_barang_box").hide();
+            $("#warna_barang").attr("data-required",false);
+        }
+    }
+
+    function add_ukuran(ukuran_barang, ro) {
+        if(ukuran_barang!=''){
+            $("#ukuran_barang_box").show();
+
+            $("#ukuran_barang").attr("readonly", ro);
+            $("#ukuran_barang_list").html("");
+            var war = ukuran_barang.split(",");
+            war.forEach(function(t, i){
+                $("#ukuran_barang_list").append("<option>"+t+"</option>");
+            });
+        }else{
+            $("#ukuran_barang_box").hide();
+            $("#ukuran_barang").attr("data-required",false);
+        }
     }
 
 </script>

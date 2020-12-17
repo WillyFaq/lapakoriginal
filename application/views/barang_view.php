@@ -1,3 +1,5 @@
+<link rel="stylesheet" href="<?= base_url('assets/vendor/tagsinput/dist/tagsinput.css'); ?>">
+<script type="text/javascript" src="<?= base_url('assets/vendor/tagsinput/dist/tagsinput.js'); ?>"></script>
 <!-- Page Heading -->
 <div class="d-sm-flex align-items-center justify-content-between mb-4">
     <h1 class="h3 mb-0 text-gray-800"> <i class="fa fa-box-open"></i> Barang</h1>
@@ -29,6 +31,18 @@
                         </div>
                     </div>
                     <div class="form-group row">
+                        <label for="warna_barang" class="col-sm-2 col-form-label">Warna</label>
+                        <div class="col-sm-10">
+                            <input type="text" data-role="tagsinput" class="form-control" name="warna_barang" id="warna_barang" placeholder="Warna (kosongkan jika tidak ada warna)" <?= isset($warna_barang)?"value='$warna_barang'":''; ?> >
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="ukuran_barang" class="col-sm-2 col-form-label">Ukuran</label>
+                        <div class="col-sm-10">
+                            <input type="text" data-role="tagsinput" class="form-control" name="ukuran_barang" id="ukuran_barang" placeholder="Ukuran (kosongkan jika tidak ada warna)" <?= isset($ukuran_barang)?"value='$ukuran_barang'":''; ?>>
+                        </div>
+                    </div>
+                    <div class="form-group row">
                         <label for="harga_jual" class="col-sm-2 col-form-label">Harga Jual</label>
                         <div class="col-sm-10">
                             <div class="input-group">
@@ -37,6 +51,22 @@
                                 </div>
                                 <input type="number" min="0" class="form-control" name="harga_jual" id="harga_jual" placeholder="Harga Jual" <?= isset($harga_jual)?"value='$harga_jual'":''; ?> required aria-describedby="addon-rp" >
                             </div>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="setting_harga" class="col-sm-2 col-form-label">Setting Harga</label>
+                        <div class="col-sm-10">
+                            <?php
+                                $rb_fix_harga = ' checked="true" ';
+                                $rb_nfix_harga = ' ';
+                                if(isset($setting_harga)){
+                                    if($setting_harga==0){
+                                        $rb_nfix_harga = ' checked="true" ';
+                                    }
+                                }
+                            ?>
+                            <input type="radio" name="setting_harga" value="1" id="rb_fix_harga" <?= $rb_fix_harga; ?> > <label for="rb_fix_harga"> Fix </label> &nbsp;&nbsp;&nbsp;
+                            <input type="radio" name="setting_harga" value="0" id="rb_nfix_harga" <?= $rb_nfix_harga; ?> > <label for="rb_nfix_harga"> Mengikuti Ukuran </label>
                         </div>
                     </div>
                     <div class="form-group row">
@@ -92,9 +122,24 @@
                             <td><?= $nama_barang; ?></td>
                         </tr>
                         <tr>
+                            <th>Warna Barang</th>
+                            <td>:</td>
+                            <td><?= $warna_barang; ?></td>
+                        </tr>
+                        <tr>
+                            <th>Ukuran Barang</th>
+                            <td>:</td>
+                            <td><?= $ukuran_barang; ?></td>
+                        </tr>
+                        <tr>
                             <th>Harga Jual</th>
                             <td>:</td>
                             <td>Rp. <?= number_format($harga_jual); ?></td>
+                        </tr>
+                        <tr>
+                            <th>Setting Harga</th>
+                            <td>:</td>
+                            <td><?= $setting_harga==1?'Fix':'Mengikuti Ukuran'; ?></td>
                         </tr>
                         <tr>
                             <th>Beban</th>

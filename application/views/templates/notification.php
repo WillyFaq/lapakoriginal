@@ -6,7 +6,7 @@ if($this->session->userdata('user')->level==1 /*|| $this->session->userdata('use
     $res = [];
     if($this->session->userdata('user')->level==1){
         $judul = "Notifikasi Pengiriman :";
-        $q = $this->Sales_order_model->get_where(['status_order' => 0]);
+        $q = $this->Sales_order_model->get_where2(['status_order' => 0]);
         $res = $q->result();
         $nr = $q->num_rows();
     }
@@ -26,7 +26,7 @@ if($this->session->userdata('user')->level==1 /*|| $this->session->userdata('use
         </h6>
         <div class="scroll_notification">
             <?php foreach($res as $row): ?>
-            <a class="dropdown-item d-flex align-items-center" href="<?= base_url("pengiriman/acc/").e_url($row->id_transaksi); ?>">
+            <a class="dropdown-item d-flex align-items-center" href="<?= base_url("pengiriman/kirimkan/").e_url($row->id_transaksi); ?>">
                 <div class="mr-3">
                     <div class="icon-circle bg-primary">
                         <i class="fas fa-dollar-sign text-white"></i>
@@ -35,7 +35,7 @@ if($this->session->userdata('user')->level==1 /*|| $this->session->userdata('use
                 <div>
                     <span class="font-weight-bold">
                         <strong><?= $row->nama_pelanggan; ?></strong>
-                        <br><?= $row->nama_barang; ?>
+                        <br><?= '';//$row->nama_barang; ?>
                     </span>
                 </div>
             </a>
