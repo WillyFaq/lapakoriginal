@@ -143,16 +143,17 @@ class Barang_model extends CI_Model {
 					d.kode_barang,
 					d.nama_barang,
 					a.tgl_order,
-					a.jumlah_order,
+					f.jumlah_order,
 					a.total_order,
-					a.harga_order,
+					f.harga_order,
 					d.laba_barang,
-					(d.laba_barang*a.jumlah_order) AS 'laba_penjualan'
+					(d.laba_barang*f.jumlah_order) AS 'laba_penjualan'
 				FROM sales_order a
+				JOIN sales_order_detail f ON a.id_transaksi = f.id_transaksi
 				JOIN user b ON a.id_user = b.id_user
 				JOIN pelanggan c ON a.no_pelanggan = c.no_pelanggan
-				JOIN barang d ON a.kode_barang = d.kode_barang
-				JOIN pengiriman e ON e.id_transaksi = a.id_transaksi
+				JOIN barang d ON f.kode_barang = d.kode_barang
+				JOIN pengiriman e ON e.id_transaksi = f.id_transaksi
 				$whr";
 		return $this->db->query($sql);
 	}
@@ -165,7 +166,7 @@ class Barang_model extends CI_Model {
 			$whr .= " AND MONTH(a.tgl_order) = '$bln' ";
 		}
 		if($brg!=""){
-			$whr .= " AND SUBSTRING_INDEX(a.kode_barang, '.', 1) = '$brg' ";
+			$whr .= " AND f.kode_barang = '$brg' ";
 		}
 		$sql = "SELECT
 					a.id_transaksi,
@@ -174,19 +175,20 @@ class Barang_model extends CI_Model {
 					d.kode_barang,
 					d.nama_barang,
 					MONTH(a.tgl_order) AS 'bulan',
-					SUM(a.jumlah_order) AS 'jumlah_order',
+					SUM(f.jumlah_order) AS 'jumlah_order',
 					SUM(a.total_order) AS 'total_order',
-					SUM(a.harga_order) AS 'harga_order',
+					SUM(f.harga_order) AS 'harga_order',
 					SUM(d.laba_barang) AS 'laba_barang',
-					SUM((d.laba_barang*a.jumlah_order)) AS 'laba_penjualan'
+					SUM((d.laba_barang*f.jumlah_order)) AS 'laba_penjualan'
 				FROM sales_order a
+				JOIN sales_order_detail f ON a.id_transaksi = f.id_transaksi
 				JOIN user b ON a.id_user = b.id_user
 				JOIN pelanggan c ON a.no_pelanggan = c.no_pelanggan
-				JOIN barang d ON a.kode_barang = d.kode_barang
+				JOIN barang d ON f.kode_barang = d.kode_barang
 				JOIN pengiriman e ON a.id_transaksi = e.id_transaksi
 				$whr
 				AND e.status_pengiriman = 2	
-				GROUP BY a.kode_barang, MONTH(a.tgl_order)";
+				GROUP BY f.kode_barang, MONTH(a.tgl_order)";
 
 		return $this->db->query($sql);
 	}
@@ -203,19 +205,20 @@ class Barang_model extends CI_Model {
 					d.nama_barang,
 					d.harga_jual,
 					MONTH(a.tgl_order) AS 'bulan',
-					SUM(a.jumlah_order) AS 'jumlah_order',
+					SUM(f.jumlah_order) AS 'jumlah_order',
 					SUM(a.total_order) AS 'total_order',
-					SUM(a.harga_order) AS 'harga_order',
+					SUM(f.harga_order) AS 'harga_order',
 					SUM(d.laba_barang) AS 'laba_barang',
-					SUM((d.laba_barang*a.jumlah_order)) AS 'laba_penjualan'
+					SUM((d.laba_barang*f.jumlah_order)) AS 'laba_penjualan'
 				FROM sales_order a
+				JOIN sales_order_detail f ON f.id_transaksi = a.id_transaksi
 				JOIN user b ON a.id_user = b.id_user
 				JOIN pelanggan c ON a.no_pelanggan = c.no_pelanggan
-				JOIN barang d ON a.kode_barang = d.kode_barang
+				JOIN barang d ON f.kode_barang = d.kode_barang
 				JOIN pengiriman e ON a.id_transaksi = e.id_transaksi
 				WHERE MONTH(a.tgl_order) = '$bln'  AND  d.kode_barang = '$id' AND YEAR(a.tgl_order) = ".date("Y")."
 				AND e.status_pengiriman = 2
-				GROUP BY a.kode_barang, MONTH(a.tgl_order)";
+				GROUP BY f.kode_barang, MONTH(a.tgl_order)";
 		return $this->db->query($sql);
 	}
 }

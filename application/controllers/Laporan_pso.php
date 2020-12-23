@@ -20,10 +20,10 @@ class Laporan_pso extends CI_Controller {
 		$sql = "SELECT 
 					b.nama,
 					a.id_transaksi,
-					a.kode_barang,
+					f.kode_barang,
 					c.nama_barang,
-					a.harga_order,
-					a.jumlah_order,
+					f.harga_order,
+					f.jumlah_order,
 					a.total_order,
 					a.tgl_order,
 					a.no_pelanggan,
@@ -33,8 +33,9 @@ class Laporan_pso extends CI_Controller {
 					a.status_order,
 					e.status_pengiriman
 				FROM sales_order a
+				JOIN sales_order_detail f ON a.id_transaksi = f.id_transaksi
 				JOIN user b ON a.id_user = b.id_user
-				JOIN barang c ON a.kode_barang = c.kode_barang
+				JOIN barang c ON f.kode_barang = c.kode_barang
 				JOIN pelanggan d ON a.no_pelanggan = d.no_pelanggan
 				LEFT JOIN pengiriman e ON a.id_transaksi = e.id_transaksi
 				WHERE YEAR(a.tgl_order) = '$thn' 

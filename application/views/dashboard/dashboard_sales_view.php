@@ -22,6 +22,9 @@
 ?>
 <?php
     $card = [];
+    $tot_ord = 0;
+    $bln_ord = 0;
+    $har_ord = 0;
     if(sizeof($semua)>1){
         foreach ($semua as $k => $v) {
             $card["$v[barang]"] = [
@@ -30,6 +33,10 @@
                                 $hari_ini[$k]['jml'],
                                 $target[$k]['jml'],
                             ];
+
+            $tot_ord += $target[$k]['jml']==""?0:$target[$k]['jml'];
+            $bln_ord += $bulan_ini[$k]['jml']==""?0:$bulan_ini[$k]['jml'];
+            $har_ord += $hari_ini[$k]['jml']==""?0:$hari_ini[$k]['jml'];
         }
     }else{
         $k = 0;
@@ -39,26 +46,13 @@
                                 $hari_ini[$k]['jml'],
                                 $target[$k]['jml'],
                             ];
+        $tot_ord += $target[$k]['jml']==""?0:$target[$k]['jml'];
+        $bln_ord += $bulan_ini[$k]['jml']==""?0:$bulan_ini[$k]['jml'];
+        $har_ord += $hari_ini[$k]['jml']==""?0:$hari_ini[$k]['jml'];
     }
 ?>
-<div class="card shadow mb-4">
-    <!-- Card Header - Accordion -->
-    <a href="#collapseCardExample" class="d-block card-header py-3" data-toggle="collapse" role="button" aria-expanded="true" aria-controls="collapseCardExample">
-        <h6 class="m-0 font-weight-bold text-primary">Summary</h6>
-    </a>
-    <!-- Card Content - Collapse -->
-    <div class="collapse show" id="collapseCardExample" style="">
-        <div class="card-body">
 
-<?php foreach($card as $k => $v): ?>
 <div class="row">
-    <?php if($k!="0"): ?>
-    <div class="col-xl-12 col-md-12">
-        <p><?= $k; ?></p>
-    </div>
-    
-    <?php endif; ?>
-    <!-- Earnings (Monthly) Card Example -->
     <div class="col-xl-3 col-md-6 mb-4">
         <div class="card border-left-primary shadow h-100 py-2">
             <div class="card-body">
@@ -66,7 +60,7 @@
                     <div class="col mr-2">
                         <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Total Order</div>
                         <div class="h5 mb-0 font-weight-bold text-gray-800">
-                        <?= number_format($v[0]); ?>
+                        <?= number_format($tot_ord); ?>
                         </div>
                     </div>
                     <div class="col-auto">
@@ -83,7 +77,7 @@
                     <div class="col mr-2">
                         <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Order Bulan ini</div>
                         <div class="h5 mb-0 font-weight-bold text-gray-800">
-                        <?= number_format($v[1]); ?>
+                        <?= number_format($bln_ord); ?>
                         </div>
                     </div>
                     <div class="col-auto">
@@ -101,7 +95,7 @@
                     <div class="col mr-2">
                         <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Order Hari ini</div>
                         <div class="h5 mb-0 font-weight-bold text-gray-800">
-                        <?= number_format($v[2]); ?>
+                        <?= number_format($har_ord); ?>
                         </div>
                     </div>
                     <div class="col-auto">
@@ -111,30 +105,35 @@
             </div>
         </div>
     </div>
+</div>
 
-    <div class="col-xl-3 col-md-6 mb-4">
-        <div class="card border-left-danger shadow h-100 py-2">
+<!-- Content Row -->
+<div class="row">
+    <!-- Content Column -->
+    <div class="col-lg-6 mb-4">
+        <!-- Project Card Example -->
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Target Harian</h6>
+            </div>
             <div class="card-body">
-                <div class="row no-gutters align-items-center">
-                    <div class="col mr-2">
-                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Target Harian</div>
-                        <div class="h5 mb-0 font-weight-bold text-gray-800">
-                        <?= number_format($v[3]); ?>
-                        </div>
+                <?php foreach($card as $k => $v): 
+                        $h = $v[2]==""?rand(1,9):$v[2];
+                        $t = $v[3]==""?0:$v[3];
+                        $p = ($h/$t)*100;
+                ?>
+                    <h4 class="small font-weight-bold"><?= $k; ?> <span
+                        class="float-right"><?= "$h/$t"; ?></span></h4>
+                    <div class="progress mb-4">
+                        <div class="progress-bar bg-success" role="progressbar" style="width: <?= $p; ?>%"
+                            aria-valuenow="<?= $p; ?>" aria-valuemin="0" aria-valuemax="100"></div>
                     </div>
-                    <div class="col-auto">
-                        <i class="fas fa-bullseye fa-2x text-gray-300"></i>
-                    </div>
-                </div>
+                <?php endforeach; ?>
             </div>
         </div>
     </div>
 </div>
-<?php endforeach; ?>
-            
-        </div>
-    </div>
-</div>
+
 <div class="row">
     <!-- Area Chart -->
     <div class="col-xl-12 col-lg-12">

@@ -26,6 +26,10 @@ class Dahsboard extends CI_Controller {
 			$q = $this->Sales_model->get_data($id);
 			$res = $q->result();
 			$ret = "";
+			$data['semua'] = [];
+			$data['bulan_ini'] = [];
+			$data['hari_ini'] = [];
+			$data['target'] = [];
 			foreach ($res as $row) {
 				$data['semua'][] =  array(
 												"barang" => $row->nama_barang,
@@ -43,6 +47,7 @@ class Dahsboard extends CI_Controller {
 												"barang" => $row->nama_barang,
 												"jml" => $row->minimal_sale,
 											);
+
 
 			}
 
@@ -75,7 +80,9 @@ class Dahsboard extends CI_Controller {
 		$laba = 0;
 		foreach ($res as $row){
 			$tot += $row->total_order;
-			$laba_penjualan = $row->total_order - $row->laba_penjualan - $this->Barang_model->get_iklan($row->kode_barang, $row->bulan);
+			$iklan = $this->Barang_model->get_iklan($row->kode_barang, $row->bulan);
+			$iklan = $iklan==''?0:$iklan;
+			$laba_penjualan = $row->total_order - $row->laba_penjualan - $iklan;
 			$laba += $laba_penjualan;
 		}
 		return $laba;
@@ -105,7 +112,6 @@ class Dahsboard extends CI_Controller {
 	        $data[] = $this->get_all_penjualan($k, $thn, $brg);
 	    }
 
-	    //print_pre($data);
 	    return array(
 	    				"label" => $bln,
 	    				"data" => $data,
@@ -319,9 +325,9 @@ class Dahsboard extends CI_Controller {
 	}
 
 
-	public function load_demografi($type="", $brg="")
+	public function load_demografi($type="", $brg="", $kd_brg="")
 	{
-		$data = array("type" => $type, "brg" => $brg);
+		$data = array("type" => $type, "brg" => $brg, $kd_brg => $kd_brg);
 		$whr = "";
         if($type!=""){
             if($type=="1"){
@@ -347,18 +353,30 @@ class Dahsboard extends CI_Controller {
         }
 
         if($brg!=""){
-        	$whr .= " AND a.kode_barang = '$brg' ";
+        	$whr .= " AND b.kode_barang = '$brg' ";
+        }
+        if($kd_brg!=""){
+        	$k = explode(".", $kd_brg);
+        	if($k[1]!=""){
+        		$whr .= "AND IF(LOCATE('.', b.kode_brg, (LOCATE('.', b.kode_brg)+1))>0, SUBSTRING(b.kode_brg, LOCATE('.', b.kode_brg)+1, LOCATE('.', SUBSTRING(b.kode_brg, LOCATE('.', b.kode_brg)+1 ) )-1), SUBSTRING(b.kode_brg, LOCATE('.', b.kode_brg)+1 ) ) = '$k[1]' ";
+        	}
+        	if($k[2]!=""){
+        		$whr .= "AND IF(LOCATE('.', b.kode_brg, (LOCATE('.', b.kode_brg)+1))>0, RIGHT(b.kode_brg, LENGTH(b.kode_brg) - LOCATE('.', b.kode_brg, (LOCATE('.', b.kode_brg)+1)) ), '') = '$k[2]' ";
+        	}
+        	//$whr .= " AND b.kode_brg LIKE '%$kd_brg%' ";
         }
         $sql = "SELECT  
-                    SUBSTR(b.alamat, 1, 2) AS prov,
-                    COUNT(*) AS jml
+                    SUBSTR(c.alamat, 1, 2) AS prov,
+                    SUM(b.jumlah_order) AS jml
                 FROM sales_order a
-                JOIN pelanggan b ON a.no_pelanggan = b.no_pelanggan
+                JOIN sales_order_detail b ON a.id_transaksi = b.id_transaksi
+                JOIN pelanggan c ON a.no_pelanggan = c.no_pelanggan
                 WHERE 1=1 $whr
-                GROUP BY SUBSTR(b.alamat, 1, 2)";
+                GROUP BY SUBSTR(c.alamat, 1, 2)";
+        //print_pre($sql);
         $q = $this->db->query($sql);
-        if($q->num_rows()==0){
-        	$whr = str_replace(" AND a.kode_barang = '$brg' ", "", $whr);
+        /*if($q->num_rows()==0){
+        	$whr = str_replace(" AND b.kode_barang = '$brg' ", "", $whr);
         	$whr .= " AND SUBSTRING_INDEX(a.kode_barang, '.', 1) = '$brg' ";
         	$sql = "SELECT  
                     SUBSTR(b.alamat, 1, 2) AS prov,
@@ -368,9 +386,11 @@ class Dahsboard extends CI_Controller {
                 WHERE 1=1 $whr
                 GROUP BY SUBSTR(b.alamat, 1, 2)";
         	$q = $this->db->query($sql);
-        }
+        }*/
         //echo $this->db->last_query();
         $data["q"] = $q;
+        $res = $q->result();
+        //print_pre($res);
 		$this->load->view('chart/demograpi_view', $data);
 	}
 
@@ -428,22 +448,47 @@ class Dahsboard extends CI_Controller {
 	public function cb_barang_filter($id='')
 	{
 		$whr = "";
+		$ret = "";
 		if($id!=""){
-			$whr = " WHERE SUBSTRING_INDEX(kode_barang, '.', 1) = '$id' ";
+			//$whr = " WHERE SUBSTRING_INDEX(kode_barang, '.', 1) = '$id' ";
+			$whr = " WHERE kode_barang = '$id' ";
+			$sql = "SELECT 
+						kode_barang,
+						warna_barang,
+						ukuran_barang
+		            FROM barang
+		            $whr";
+		    $q = $this->db->query($sql);
+			$res = $q->result();
+			$opt[""] = "Semua Warna";
+			$opt2[""] = "Semua Ukuran";
+			foreach ($res as $row) {
+				$warna = explode(",", $row->warna_barang);
+				$ukuran = explode(",", $row->ukuran_barang);
+				foreach($warna as $k => $v){
+					$opt[$v] = $v;
+				}
+				foreach($ukuran as $k => $v){
+					$opt2[$v] = $v;
+				}
+			}
+			$war = "";
+			if(sizeof($opt)>1){
+				$js = 'class="form-control" id="cb_brg_warna" onchange="filter_demo()" ';
+				$war = '<div class="col-sm-6">';
+				$war .= form_dropdown('warna_barang',$opt,"",$js);
+				$war .= '</div>';
+			}
+
+			$ukr = '';
+			if(sizeof($opt2)>1){
+				$js2 = 'class="form-control" id="cb_brg_ukuran" onchange="filter_demo()" ';
+				$ukr = '<div class="col-sm-6">';
+				$ukr .= form_dropdown('ukuran_barang',$opt2,"",$js2);
+				$ukr .= '</div>';
+			}
+			$ret = $war.$ukr; 
 		}
-		//$ret = '<div class="form-group row"><label for="nama" class="col-sm-2 col-form-label">Barang</label><div class="col-sm-10">';
-		$sql = "SELECT *
-	            FROM barang
-	            $whr
-	            GROUP BY kode_barang";
-	    $q = $this->db->query($sql);
-		$res = $q->result();
-			$opt[$id] = "Semua Barang";
-		foreach ($res as $row) {
-			$opt[$row->kode_barang] = $row->nama_barang;
-		}
-		$js = 'class="form-control" id="cb_brg" onchange="filter_demo()" ';
-		$ret = form_dropdown('kode_barang',$opt,"",$js);
 		//$ret= $ret.'</div></div>';
 		echo $ret;
 	}

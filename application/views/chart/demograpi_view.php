@@ -1,11 +1,16 @@
 <?php
         
         //echo $sql;
+        //echo $this->db->last_query();
         $res = $q->result();
         $data = [];
         $map = json_decode(file_get_contents(base_url('assets/mapping.json')), true);
         foreach ($res as $row) {
-            $data[$map[$row->prov]] = $row->jml;
+            if(isset($map[$row->prov])){
+                $data[$map[$row->prov]] = $row->jml;
+            }else{
+                $data['id-jt'] = $row->jml;
+            }
         }
     ?>
 <div id="container_demo"></div>

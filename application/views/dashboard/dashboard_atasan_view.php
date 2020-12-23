@@ -114,29 +114,17 @@
 
                     <div class="form-group row cb_product_box">
                         <label for="filter" class="col-sm-2 col-form-label">Barang</label>
-                        <div class="col-sm-5">
+                        <div class="col-sm-10">
                             <select name="filter" id="cb_jenis_brg" class="form-control">
-                                <option value="">Semua Jenis Barang</option>
-                                <?php
-                                    $sql = "SELECT 
-                                                DISTINCT SUBSTRING_INDEX(kode_barang, '.', 1) AS kode_barang
-                                            FROM barang ";
-                                    $q = $this->db->query($sql);
-                                    $res = $q->result();
-                                    foreach ($res as $row) {
-                                        $sel = '';
-                                        echo '<option value="'.$row->kode_barang.'" '.$sel.'>'.$row->kode_barang.'</option>';
-                                    }
-                                ?>
-                            </select>
-                        </div>
-                        <div class="col-sm-5 cb_brg_box">
-                            <select name="filter" id="cb_brg" class="form-control">
                                 <option value="">Semua Barang</option>
                                 <?php
-                                    $sql = "SELECT *
-                                            FROM barang
-                                            GROUP BY kode_barang";
+                                    /*$sql = "SELECT 
+                                                DISTINCT SUBSTRING_INDEX(kode_barang, '.', 1) AS kode_barang
+                                            FROM barang ";*/
+                                    $sql = "SELECT 
+                                                kode_barang,
+                                                nama_barang
+                                            FROM barang ";
                                     $q = $this->db->query($sql);
                                     $res = $q->result();
                                     foreach ($res as $row) {
@@ -145,6 +133,43 @@
                                     }
                                 ?>
                             </select>
+                        </div>
+                    </div>
+                    <div class="form-group row cb_product_box">
+                        <label for="filter" class="col-sm-2 col-form-label"></label>
+                        <div class="col-sm-10 row cb_brg_box">
+                            <div class="col-sm-6">
+                                <select name="filter" id="cb_brg_warna" class="form-control cb_det_filter_barang">
+                                    <option value="">Semua Warna</option>
+                                    <?php
+                                        $sql = "SELECT *
+                                                FROM barang
+                                                GROUP BY kode_barang";
+                                        $q = $this->db->query($sql);
+                                        $res = $q->result();
+                                        foreach ($res as $row) {
+                                            $sel = '';
+                                            echo '<option value="'.$row->kode_barang.'" '.$sel.'>'.$row->nama_barang.'</option>';
+                                        }
+                                    ?>
+                                </select>
+                            </div>
+                            <div class="col-sm-6">
+                                <select name="filter" id="cb_brg_ukuran" class="form-control cb_det_filter_barang">
+                                    <option value="">Semua Warna</option>
+                                    <?php
+                                        $sql = "SELECT *
+                                                FROM barang
+                                                GROUP BY kode_barang";
+                                        $q = $this->db->query($sql);
+                                        $res = $q->result();
+                                        foreach ($res as $row) {
+                                            $sel = '';
+                                            echo '<option value="'.$row->kode_barang.'" '.$sel.'>'.$row->nama_barang.'</option>';
+                                        }
+                                    ?>
+                                </select>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -193,16 +218,17 @@
                     <label for="filter" class="col-sm-2 col-form-label">Barang</label>
                     <div class="col-sm-10">
                         <select name="filter" id="cb_jenis_brg_profit" class="form-control">
-                            <option value="">Semua Jenis Barang</option>
+                            <option value="">Semua Barang</option>
                             <?php
                                 $sql = "SELECT 
-                                            DISTINCT SUBSTRING_INDEX(kode_barang, '.', 1) AS kode_barang
+                                            kode_barang,
+                                            nama_barang
                                         FROM barang ";
                                 $q = $this->db->query($sql);
                                 $res = $q->result();
                                 foreach ($res as $row) {
                                     $sel = '';
-                                    echo '<option value="'.$row->kode_barang.'" '.$sel.'>'.$row->kode_barang.'</option>';
+                                    echo '<option value="'.$row->kode_barang.'" '.$sel.'>'.$row->nama_barang.'</option>';
                                 }
                             ?>
                         </select>
@@ -253,16 +279,17 @@
                     <label for="filter" class="col-sm-2 col-form-label">Barang</label>
                     <div class="col-sm-10">
                         <select name="filter" id="cb_jenis_brg_omset" class="form-control">
-                            <option value="">Semua Jenis Barang</option>
+                            <option value="">Semua Barang</option>
                             <?php
                                 $sql = "SELECT 
-                                            DISTINCT SUBSTRING_INDEX(kode_barang, '.', 1) AS kode_barang
+                                            kode_barang,
+                                            nama_barang
                                         FROM barang ";
                                 $q = $this->db->query($sql);
                                 $res = $q->result();
                                 foreach ($res as $row) {
                                     $sel = '';
-                                    echo '<option value="'.$row->kode_barang.'" '.$sel.'>'.$row->kode_barang.'</option>';
+                                    echo '<option value="'.$row->kode_barang.'" '.$sel.'>'.$row->nama_barang.'</option>';
                                 }
                             ?>
                         </select>
@@ -310,7 +337,7 @@
             filter_demo();
         });
 
-        $("#cb_brg").change(function(){
+        $(".cb_det_filter_barang").change(function(){
             filter_demo();
         });
 
@@ -335,7 +362,14 @@
 
     function filter_demo() {
         var v = $("#cb_filter").val();
-        var brg = $("#cb_brg").val();
+        var brg = $("#cb_jenis_brg").val();
+        var warna = $("#cb_brg_warna").val();
+        var ukuran = $("#cb_brg_ukuran").val();
+        var kd_brg = "";
+        if(warna!="" || ukuran!=""){
+            kd_brg = brg+(warna!=undefined?"."+warna:".")+(ukuran!=undefined?"."+ukuran:".");
+            console.log(kd_brg);
+        }
 
         var loading_box = "";
         loading_box += '<div class="loading_box" id="demograpi_load">';
@@ -347,11 +381,11 @@
             var tgl2 = $("#tgl2").val();
             var tmbh = "4_"+tgl1+"_"+tgl2;
             $("#demograpi_load").html(loading_box);
-            $("#demograpi_load").load('<?= base_url("dahsboard/load_demografi/"); ?>'+tmbh+"/"+brg);
+            $("#demograpi_load").load('<?= base_url("dahsboard/load_demografi/"); ?>'+tmbh+"/"+brg+"/"+kd_brg);
         }else{
             $(".cb_tgl_box").hide();
             $("#demograpi_load").html(loading_box);
-            $("#demograpi_load").load('<?= base_url("dahsboard/load_demografi/"); ?>'+v+"/"+brg);
+            $("#demograpi_load").load('<?= base_url("dahsboard/load_demografi/"); ?>'+v+"/"+brg+"/"+kd_brg);
         }
     }
 

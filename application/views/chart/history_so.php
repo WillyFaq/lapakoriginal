@@ -12,7 +12,8 @@ foreach ($res as $row) {
 $sql1 = "SELECT
            DATE(a.tgl_order) AS tgl_order
         FROM sales_order a
-        JOIN barang b ON a.kode_barang = b.kode_barang
+        JOIN sales_order_detail b ON a.id_transaksi = b.id_transaksi
+        JOIN barang c ON c.kode_barang = b.kode_barang
         WHERE a.id_user = ".$this->session->userdata('user')->id_user."
         $sql
         GROUP BY DATE(a.tgl_order)
@@ -29,16 +30,17 @@ foreach ($res as $row) {
     foreach ($dada as $k => $va) {
         $sql = "SELECT 
                a.id_user,
-               a.kode_barang,
-               b.nama_barang,
+               b.kode_barang,
+               c.nama_barang,
                DATE(a.tgl_order) AS tgl_order,
-               SUM(a.jumlah_order) AS jumlah_order
+               SUM(b.jumlah_order) AS jumlah_order
             FROM sales_order a
-            JOIN barang b ON a.kode_barang = b.kode_barang
+            JOIN sales_order_detail b ON a.id_transaksi = b.id_transaksi
+            JOIN barang c ON c.kode_barang = b.kode_barang
             WHERE a.id_user = ".$this->session->userdata('user')->id_user."
-            AND DATE(a.tgl_order) = '$tgl2' AND a.kode_barang = '$k'
-            GROUP BY a.kode_barang, DATE(a.tgl_order)
-            ORDER BY a.kode_barang, DATE(a.tgl_order)";
+            AND DATE(a.tgl_order) = '$tgl2' AND b.kode_barang = '$k'
+            GROUP BY b.kode_barang, DATE(a.tgl_order)
+            ORDER BY b.kode_barang, DATE(a.tgl_order)";
         $qq = $this->db->query($sql);
         $ress = $qq->result();
         if($qq->num_rows()>0){

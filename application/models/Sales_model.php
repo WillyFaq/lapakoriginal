@@ -122,15 +122,16 @@ class Sales_model extends CI_Model {
 	{
 		$whr = "";
 		if($kode!=""){
-			$whr .= " AND kode_barang = '$kode' ";
+			$whr .= " AND b.kode_barang = '$kode' ";
 		}
 		$sql = "SELECT 
-					id_user,
-					MONTH(tgl_order) AS bulan,
-					SUM(jumlah_order) AS jumlah_order
-				FROM sales_order 
-				WHERE id_user = '$id' AND YEAR(tgl_order) = $thn AND MONTH(tgl_order) = $bln $whr
-				GROUP BY id_user, MONTH(tgl_order)";
+					a.id_user,
+					MONTH(a.tgl_order) AS bulan,
+					SUM(b.jumlah_order) AS jumlah_order
+				FROM sales_order a
+				JOIN sales_order_detail b ON a.id_transaksi = b.id_transaksi
+				WHERE a.id_user = '$id' AND YEAR(a.tgl_order) = $thn AND MONTH(a.tgl_order) = $bln $whr
+				GROUP BY a.id_user, MONTH(a.tgl_order)";
 		$q = $this->db->query($sql);
 		$res = $q->result();
 		foreach ($res as $row) {
@@ -144,10 +145,11 @@ class Sales_model extends CI_Model {
 					a.id_user,
 					b.nama_barang,
 					a.tgl_order,
-					SUM(a.jumlah_order) as jumlah_order
+					SUM(c.jumlah_order) as jumlah_order
 				FROM sales_order a
-				JOIN barang b ON a.kode_barang = b.kode_barang
-				WHERE a.id_user = '$id' AND MONTH(a.tgl_order) = $bln AND YEAR(a.tgl_order) = $thn  AND a.kode_barang = '$kode'
+				JOIN sales_order_detail c ON a.id_transaksi = c.id_transaksi
+				JOIN barang b ON c.kode_barang = b.kode_barang
+				WHERE a.id_user = '$id' AND MONTH(a.tgl_order) = $bln AND YEAR(a.tgl_order) = $thn  AND c.kode_barang = '$kode'
 				GROUP BY DATE(a.tgl_order)";
 		return $this->db->query($sql);
 	}
@@ -156,15 +158,16 @@ class Sales_model extends CI_Model {
 	{
 		$whr = "";
 		if($kode!=""){
-			$whr .= " AND kode_barang = '$kode' ";
+			$whr .= " AND b.kode_barang = '$kode' ";
 		}
 		$sql = "SELECT 
-					id_user,
-					MONTH(tgl_order) AS bulan,
-					SUM(jumlah_order) AS jumlah_order
-				FROM sales_order 
-				WHERE id_user = '$id' $whr
-				GROUP BY id_user";
+					a.id_user,
+					MONTH(a.tgl_order) AS bulan,
+					SUM(b.jumlah_order) AS jumlah_order
+				FROM sales_order a
+				JOIN sales_order_detail b ON a.id_transaksi = b.id_transaksi
+				WHERE a.id_user = '$id' $whr
+				GROUP BY a.id_user";
 		$q = $this->db->query($sql);
 		$res = $q->result();
 		foreach ($res as $row) {
@@ -176,12 +179,13 @@ class Sales_model extends CI_Model {
 	{
 		$tgl = date("Y-m-d");
 		$sql = "SELECT 
-					id_user,
-					MONTH(tgl_order) AS bulan,
-					SUM(jumlah_order) AS jumlah_order
-				FROM sales_order 
-				WHERE id_user = '$id' AND kode_barang = '$kode' AND DATE(tgl_order) = '$tgl'
-				GROUP BY id_user";
+					a.id_user,
+					MONTH(a.tgl_order) AS bulan,
+					SUM(b.jumlah_order) AS jumlah_order
+				FROM sales_order a
+				JOIN sales_order_detail b ON a.id_transaksi = b.id_transaksi
+				WHERE a.id_user = '$id' AND b.kode_barang = '$kode' AND DATE(a.tgl_order) = '$tgl'
+				GROUP BY a.id_user";
 		$q = $this->db->query($sql);
 		$res = $q->result();
 		foreach ($res as $row) {
