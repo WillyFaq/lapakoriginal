@@ -18,6 +18,7 @@ $sql1 = "SELECT
         $sql
         GROUP BY DATE(a.tgl_order)
         ORDER BY DATE(a.tgl_order)";
+//echo $sql1;
 $q = $this->db->query($sql1);
 $res = $q->result();
 $label = [];
@@ -52,11 +53,11 @@ foreach ($res as $row) {
         }
     }
 }
-
-/*print_pre($label);
+/*
+print_pre($label);
 print_pre($jml);
-print_pre($dada);*/
-
+print_pre($dada);
+*/
 
 $color = ['red','orange','yellow','green','blue','purple','grey', 'black'];
 $datasets = [];

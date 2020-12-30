@@ -24,7 +24,7 @@ class Pengiriman extends CI_Controller {
 
 		$this->table->set_template($tmpl);
 		$this->table->set_empty("&nbsp;");
-		$this->table->set_heading('No', 'Id Transaksi', 'Nama Pelanggan', 'Jasa Pengiriman', 'No Resi', 'Tgl Pengiriman', 'Status', 'Aksi');
+		$this->table->set_heading('No', 'Nama Sales', 'Nama Pelanggan', 'Jasa Pengiriman', 'No Resi', 'Tgl Pengiriman', 'Status', 'Aksi');
 
 		if($aj==""){
 
@@ -52,19 +52,19 @@ class Pengiriman extends CI_Controller {
 			$sts = $sts=="ac"?"0":$sts;
 			
 			if($sts == "3"){
-				$query = $this->Pengiriman_model->get_where_like(array(
+				$query = $this->Pengiriman_model->get_where_like2(array(
 																"pengiriman.status_pengiriman" => "3",
 																"pengiriman.status_pengiriman" => "4",
 															));
 			}else{
-				$query = $this->Pengiriman_model->get_where(array("pengiriman.status_pengiriman" => $sts));
+				$query = $this->Pengiriman_model->get_where2(array("pengiriman.status_pengiriman" => $sts));
 			}
 
 		}else if($this->input->post("search")){
 			$sts = $this->input->post("search")['value'];
-			$query = $this->Pengiriman_model->get_where_like(
+			$query = $this->Pengiriman_model->get_where_like2(
 														array(
-															"pengiriman.id_transaksi" => $sts,
+															"user.nama" => $sts,
 															"pelanggan.nama_pelanggan" => $sts,
 															"pengiriman.jasa_pengiriman" => $sts,
 															"pengiriman.no_resi" => $sts,
@@ -105,7 +105,7 @@ class Pengiriman extends CI_Controller {
 				}
 				$ret[] = [
 							++$i,
-							$row->id_transaksi,
+							$row->nama,
 							$row->nama_pelanggan,
 							$row->jasa_pengiriman,
 							$row->no_resi,
@@ -115,10 +115,11 @@ class Pengiriman extends CI_Controller {
 							.'&nbsp;'.
 							$btn_update
 							];
-				//if($i>=1000){break;}
+				if($i>=1000){break;}
 			}
 		}
 		if($aj=="1"){
+			//print_pre($ret);
 			return $ret;
 		}else{
 
@@ -165,7 +166,7 @@ class Pengiriman extends CI_Controller {
 
 		$this->table->set_template($tmpl);
 		$this->table->set_empty("&nbsp;");
-		$this->table->set_heading('No', 'Id Transaksi', 'Nama Sales', 'Nama Pelanggan', 'Total', 'Status', 'Aksi');
+		$this->table->set_heading('No', 'Nama Sales', 'Nama Pelanggan', 'Total', 'Status', 'Aksi');
 
 		if ($num_rows > 0)
 		{
@@ -177,7 +178,6 @@ class Pengiriman extends CI_Controller {
 					$sts = '<span class="badge badge-success">Sudah dikirim</span>';
 				}
 				$this->table->add_row(	++$i,
-							$row->id_transaksi,
 							$row->nama,
 							$row->nama_pelanggan,
 							'Rp. '.number_format($row->total_order),

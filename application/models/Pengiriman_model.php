@@ -59,12 +59,36 @@ class Pengiriman_model extends CI_Model {
 		return $this->db->get();
 	}
 
+	public function get_where2($id)
+	{
+		$this->db->select('*');
+		$this->db->from($this->table);
+		$this->db->join($this->join1, $this->table.'.'.$this->fk1.' = '.$this->join1.'.'.$this->fk1);
+		$this->db->join($this->join4, $this->join1.'.'.$this->fk4.' = '.$this->join4.'.'.$this->fk4);
+		$this->db->join($this->join2, $this->join1.'.'.$this->fk2.' = '.$this->join2.'.'.$this->fk2);
+		$this->db->where($id);
+		$this->db->order_by($this->table.".id_pengiriman", 'desc');
+		return $this->db->get();
+	}
+
 	public function get_where_like($id)
 	{
 		$this->db->select('*');
 		$this->db->from($this->table);
 		$this->db->join($this->join1, $this->table.'.'.$this->fk1.' = '.$this->join1.'.'.$this->fk1);
 		$this->db->join($this->join4, $this->join1.'.'.$this->fk4.' = '.$this->join4.'.'.$this->fk4);
+		$this->db->like($id);
+		$this->db->order_by($this->table.".id_pengiriman", 'desc');
+		return $this->db->get();
+	}
+
+	public function get_where_like2($id)
+	{
+		$this->db->select('*');
+		$this->db->from($this->table);
+		$this->db->join($this->join1, $this->table.'.'.$this->fk1.' = '.$this->join1.'.'.$this->fk1);
+		$this->db->join($this->join4, $this->join1.'.'.$this->fk4.' = '.$this->join4.'.'.$this->fk4);
+		$this->db->join($this->join2, $this->join1.'.'.$this->fk2.' = '.$this->join2.'.'.$this->fk2);
 		$this->db->like($id);
 		$this->db->order_by($this->table.".id_pengiriman", 'desc');
 		return $this->db->get();

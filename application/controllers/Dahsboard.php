@@ -153,7 +153,7 @@ class Dahsboard extends CI_Controller {
 
 	public function gen_table_pengiriman2()
 	{
-		$query=$this->Pengiriman_model->get_where(array("status_pengiriman" => 1));
+		$query=$this->Pengiriman_model->get_where2(array("status_pengiriman" => 1));
 		//echo $this->db->last_query();
 		$res = $query->result();
 		$num_rows = $query->num_rows();
@@ -165,7 +165,7 @@ class Dahsboard extends CI_Controller {
 
 		$this->table->set_template($tmpl);
 		$this->table->set_empty("&nbsp;");
-		$this->table->set_heading('No', 'Id Transaksi', 'Nama Pelanggan', 'Jasa Pengiriman', 'No Resi', 'Tgl Pengiriman', 'Status', 'Aksi');
+		$this->table->set_heading('No', 'Nama Sales', 'Nama Pelanggan', 'Jasa Pengiriman', 'No Resi', 'Tgl Pengiriman', 'Status', 'Aksi');
 
 		if ($num_rows > 0)
 		{
@@ -196,7 +196,7 @@ class Dahsboard extends CI_Controller {
 					$tgl = date("d-m-Y", strtotime($row->tgl_kirim));
 				}
 				$this->table->add_row(	++$i,
-							$row->id_transaksi,
+							$row->nama,
 							$row->nama_pelanggan,
 							$row->jasa_pengiriman,
 							$row->no_resi,
@@ -223,7 +223,7 @@ class Dahsboard extends CI_Controller {
 
 		$this->table->set_template($tmpl);
 		$this->table->set_empty("&nbsp;");
-		$this->table->set_heading('No', 'Id Transaksi', 'Nama Sales', 'Nama Pelanggan', 'Total', 'Status', 'Aksi');
+		$this->table->set_heading('No', 'Nama Sales', 'Nama Pelanggan', 'Total', 'Status', 'Aksi');
 
 		if ($num_rows > 0)
 		{
@@ -235,7 +235,6 @@ class Dahsboard extends CI_Controller {
 					$sts = '<span class="badge badge-success">Sudah dikirim</span>';
 				}
 				$this->table->add_row(	++$i,
-							$row->id_transaksi,
 							$row->nama,
 							$row->nama_pelanggan,
 							'Rp. '.number_format($row->total_order),

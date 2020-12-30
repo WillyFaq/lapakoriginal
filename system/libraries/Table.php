@@ -70,6 +70,7 @@ class CI_Table {
 	 * @var array
 	 */
 	public $footer		= array();
+	public $footer2		= array();
 
 	/**
 	 * Whether or not to automatically create the table header
@@ -178,6 +179,11 @@ class CI_Table {
 		$this->footer = $this->_prep_args(func_get_args());
 		return $this;
 	}
+	public function set_footer2($args = array())
+	{
+		$this->footer2 = $this->_prep_args2(func_get_args());
+		return $this;
+	}
 
 	// --------------------------------------------------------------------
 
@@ -282,6 +288,26 @@ class CI_Table {
 		foreach ($args as $key => $val)
 		{
 			is_array($val) OR $args[$key] = array('data' => $val);
+		}
+
+		return $args;
+	}
+
+	protected function _prep_args2($args)
+	{
+		// If there is no $args[0], skip this and treat as an associative array
+		// This can happen if there is only a single key, for example this is passed to table->generate
+		// array(array('foo'=>'bar'))
+		if (isset($args[0]) && count($args) === 1 && is_array($args[0]) && ! isset($args[0]['data']))
+		{
+			$args = $args[0];
+		}
+
+		foreach ($args as $key => $val)
+		{
+			foreach ($val as $a => $b) {
+				is_array($b) OR $args[$key][$a] = array('data' => $b);
+			}
 		}
 
 		return $args;
@@ -451,10 +477,37 @@ class CI_Table {
 			$out .= $this->template['footer_row_end'].$this->newline.$this->template['tfoot_close'].$this->newline;
 		}
 
+		// Is there a table multiple footer to display?
+		if ( ! empty($this->footer2))
+		{
+			$out .= $this->template['tfoot_open'].$this->newline;
+
+			foreach ($this->footer2 as $footer_row)
+			{
+				$out .= $this->template['footer_row_start'].$this->newline;
+				foreach ($footer_row as $footer) {
+				
+				$temp = $this->template['footer_cell_start'];
+
+				foreach ($footer as $key => $val)
+				{
+					if ($key !== 'data')
+					{
+						$temp = str_replace('<th', '<th '.$key.'="'.$val.'"', $temp);
+					}
+				}
+
+				$out .= $temp.(isset($footer['data']) ? $footer['data'] : '').$this->template['footer_cell_end'];
+				}
+				$out .= $this->template['footer_row_end'];
+			}
+
+			$out .= $this->newline.$this->template['tfoot_close'].$this->newline;
+		}
+
 
 
 		$out .= $this->template['table_close'];
-
 		// Clear table class properties before generating the table
 		$this->clear();
 
