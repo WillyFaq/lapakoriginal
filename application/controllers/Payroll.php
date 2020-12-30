@@ -356,7 +356,7 @@ class Payroll extends CI_Controller {
 
 		$this->table->set_footer(
 								array('data' => 'Total Diterima', "colspan" => 3), 
-								number_format($tot_terima),
+								number_format($tot_terima)
 								);
 
 		$table = $this->table->generate();
