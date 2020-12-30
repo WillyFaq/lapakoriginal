@@ -22,10 +22,8 @@ class Payroll extends CI_Controller {
 			);
 
 		$this->table->set_template($tmpl);
-
 		$this->table->set_empty("&nbsp;");
-
-		$this->table->set_heading('No', 'Nama', 'tgl', 'Jumlah', 'Bonus', 'Total',  'Aksi');
+		$this->table->set_heading('No', 'Nama', 'Tanggal', 'Jumlah', 'Bonus', 'Total',  'Aksi');
 
 		if ($num_rows > 0)
 		{
@@ -66,7 +64,7 @@ class Payroll extends CI_Controller {
 		$this->load->view('index', $data);
 	}
 
-	public function detail($id='')
+	public function detail($id='', $cetak="")
 	{
 		$data = array(
 						"page" => "payroll_view",
@@ -89,6 +87,9 @@ class Payroll extends CI_Controller {
 			$data['detail']['Total'] = 'Rp. '.number_format($total);
 		}
 		$data['json_detail'] = $this->load_detail($id, '', $lvl);
+		if($cetak!=""){
+			$data['cetak'] = "cetak('".e_url($id)."')";
+		}
 		$this->load->view('index', $data);
 	}
 
@@ -126,8 +127,10 @@ class Payroll extends CI_Controller {
 		$data['id_payroll'] = $this->Payroll_model->gen_id();
 		if($data['level']==2){
 			$q = $this->Payroll_model->get_det_sales($data['id_user'], $data['tgl_gaji']);
-		}else{
+		}else if($data['level']==1){
 			$q = $this->Payroll_model->get_det_admin($data['id_user'], $data['tgl_gaji']);
+		}else if($data['level']==4){
+			$q = $this->Payroll_model->get_det_iklan($data['id_user'], $data['tgl_gaji']);
 		}
 		unset($data['nama'], $data['level'], $data['btnSimpan']);
 		$res = $q->result();
@@ -138,9 +141,12 @@ class Payroll extends CI_Controller {
 								'id_transaksi' => $row->id_transaksi
 								);
 		}
+		
+		/*print_pre($data);
+		print_pre($id_trans);*/
 		if($this->Payroll_model->add($data, $id_trans)){
 			alert_notif("success");
-			redirect('payroll');
+			redirect('payroll/detail/'.e_url($data['id_payroll']).'/cetak');
 		}else{
 			alert_notif("danger");
 			redirect('payroll');
@@ -150,7 +156,7 @@ class Payroll extends CI_Controller {
 
 	public function gen_table_pegawai()
 	{
-		$query=$this->User_model->get_where("jabatan.level IN (1,2)");
+		$query=$this->User_model->get_where("jabatan.level IN (1,2,4)");
 		$res = $query->result();
 		$num_rows = $query->num_rows();
 
@@ -186,11 +192,15 @@ class Payroll extends CI_Controller {
 		if($level==2){
 			$ret = $this->gen_table_detail_sales($id, $tgl);
 			$ret['total'] = $set['gaji_sales_penjualan'] * $ret['total'];
-		}else{
+		}else if($level==1){
 			$ret = $this->gen_table_detail_admin($id, $tgl);
 			$tolak = $set['gaji_admin_ditolak'] * $ret['total_tolak'];
 			$terima = $set['gaji_admin_diterima'] * $ret['total_terima'];
 			$ret['total'] = $terima + $tolak;
+		}else if($level==4){
+			$ret = $this->gen_table_detail_admin_iklan($id, $tgl);
+			$terima = $set['gaji_admin_iklan'] * $ret['total_terima'];
+			$ret['total'] = $terima;
 		}
 		if($tgl!=''){
 			echo json_encode($ret);
@@ -299,6 +309,61 @@ class Payroll extends CI_Controller {
 					"table" => $table,
 					"total_terima" => $tot_terima,
 					"total_tolak" => $tot_tolak
+					);
+		return $ret;
+	}
+
+	public function gen_table_detail_admin_iklan($id='', $tgl='')
+	{
+		if($tgl!=""){
+			$query = $this->Payroll_model->get_det_admin_iklan($id, $tgl);
+		}else{
+			$query = $this->Payroll_model->get_det_admin_iklan_payroll($id);
+		}
+		$res = $query->result();
+		$num_rows = $query->num_rows();
+
+		$tmpl = array(  'table_open'    => '<table class="table table-striped table-hover dataTableModal">',
+				'row_alt_start'  => '<tr>',
+				'row_alt_end'    => '</tr>'
+			);
+
+		$this->table->set_template($tmpl);
+		$this->table->set_empty("&nbsp;");
+		$this->table->set_heading('No', 'Id Transaksi', 'Tgl Kirim', 'Status');
+
+			$tot_terima = 0;
+			$tot_tolak = 0;
+		if ($num_rows > 0)
+		{
+			$i = 0;
+			foreach ($res as $row){
+				$sts = '';
+				if($row->status_pengiriman==2){
+					$sts = '<span class="badge badge-success">Sudah diterima</span>';
+					$tot_terima++;
+				}else if($row->status_pengiriman==3){
+					$sts = '<span class="badge badge-danger">Ditolak</span>';
+					$tot_tolak++;
+				}
+				$this->table->add_row(	++$i,
+							$row->id_transaksi,
+							$row->tgl_kirim,
+							$sts
+						);
+			}
+		}
+
+		$this->table->set_footer(
+								array('data' => 'Total Diterima', "colspan" => 3), 
+								number_format($tot_terima),
+								);
+
+		$table = $this->table->generate();
+		$table = $tgl!=""?$table.init_datatable_tooltips_ajax():$table;
+		$ret = array(
+					"table" => $table,
+					"total_terima" => $tot_terima
 					);
 		return $ret;
 	}

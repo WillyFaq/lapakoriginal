@@ -143,6 +143,7 @@
                 var ttbl = $(".dataTableModal").DataTable();
             }
         <?php endif; ?>
+        <?= isset($cetak)?$cetak:''; ?>
     });
 
     function pilih_pegawai(id, nama, level) {

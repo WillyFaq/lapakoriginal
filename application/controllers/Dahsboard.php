@@ -66,6 +66,11 @@ class Dahsboard extends CI_Controller {
 		}else if($lvl==3){
 			$data['sub_page'] = 'dashboard/dashboard_gudang_view';
 			$data['table'] = $this->gen_table_gudang();
+		}else if($lvl==4){
+			/*$data['sub_page'] = 'dashboard/dashboard_gudang_view';
+			$data['table'] = $this->gen_table_gudang();*/
+
+			$data['sub_page'] = 'dashboard/dashboard_iklan_view';
 		}
 		$this->load->view('index', $data);
 	}
@@ -258,7 +263,8 @@ class Dahsboard extends CI_Controller {
 		
 		$sql = "SELECT * FROM pengiriman a
 				JOIN sales_order b ON a.id_transaksi = b.id_transaksi
-				JOIN barang c ON b.kode_barang = c.kode_barang
+				JOIN sales_order_detail e ON a.id_transaksi = e.id_transaksi
+				JOIN barang c ON e.kode_barang = c.kode_barang
 				JOIN pelanggan d ON b.no_pelanggan = d.no_pelanggan
 				WHERE a.id_gudang = $id_gudang AND a.status_pengiriman = 0";
 		$q = $this->db->query($sql);
@@ -278,7 +284,8 @@ class Dahsboard extends CI_Controller {
 
 		$sql = "SELECT * FROM pengiriman a
 				JOIN sales_order b ON a.id_transaksi = b.id_transaksi
-				JOIN barang c ON b.kode_barang = c.kode_barang
+				JOIN sales_order_detail e ON a.id_transaksi = e.id_transaksi
+				JOIN barang c ON e.kode_barang = c.kode_barang
 				JOIN pelanggan d ON b.no_pelanggan = d.no_pelanggan
 				WHERE a.id_gudang = $id_gudang AND a.status_pengiriman = 3";
 		$q = $this->db->query($sql);

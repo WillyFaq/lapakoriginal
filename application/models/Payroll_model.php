@@ -77,10 +77,10 @@ class Payroll_model extends CI_Model {
 	{
 		$d = date("Y-m-d");
 		$da = date("Ymd");
-		$this->db->where("DATE(tgl_gaji)", $d);
+		$this->db->where("SUBSTR(id_payroll, 2, 8) = $da");
 		$q = $this->db->get($this->table2);
 		$nr = $q->num_rows();
-		$nr++;
+		$nr+=1;
 		$no = "000000".$nr;
 		$no = substr($no, strlen($no)-6, strlen($no));
 		return "B$da$no"; 
@@ -120,6 +120,7 @@ class Payroll_model extends CI_Model {
 	{
 		$id_transaksi = $this->get_det($id);
 		$sql = "SELECT 
+					c.id_transaksi,
 					f.nama_barang,
 					c.tgl_order,
 					d.jumlah_order
@@ -149,6 +150,36 @@ class Payroll_model extends CI_Model {
 		return $this->db->query($sql);
 	}
 
+	public function get_det_iklan($id='', $tgl='')
+	{
+		$id_transaksi = $this->get_det($id);
+		$sql = "SELECT
+					a.id_transaksi,
+					a.no_resi,
+					a.tgl_kirim,
+					a.status_pengiriman
+				FROM pengiriman a
+				JOIN user b ON a.id_user = b.id_user
+				WHERE a.tgl_kirim <= '$tgl' AND a.status_pengiriman = 2 AND a.id_transaksi NOT IN($id_transaksi)
+				ORDER BY a.tgl_kirim, a.status_pengiriman DESC";
+		return $this->db->query($sql);
+	}
+
+	public function get_det_admin_iklan($id="", $tgl='')
+	{
+		$id_transaksi = $this->get_det($id);
+		$sql = "SELECT
+					a.id_transaksi,
+					a.no_resi,
+					a.tgl_kirim,
+					a.status_pengiriman
+				FROM pengiriman a
+				JOIN user b ON a.id_user = b.id_user
+				WHERE a.tgl_kirim <= '$tgl' AND a.status_pengiriman = 2 AND a.id_transaksi NOT IN($id_transaksi)
+				ORDER BY a.tgl_kirim, a.status_pengiriman DESC";
+		return $this->db->query($sql);
+	}
+
 	public function get_det_sales_payroll($id='')
 	{
 		$sql = "SELECT 
@@ -165,6 +196,20 @@ class Payroll_model extends CI_Model {
 	}
 
 	public function get_det_admin_payroll($id='')
+	{
+		$sql = "SELECT 
+					a.id_transaksi,
+					b.no_resi,
+					b.tgl_kirim,
+					b.status_pengiriman
+				FROM payroll_detail a
+				JOIN pengiriman b ON a.id_transaksi = b.id_transaksi
+				WHERE a.id_payroll = '$id'
+				ORDER BY b.tgl_kirim, b.status_pengiriman DESC";
+		return $this->db->query($sql);
+	}
+
+	public function get_det_admin_iklan_payroll($id='')
 	{
 		$sql = "SELECT 
 					a.id_transaksi,

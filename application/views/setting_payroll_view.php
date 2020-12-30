@@ -16,7 +16,7 @@
                     echo form_open($form, '', '');
                 ?>
                     <div class="form-group">
-                        <label for="exampleInputEmail1">Gaji Sales Setiap Penjualan</label>
+                        <label for="gaji_sales_penjualan">Gaji Sales Setiap Penjualan</label>
                         <div class="input-group">
                             <div class="input-group-prepend">
                                 <span class="input-group-text" id="addon-rp">Rp.</span>
@@ -26,7 +26,7 @@
                         <small id="sales_gaji" class="form-text text-muted">Inputan diatas akan dikalikan dengan jumlah penjualan sales.</small>
                     </div>
                     <div class="form-group">
-                        <label for="exampleInputEmail1">Gaji Admin Setiap Penjualan Diterima</label>
+                        <label for="gaji_admin_diterima">Gaji Admin Setiap Penjualan Diterima</label>
                         <div class="input-group">
                             <div class="input-group-prepend">
                                 <span class="input-group-text" id="addon-rp">Rp.</span>
@@ -36,7 +36,7 @@
                         <small id="sales_gaji" class="form-text text-muted">Inputan diatas akan dikalikan dengan jumlah input penjualan sales yang diterima.</small>
                     </div>
                     <div class="form-group">
-                        <label for="exampleInputEmail1">Gaji Admin Setiap Penjualan Ditolak</label>
+                        <label for="gaji_admin_ditolak">Gaji Admin Setiap Penjualan Ditolak</label>
                         <div class="input-group">
                             <div class="input-group-prepend">
                                 <span class="input-group-text" id="addon-rp">Rp.</span>
@@ -44,6 +44,16 @@
                             <input type="number" min="0" class="form-control" name="gaji_admin_ditolak" id="gaji_admin_ditolak" placeholder="Gaji Admin Setiap Penjualan Ditolak" <?= isset($gaji_admin_ditolak)?"value='$gaji_admin_ditolak'":''; ?> required="">
                         </div>
                         <small id="sales_gaji" class="form-text text-muted">Inputan diatas akan dikalikan dengan jumlah input penjualan sales yang ditolak.</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="gaji_admin_iklan">Gaji Admin Iklan Setiap Penjualan Diterima</label>
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" id="addon-rp">Rp.</span>
+                            </div>
+                            <input type="number" min="0" class="form-control" name="gaji_admin_iklan" id="gaji_admin_iklan" placeholder="Gaji Admin Iklan Setiap Penjualan" <?= isset($gaji_admin_iklan)?"value='$gaji_admin_iklan'":''; ?> required="">
+                        </div>
+                        <small id="sales_gaji" class="form-text text-muted">Inputan diatas akan dikalikan dengan jumlah input penjualan sales yang diterima.</small>
                     </div>
 
                     <div class="form-group row">
