@@ -50,8 +50,6 @@ class Dahsboard extends CI_Controller {
 
 
 			}
-
-			//$data['bulan_ini'] = 
 		}else if($lvl==1){
 			$data['sub_page'] = 'dashboard/dashboard_admin_view';
 			$data['table'] = $this->gen_table_pengiriman();
@@ -67,9 +65,6 @@ class Dahsboard extends CI_Controller {
 			$data['sub_page'] = 'dashboard/dashboard_gudang_view';
 			$data['table'] = $this->gen_table_gudang();
 		}else if($lvl==4){
-			/*$data['sub_page'] = 'dashboard/dashboard_gudang_view';
-			$data['table'] = $this->gen_table_gudang();*/
-
 			$data['sub_page'] = 'dashboard/dashboard_iklan_view';
 		}
 		$this->load->view('index', $data);

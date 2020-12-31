@@ -91,7 +91,9 @@ class Payroll_model extends CI_Model {
 		
 		$this->db->trans_begin();
 		$this->db->insert($this->table2, $data);
-		$this->db->insert_batch($this->join1, $detail);
+		if(!empty($detail)){
+			$this->db->insert_batch($this->join1, $detail);
+		}
 
 		if ($this->db->trans_status() === FALSE){
 		    $this->db->trans_rollback();

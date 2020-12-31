@@ -118,7 +118,7 @@
             </div>
             <div class="card-body">
                 <?php foreach($card as $k => $v): 
-                        $h = $v[2]==""?rand(1,9):$v[2];
+                        $h = $v[2]==""?0:$v[2];
                         $t = $v[3]==""?0:$v[3];
                         $p = ($h/$t)*100;
                 ?>

@@ -125,25 +125,19 @@ class Payroll extends CI_Controller {
 	{
 		$data = $this->input->post();
 		$data['id_payroll'] = $this->Payroll_model->gen_id();
+		$id_trans = [];
 		if($data['level']==2){
 			$q = $this->Payroll_model->get_det_sales($data['id_user'], $data['tgl_gaji']);
+			$id_trans = $this->gen_det_add($q, $data);
 		}else if($data['level']==1){
 			$q = $this->Payroll_model->get_det_admin($data['id_user'], $data['tgl_gaji']);
+			$id_trans = $this->gen_det_add($q, $data);
 		}else if($data['level']==4){
 			$q = $this->Payroll_model->get_det_iklan($data['id_user'], $data['tgl_gaji']);
-		}
-		unset($data['nama'], $data['level'], $data['btnSimpan']);
-		$res = $q->result();
-		$id_trans = [];
-		foreach ($res as $row) {
-			$id_trans[] = array(
-								'id_payroll' => $data['id_payroll'],
-								'id_transaksi' => $row->id_transaksi
-								);
+			$id_trans = $this->gen_det_add($q, $data);
 		}
 		
-		/*print_pre($data);
-		print_pre($id_trans);*/
+		unset($data['nama'], $data['level'], $data['btnSimpan']);
 		if($this->Payroll_model->add($data, $id_trans)){
 			alert_notif("success");
 			redirect('payroll/detail/'.e_url($data['id_payroll']).'/cetak');
@@ -153,6 +147,18 @@ class Payroll extends CI_Controller {
 		}
 	}
 
+	public function gen_det_add($q, $data)
+	{
+		$id_trans = [];
+		$res = $q->result();
+		foreach ($res as $row) {
+			$id_trans[] = array(
+								'id_payroll' => $data['id_payroll'],
+								'id_transaksi' => $row->id_transaksi
+								);
+		}
+		return $id_trans;
+	}
 
 	public function gen_table_pegawai()
 	{

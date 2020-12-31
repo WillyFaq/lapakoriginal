@@ -132,7 +132,9 @@
         });
 
         $("#tgl_gaji").change(function(){
-            show_detail();
+            if($("#id_user").val()!=""){
+                show_detail();
+            }
         });
 
         <?php if(isset($json_detail)): ?>
