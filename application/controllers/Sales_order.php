@@ -331,24 +331,28 @@ class Sales_order extends CI_Controller {
 						"keterangan" => $this->input->post("keterangan"),
 						);
 		$tot = 0;
-		foreach($this->input->post('kode_barang') as $k => $v){
-			$sbtr = $this->input->post('subtotal_order')[$k];
-			$tot += $sbtr;
-			$warna = $this->input->post('warna_barang')[$k]!=""?".".$this->input->post('warna_barang')[$k]:'';
-			$ukuran = $this->input->post('ukuran_barang')[$k]!=""?".".$this->input->post('ukuran_barang')[$k]:'';
-			$kode_brg = $v.$warna.$ukuran;
-			$order['detail'][] = array(
-										'id_transaksi' => $id_transaksi,
-										'kode_barang' => $v,
-										'kode_brg' => $kode_brg,
-										'harga_order' => $this->input->post('harga_barang')[$k],
-										'potongan_order' => $this->input->post('potongan')[$k],
-										'jumlah_order' => $this->input->post('jumlah_beli')[$k],
-										'subtotal_order' => $sbtr,
-										);
+		$kdbbrg = $this->input->post('kode_barang');
+		$hrrgg = $this->input->post('harga_barang');
+		if(is_array($hrrgg)){
+			foreach($this->input->post('kode_barang') as $k => $v){
+				$sbtr = $this->input->post('subtotal_order')[$k];
+				$tot += $sbtr;
+				$warna = $this->input->post('warna_barang')[$k]!=""?".".$this->input->post('warna_barang')[$k]:'';
+				$ukuran = $this->input->post('ukuran_barang')[$k]!=""?".".$this->input->post('ukuran_barang')[$k]:'';
+				$kode_brg = $v.$warna.$ukuran;
+				$order['detail'][] = array(
+											'id_transaksi' => $id_transaksi,
+											'kode_barang' => $v,
+											'kode_brg' => $kode_brg,
+											'harga_order' => $this->input->post('harga_barang')[$k],
+											'potongan_order' => $this->input->post('potongan')[$k],
+											'jumlah_order' => $this->input->post('jumlah_beli')[$k],
+											'subtotal_order' => $sbtr,
+											);
+			}
 		}
 		$order['total_order'] = $tot;
-		if(!empty($order)){
+		if(!empty($order['detail'])){
 
 			if($this->Sales_order_model->add($pelaggan, $order)){
 				$this->session->set_flashdata('msg_title', 'Sukses!');

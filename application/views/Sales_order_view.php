@@ -54,8 +54,14 @@
                             <div class="col-sm-10">
                                 <input type="text" list="jasa_pengiriman_list" class="form-control" name="jasa_pengiriman" id="jasa_pengiriman" placeholder="Jasa Pengiriman" <?= isset($jasa_pengiriman)?"value='$jasa_pengiriman'":''; ?> required >
                                 <datalist id="jasa_pengiriman_list">
-                                    <option>JNE</option>
-                                    <option>JNT</option>
+                                    <?php
+                                        $sql = "SELECT DISTINCT jasa_pengiriman FROM sales_order";
+                                        $q = $this->db->query($sql);
+                                        $res = $q->result();
+                                        foreach ($res as $row) {
+                                            echo "<option>$row->jasa_pengiriman</option>";
+                                        }
+                                    ?>
                                 </datalist>
                             </div>
                         </div> 
