@@ -156,7 +156,9 @@ class Pengiriman extends CI_Controller {
 
 	public function gen_table_belum()
 	{
-		$query=$this->Sales_order_model->get_where2(["status_order" => "0"]);
+		//$query=$this->Sales_order_model->get_where2(["status_order" => "0"]);
+		$pending = $this->Pengiriman_model->get_pending_id();
+		$query=$this->Sales_order_model->get_where2("status_order = 0 AND id_transaksi NOT IN ($pending)");
 		$res = $query->result();
 		$num_rows = $query->num_rows();
 		$tmpl = array(  'table_open'    => '<table class="table table-striped table-hover dataTable">',
@@ -166,7 +168,7 @@ class Pengiriman extends CI_Controller {
 
 		$this->table->set_template($tmpl);
 		$this->table->set_empty("&nbsp;");
-		$this->table->set_heading('No', 'Nama Sales', 'Nama Pelanggan', 'Total', 'Status', 'Aksi');
+		$this->table->set_heading('No', 'Nama Sales', 'Nama Pelanggan', 'Total', 'Tanggal', 'Status', 'Aksi');
 
 		if ($num_rows > 0)
 		{
@@ -178,13 +180,16 @@ class Pengiriman extends CI_Controller {
 					$sts = '<span class="badge badge-success">Sudah dikirim</span>';
 				}
 				$this->table->add_row(	++$i,
-							$row->nama,
-							$row->nama_pelanggan,
+							trim($row->nama),
+							trim($row->nama_pelanggan),
 							'Rp. '.number_format($row->total_order),
+							date("d-m-Y", strtotime($row->tgl_order)),
 							$sts,
 							anchor('pengiriman/kirimkan/'.e_url($row->id_transaksi),'<span class="fa fa-box"></span>',array( 'title' => 'Kirim', 'class' => 'btn btn-success btn-xs', 'data-toggle' => 'tooltip'))
 							.'&nbsp;'.
 							anchor('pengiriman/tolak_so/'.e_url($row->id_transaksi),'<span class="fa fa-ban"></span>',array( 'title' => 'Batalkan', 'class' => 'btn btn-danger btn-xs', 'data-toggle' => 'tooltip'))
+							.'&nbsp;'.
+							anchor('pengiriman/pending/'.e_url($row->id_transaksi),'<span class="fa fa-exclamation-triangle"></span>',array( 'title' => 'Pending', 'class' => 'btn btn-warning btn-xs', 'data-toggle' => 'tooltip'))
 						);
 			}
 		}
@@ -195,8 +200,13 @@ class Pengiriman extends CI_Controller {
 	{
 		$v = d_url($v);
 		if($this->Sales_order_model->update(array("status_order" => 4), $v )){
-			alert_notif("success");
-			redirect('');
+			if($this->Pengiriman_model->delete_pending($v)){
+				alert_notif("success");
+				redirect('');
+			}else{
+				alert_notif("danger");
+				redirect('pengiriman/belum/');
+			}
 		}else{
 			alert_notif("danger");
 			redirect('pengiriman/belum/');
@@ -928,6 +938,19 @@ $row->stok,
 		$data['kode_barang'] = e_url("'".join("', '", $kde)."'");
 		$data["transaksi"] = $detail;
 		$this->load->view('index', $data);
+	}
+
+	public function pending($id)
+	{
+		$id = d_url($id);
+		$sql = "INSERT INTO pending (id_transaksi) VALUES('$id')";
+		if($this->Pengiriman_model->pending_add($id)){
+			alert_notif("success");
+			redirect('pengiriman/belum/');
+		}else{
+			alert_notif("danger");
+			redirect('pengiriman/belum/');
+		}
 	}
 
 }

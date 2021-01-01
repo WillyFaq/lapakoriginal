@@ -348,12 +348,21 @@ class Sales_order extends CI_Controller {
 										);
 		}
 		$order['total_order'] = $tot;
-		if($this->Sales_order_model->add($pelaggan, $order)){
-			$this->session->set_flashdata('msg_title', 'Sukses!');
-			$this->session->set_flashdata('msg_status', 'alert-success');
-			$this->session->set_flashdata('msg', 'Data berhasil disimpan! ');
-			redirect('sales_order/detail/'.e_url($id_transaksi));
-		}else{
+		if(!empty($order)){
+
+			if($this->Sales_order_model->add($pelaggan, $order)){
+				$this->session->set_flashdata('msg_title', 'Sukses!');
+				$this->session->set_flashdata('msg_status', 'alert-success');
+				$this->session->set_flashdata('msg', 'Data berhasil disimpan! ');
+				redirect('sales_order/detail/'.e_url($id_transaksi));
+			}else{
+				$this->session->set_flashdata('msg_title', 'Terjadi Kesalahan!');
+				$this->session->set_flashdata('msg_status', 'alert-danger');
+				$this->session->set_flashdata('msg', 'Data gagal disimpan! ');
+				redirect('sales_order');
+			}
+		}
+		else{
 			$this->session->set_flashdata('msg_title', 'Terjadi Kesalahan!');
 			$this->session->set_flashdata('msg_status', 'alert-danger');
 			$this->session->set_flashdata('msg', 'Data gagal disimpan! ');

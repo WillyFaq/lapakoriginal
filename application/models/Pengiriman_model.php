@@ -219,6 +219,9 @@ class Pengiriman_model extends CI_Model {
 		$this->db->where($this->fk1, $kirim['id_transaksi']);
 		$this->db->update($this->join1);
 
+		$this->db->where('id_transaksi', $kirim['id_transaksi']);
+		$this->db->delete('pending');
+
 		if ($this->db->trans_status() === FALSE){
 		    $this->db->trans_rollback();
 		    return false;
@@ -226,6 +229,38 @@ class Pengiriman_model extends CI_Model {
 		    $this->db->trans_commit();
 		    return true;
 		}
+	}
+
+	public function pending_add($id)
+	{
+		return $this->db->insert('pending', ["id_transaksi" => $id]);
+	}
+
+	public function get_pending_id()
+	{
+		$q = $this->db->get('pending');
+		$res = $q->result();
+		$id = [];
+		foreach ($res as $row) {
+			$id[] = $row->id_transaksi; 
+		}
+		return "'".join("','", $id)."'";
+	}
+
+	public function get_pending()
+	{
+		$this->db->select('*');
+		$this->db->from('pending');
+		$this->db->join('sales_order', 'pending.id_transaksi = sales_order.id_transaksi');
+		$this->db->join('pelanggan', 'sales_order.no_pelanggan = pelanggan.no_pelanggan');
+		$this->db->join('user', 'sales_order.id_user = user.id_user');
+		return $this->db->get();
+	}
+
+	public function delete_pending($id='')
+	{
+		$this->db->where('id_transaksi', $id);
+		return $this->db->delete('pending');
 	}
 }
 
