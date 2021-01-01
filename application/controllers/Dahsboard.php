@@ -246,6 +246,8 @@ class Dahsboard extends CI_Controller {
 							anchor('pengiriman/kirimkan/'.e_url($row->id_transaksi),'<span class="fa fa-box"></span>',array( 'title' => 'Kirim', 'class' => 'btn btn-success btn-xs', 'data-toggle' => 'tooltip'))
 							.'&nbsp;'.
 							anchor('pengiriman/tolak_so/'.e_url($row->id_transaksi),'<span class="fa fa-ban"></span>',array( 'title' => 'Batalkan', 'class' => 'btn btn-danger btn-xs', 'data-toggle' => 'tooltip'))
+							.'&nbsp;'.
+							anchor('pengiriman/pending/'.e_url($row->id_transaksi),'<span class="fa fa-exclamation-triangle"></span>',array( 'title' => 'Pending', 'class' => 'btn btn-warning btn-xs', 'data-toggle' => 'tooltip'))
 						);
 			}
 		}
