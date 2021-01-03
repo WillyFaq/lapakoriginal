@@ -147,6 +147,7 @@
                                 <input type="button" class="btn btn-success btnTambahBarang" name="btnAddBarang" value="Tambah Barang">
                             </div>
                         </div>
+                        <div class="table_detail_box">
                         <table class="table">
                             <thead>
                                 <tr>   
@@ -172,6 +173,7 @@
                                 </tr> -->
                             </tbody>
                         </table>
+                        </div>
                     </fieldset>
                     <div class="form-group row">
                         <div class="col-sm-2 offset-md-10 text-right">

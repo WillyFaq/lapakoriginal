@@ -1,5 +1,6 @@
 <?php $this->load->view('templates/head'); ?>
 <body id="page-top">
+    <div class="sidebar_overlay_box"></div>
     <div class="ajax_loading_box">&nbsp;</div>
     <!-- Page Wrapper -->
     <div id="wrapper">
