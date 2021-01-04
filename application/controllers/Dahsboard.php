@@ -50,6 +50,8 @@ class Dahsboard extends CI_Controller {
 
 
 			}
+			$data['tbl_pending'] = $this->gen_table_pending_sales($id);
+			$data['tbl_kirim'] = $this->gen_table_pengiriman_sales($id);
 		}else if($lvl==1){
 			$data['sub_page'] = 'dashboard/dashboard_admin_view';
 			$data['table'] = $this->gen_table_pengiriman();
@@ -276,6 +278,7 @@ class Dahsboard extends CI_Controller {
 
 			foreach ($res as $row){
 				$sts = '<span class="badge badge-danger">Belum dikirim</span>';
+				$sts .= '&nbsp;<span class="badge badge-danger">Pending</span>';
 				if($sts==1){
 					$sts = '<span class="badge badge-success">Sudah dikirim</span>';
 				}
@@ -538,6 +541,105 @@ class Dahsboard extends CI_Controller {
 		}
 		//$ret= $ret.'</div></div>';
 		echo $ret;
+	}
+
+
+	public function gen_table_pending_sales($id)
+	{
+		$query = $this->Pengiriman_model->get_pending_sales($id);
+		$res = $query->result();
+		$num_rows = $query->num_rows();
+		$tmpl = array(  'table_open'    => '<table class="table table-striped table-hover dataTable">',
+				'row_alt_start'  => '<tr>',
+				'row_alt_end'    => '</tr>'
+			);
+
+		$this->table->set_template($tmpl);
+		$this->table->set_empty("&nbsp;");
+		$this->table->set_heading('No', 'Nama Sales', 'Nama Pelanggan', 'Total', 'Tanggal', 'Status', 'Aksi');
+
+		if ($num_rows > 0)
+		{
+			$i = 0;
+
+			foreach ($res as $row){
+				$sts = '<span class="badge badge-danger">Belum dikirim</span>';
+				$sts .= '&nbsp;<span class="badge badge-danger">Pending</span>';
+				if($sts==1){
+					$sts = '<span class="badge badge-success">Sudah dikirim</span>';
+				}
+				$this->table->add_row(	++$i,
+							trim($row->nama),
+							trim($row->nama_pelanggan),
+							'Rp. '.number_format($row->total_order),
+							date("d-m-Y", strtotime($row->tgl_order)),
+							$sts,
+							anchor('sales_order/detail/'.e_url($row->id_transaksi),'<span class="fa fa-eye"></span>',array( 'title' => 'Detail', 'class' => 'btn btn-warning btn-xs', 'data-toggle' => 'tooltip'))
+							.'&nbsp;'
+						);
+			}
+			return  $this->table->generate();
+		}else{
+			return '';;
+		}
+	}
+
+	public function gen_table_pengiriman_sales($id)
+	{
+		$query=$this->Pengiriman_model->get_where2(array("status_pengiriman" => 1, 'sales_order.id_user' => $id));
+		//echo $this->db->last_query();
+		$res = $query->result();
+		$num_rows = $query->num_rows();
+
+		$tmpl = array(  'table_open'    => '<table class="table table-striped table-hover dataTable">',
+				'row_alt_start'  => '<tr>',
+				'row_alt_end'    => '</tr>'
+			);
+
+		$this->table->set_template($tmpl);
+		$this->table->set_empty("&nbsp;");
+		$this->table->set_heading('No','Nama Pelanggan', 'Jasa Pengiriman', 'No Resi', 'Tgl Pengiriman', 'Status', 'Aksi');
+
+		if ($num_rows > 0)
+		{
+			$i = 0;
+
+			foreach ($res as $row){
+				$sts = '<span class="badge badge-warning">Sudah di acc</span>';
+				$btn_update = anchor('pengiriman/tambah/'.e_url($row->id_pengiriman),'<span class="fas fa-paper-plane"></span>',array( 'title' => 'Kirim', 'class' => 'btn btn-success btn-xs', 'data-toggle' => 'tooltip'));
+				if($row->status_pengiriman==1){
+					$sts = '<span class="badge badge-info">Sudah dikirim</span>';
+					$btn_update = anchor('pengiriman/terima/'.e_url($row->id_pengiriman),'<span class="fa fa-check"></span>',array( 'title' => 'Diterima', 'class' => 'btn btn-success btn-xs', 'data-toggle' => 'tooltip'));
+					$btn_update .= "&nbsp;";
+					$btn_update .= anchor('pengiriman/tolak/'.e_url($row->id_pengiriman),'<span class="fa fa-ban"></span>',array( 'title' => 'Ditolak', 'class' => 'btn btn-danger btn-xs', 'data-toggle' => 'tooltip'));
+					
+				}else if($row->status_pengiriman==2){
+					$sts = '<span class="badge badge-success">Sudah diterima</span>';
+					$btn_update = '';
+				}else if($row->status_pengiriman>=3){
+					$sts = '<span class="badge badge-danger">Ditolak</span>';
+					$c = $this->Pengiriman_model->get_where(['pengiriman.id_transaksi' => $row->id_transaksi]);
+					$btn_update = '';
+					if($c->num_rows()<2){
+						$btn_update = anchor('pengiriman/kirim_ulang/'.e_url($row->id_transaksi),'<span class="fas fa-paper-plane"></span>',array( 'title' => 'Kirim Ulang', 'class' => 'btn btn-success btn-xs', 'data-toggle' => 'tooltip'));
+					}
+				}
+				$tgl = '';
+				if($row->tgl_kirim!=null){
+					$tgl = date("d-m-Y", strtotime($row->tgl_kirim));
+				}
+				$this->table->add_row(	++$i,
+							$row->nama_pelanggan,
+							$row->jasa_pengiriman,
+							$row->no_resi,
+							$tgl,
+							$sts,
+							anchor('sales_order/detail/'.e_url($row->id_transaksi),'<span class="fa fa-eye"></span>',array( 'title' => 'Detail', 'class' => 'btn btn-warning btn-xs', 'data-toggle' => 'tooltip'))
+							.'&nbsp;'
+						);
+			}
+		}
+		return $this->table->generate();
 	}
 }
 

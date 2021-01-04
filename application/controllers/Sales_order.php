@@ -184,6 +184,13 @@ class Sales_order extends CI_Controller {
 				$detail['Status'] = '<span class="badge badge-secondary">Dibatalkan Admin</span>';
 			}else{
 				$detail['Status'] = '<span class="badge badge-danger">Belum diproses</span>';
+				$idddd = $this->session->userdata('user')->id_user;
+				$query2 = $this->Pengiriman_model->get_pending_sales($idddd);
+				$res2 = $query2->result();
+				$num_rows2 = $query2->num_rows();
+				if($num_rows2>0){
+					$detail['Status'] .= '<br><span class="badge badge-warning">Pending!</span>';
+				}
 				$data["add"] = anchor('sales_order/ubah/'.e_url($row->id_transaksi), '<i class="fa fa-pencil-alt"></i>', array("class" => "btn btn-success", "data-toggle" => "tooltip", "data-placement" => "top", "title" => "Ubah Data"));
 				$data["add"] .= "&nbsp;".anchor('sales_order/batal/'.e_url($row->id_transaksi), '<i class="fa fa-ban"></i>', array("class" => "btn btn-danger", "data-toggle" => "tooltip", "data-placement" => "top", "title" => "Batalkan Order"));		
 			}

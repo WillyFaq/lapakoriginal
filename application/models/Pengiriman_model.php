@@ -257,6 +257,17 @@ class Pengiriman_model extends CI_Model {
 		return $this->db->get();
 	}
 
+	public function get_pending_sales($id)
+	{
+		$this->db->select('*');
+		$this->db->from('pending');
+		$this->db->join('sales_order', 'pending.id_transaksi = sales_order.id_transaksi');
+		$this->db->join('pelanggan', 'sales_order.no_pelanggan = pelanggan.no_pelanggan');
+		$this->db->join('user', 'sales_order.id_user = user.id_user');
+		$this->db->where('sales_order.id_user', $id);
+		return $this->db->get();
+	}
+
 	public function delete_pending($id='')
 	{
 		$this->db->where('id_transaksi', $id);
