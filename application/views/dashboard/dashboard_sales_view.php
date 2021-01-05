@@ -193,7 +193,7 @@
                         <input type="date" class="form-control cb_tgl" id="tgl2" format="Y-m-d">
                     </div>
                 </div>
-                <div class="chart-area"  style="min-height: 500px;">
+                <div class="chart-area"  style="min-height: 500px;width: 100%;overflow-x: scroll;">
                     <div class="loading_box" id="omset_load">
                     <img  src="<?= base_url('assets/img/loading_barchart.svg'); ?>" alt="loading">
                     </div>

@@ -678,7 +678,7 @@ class Pengiriman extends CI_Controller {
 
 		$sql = "SELECT * FROM pengiriman a 
 				JOIN sales_order b ON a.id_transaksi = b.id_transaksi 
-				JOIN Sales_order_detail c ON b.id_transaksi = c.id_transaksi
+				JOIN sales_order_detail c ON b.id_transaksi = c.id_transaksi
 				WHERE a.id_pengiriman = '$id_pengiriman'";
 		$q = $this->db->query($sql);
 		$res = $q->result();
