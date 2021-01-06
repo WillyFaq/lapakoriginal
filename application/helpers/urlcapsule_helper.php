@@ -235,3 +235,9 @@ if(!function_exists('terbilang')){
 		return $hasil;
 	}
 }
+
+if(!function_exists('get_avatar')){
+	function get_avatar($level) {
+		return base_url('assets/img/user_'.$level.'.png');
+	}
+}

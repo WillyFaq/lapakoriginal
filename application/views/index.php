@@ -10,7 +10,8 @@
             <!-- Sidebar - Brand -->
             <a class="sidebar-brand d-flex align-items-center justify-content-center" href="<?= base_url(); ?>">
                 <div class="sidebar-brand-icon">
-                    <i class="fab fa-opencart"></i>
+                    <!-- <i class="fab fa-opencart"></i> -->
+                    <img src="<?= base_url('assets/img/logo.png'); ?>" alt="logo">
                 </div>
                 <div class="sidebar-brand-text mx-3">Lapak Original</div>
             </a>
@@ -50,7 +51,7 @@
                             <span class="mr-2 d-none d-lg-inline text-gray-600 small">
                             <?= $this->session->userdata('user')->nama;?>
                             </span>
-                            <img class="img-profile rounded-circle" src="<?= base_url('assets/img/user.png'); ?>">
+                            <img class="img-profile rounded-circle" src="<?= get_avatar($this->session->userdata('user')->level); ?>">
                         </a>
                         <!-- Dropdown - User Information -->
                         <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="userDropdown">

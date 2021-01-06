@@ -67,7 +67,7 @@ class Dahsboard extends CI_Controller {
 		}else if($lvl==3){
 			$data['sub_page'] = 'dashboard/dashboard_gudang_view';
 			$data['table'] = $this->gen_table_gudang();
-		}else if($lvl==4){
+		}else if($lvl==4){ // admin iklan
 			$data['sub_page'] = 'dashboard/dashboard_iklan_view';
 		}
 		$this->load->view('index', $data);
