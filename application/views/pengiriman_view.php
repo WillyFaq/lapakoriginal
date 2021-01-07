@@ -325,6 +325,7 @@
 <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/css/select2.min.css" rel="stylesheet" />
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/js/select2.min.js"></script>
 <script type="text/javascript">
+    var table;
     $(document).ready(function(){
         $(".btn_ubah_trans").click(function(e){
             e.preventDefault();
@@ -360,6 +361,19 @@
             table.draw();
         });
        //
+
+        $(".editable-txt").click(function(){
+            var id = $(this).attr("data-id");
+            var val = $(this).attr("data-val");
+            console.log(id+" "+val);
+            $(".box_editable").append("");
+            $(this).hide();
+            $("#no_resi_edit").show();
+        });
+
+        $("#no_resi_edit").change(function(){
+            $("#frm_noresi").submit();
+        });
     });
 
     function pilih_gudang(kode_barang, nama_barang, kt) {
@@ -373,6 +387,7 @@
             $("#nama_gudang").val(nama_barang);
         }
     }
+
 
 </script>
 

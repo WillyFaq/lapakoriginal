@@ -22,6 +22,9 @@
     <!-- Custom styles for this template-->
     <link href="<?= base_url('assets/css/sb-admin-2.css'); ?>" rel="stylesheet" type="text/css">
     <link href="<?= base_url('assets/css/style.css?').time(); ?>" rel="stylesheet" type="text/css">
+    <?php if($this->session->userdata('user') && $this->session->userdata('user')->level == 0 ): ?>
+    <link href="<?= base_url('assets/css/style_atasan.css?').time(); ?>" rel="stylesheet" type="text/css">
+    <?php endif; ?>
 
     <link href="<?= base_url('assets/vendor/datatables/dataTables.bootstrap4.min.css'); ?>" rel="stylesheet" type="text/css">
 

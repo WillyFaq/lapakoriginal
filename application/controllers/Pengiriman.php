@@ -84,7 +84,8 @@ class Pengiriman extends CI_Controller {
 				$btn_update = anchor('pengiriman/tambah/'.e_url($row->id_pengiriman),'<span class="fas fa-paper-plane"></span>',array( 'title' => 'Kirim', 'class' => 'btn btn-success btn-xs', 'data-toggle' => 'tooltip'));
 				if($row->status_pengiriman==1){
 					$sts = '<span class="badge badge-info">Sudah dikirim</span>';
-					$btn_update = anchor('pengiriman/terima/'.e_url($row->id_pengiriman),'<span class="fa fa-check"></span>',array( 'title' => 'Diterima', 'class' => 'btn btn-success btn-xs', 'data-toggle' => 'tooltip'));
+					$btn_update = anchor('pengiriman/terima/'.e_url($row->id_pengiriman),'<span class="fa fa-check"></span>',array( 'title' => 'Diterima', 'class' => 'btn btn-success btn-xs', 'data-toggle' => 'tooltip'
+										));
 					$btn_update .= "&nbsp;";
 					$btn_update .= anchor('pengiriman/tolak/'.e_url($row->id_pengiriman),'<span class="fa fa-ban"></span>',array( 'title' => 'Ditolak', 'class' => 'btn btn-danger btn-xs', 'data-toggle' => 'tooltip'));
 					
@@ -579,9 +580,15 @@ class Pengiriman extends CI_Controller {
 			if($row->status_pengiriman==0){
 				$detail['Data Pengiriman']['Nama Gudang'] = $row->nama_gudang;
 			}else{
+				$no_resi = "<div class='box_editable'>";
+				$no_resi .= "<span class='editable-txt' data-id='$row->id_pengiriman' data-val='$row->no_resi'>".$row->no_resi."</span>";
+				$no_resi .= form_open('pengiriman/edit_no_resi', array("id"=>"frm_noresi"), array("id_pengiriman" => $row->id_pengiriman));
+				$no_resi .= "<input type='text' name='no_resi_edit' id='no_resi_edit' value='$row->no_resi' style='display:none'>";
+				$no_resi .= "</form>";
+				$no_resi .= "</div>";
 				$detail['Data Pengiriman']['Nama Gudang'] = $row->nama_gudang;
 				$detail['Data Pengiriman']['Jasa Pengiriman'] = $row->jasa_pengiriman;
-				$detail['Data Pengiriman']['No Resi'] = $row->no_resi;
+				$detail['Data Pengiriman']['No Resi'] = $no_resi;
 				$detail['Data Pengiriman']['Tgl Kirim'] = date("d-m-Y", strtotime($row->tgl_kirim));
 				$detail['Data Pengiriman']['Pengirim'] = $row->nama;
 			}
@@ -950,6 +957,21 @@ $row->stok,
 		}else{
 			alert_notif("danger");
 			redirect('pengiriman/belum/');
+		}
+	}
+
+	public function edit_no_resi()
+	{
+		$data = array("no_resi" => $this->input->post("no_resi_edit"));
+		$idp = $this->input->post('id_pengiriman');
+		unset($data['id_pengiriman']);
+		if($this->Pengiriman_model->update($data, $idp)){
+			//echo $this->db->last_query();
+			alert_notif("success");
+			redirect('pengiriman/detail/'.e_url($idp));
+		}else{
+			alert_notif("danger");
+			redirect('pengiriman/detail/'.e_url($idp));
 		}
 	}
 
