@@ -225,6 +225,21 @@ class Payroll_model extends CI_Model {
 		return $this->db->query($sql);
 	}
 
+	public function get_gaji_bulan($id='')
+	{
+		$b = date('m');
+		$y = date('Y');
+		$sql = "SELECT jumlah_gaji, bonus FROM payroll WHERE id_user = $id AND MONTH(tgl_gaji) = '$b' AND YEAR(tgl_gaji) = '$y' ";
+		$q = $this->db->query($sql);	
+		$res = $q->result();
+		$ret = 0;
+		foreach ($res as $row) {
+			$ret += $row->jumlah_gaji;
+			$ret += $row->bonus;
+		}
+		return $ret;
+	}
+
 }
 
 /* End of file Payroll_model.php */

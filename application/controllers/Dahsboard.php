@@ -11,6 +11,7 @@ class Dahsboard extends CI_Controller {
 		$this->load->model("Barang_model", "", TRUE);
 		$this->load->model("Sales_order_model", "", TRUE);
 		$this->load->model("Pengiriman_model", "", TRUE);
+		$this->load->model("Payroll_model", "", TRUE);
 	}
 
 	public function index()
@@ -52,6 +53,7 @@ class Dahsboard extends CI_Controller {
 			}
 			$data['tbl_pending'] = $this->gen_table_pending_sales($id);
 			$data['tbl_kirim'] = $this->gen_table_pengiriman_sales($id);
+			$data['gaji_bulan_ini'] = $this->Payroll_model->get_gaji_bulan($id);
 		}else if($lvl==1){
 			$data['sub_page'] = 'dashboard/dashboard_admin_view';
 			$data['table'] = $this->gen_table_pengiriman();
@@ -488,6 +490,37 @@ class Dahsboard extends CI_Controller {
 						'judul' => $judul
 						);
 		$this->load->view('chart/history_so', $data);
+	}
+
+	public function load_income_history($tgl="")
+	{	
+		$judul = "Income History";
+		//$sql = " AND YEAR(tgl_gaji) = '".date("Y")."' AND MONTH(tgl_gaji) = '".date("m")."' ";
+		$sql = "";
+		if($tgl!=""){
+			$judul = "Income History ";
+			$tgl = explode("_", $tgl);
+			if($tgl[1]==""){
+				$sql = " AND tgl_gaji > '$tgl[0]' ";
+				$judul .= "Mulai Tanggal $tgl[0] ";
+			}else if($tgl[0]==""){
+				$sql = " AND tgl_gaji < '$tgl[1]' ";
+				$judul .= "Sampai Tanggal $tgl[1] ";
+			}else{
+				if(strtotime($tgl[1])<strtotime($tgl[0])){
+					echo 'Tanggal tidal valid!';
+				}else{
+					$sql = " AND tgl_gaji < '$tgl[1]' AND tgl_gaji > '$tgl[0]' ";
+					$judul .= "Mulai Tanggal $tgl[0] Sampai Tanggal $tgl[1] ";
+				}
+			}
+		}
+
+		$data = array(
+						'sql' => $sql,
+						'judul' => $judul
+						);
+		$this->load->view('chart/income_so', $data);
 	}
 
 	public function chart_history($sql='')

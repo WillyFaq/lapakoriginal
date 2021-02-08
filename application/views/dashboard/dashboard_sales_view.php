@@ -105,6 +105,24 @@
             </div>
         </div>
     </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-danger shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Penghasilan Bulan ini</div>
+                        <div class="h5 mb-0 font-weight-bold">
+                        Rp. <?= number_format($gaji_bulan_ini); ?>
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-thumbs-up fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <!-- Content Row -->
@@ -202,6 +220,36 @@
         </div>
     </div>
 </div>
+<div class="row">
+    <!-- Area Chart -->
+    <div class="col-xl-12 col-lg-12">
+        <div class="card shadow mb-4">
+            <!-- Card Header - Dropdown -->
+            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                <h6 class="m-0 font-weight-bold text-primary">Income History</h6>
+                <div class="dropdown no-arrow">
+                </div>
+            </div>
+                <!-- Card Body -->
+            <div class="card-body">
+                <div class="form-group row cb_tgl_box">
+                    <label for="filter" class="col-sm-2 col-form-label">Filter</label>
+                    <div class="col">
+                        <input type="date" class="form-control cb_tgl_2" id="tgl1_2" format="Y-m-d">
+                    </div>
+                    <div class="col">
+                        <input type="date" class="form-control cb_tgl_2" id="tgl2_2" format="Y-m-d">
+                    </div>
+                </div>
+                <div class="chart-area-2"  style="min-height: 500px;width: 100%;overflow-x: scroll;">
+                    <div class="loading_box" id="gaji_load">
+                    <img  src="<?= base_url('assets/img/loading_barchart.svg'); ?>" alt="loading">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 <script type="text/javascript">
     $(document).ready(function(){
         $(".chart-area").load('<?= base_url('dahsboard/load_history'); ?>');
@@ -221,6 +269,23 @@
 
             $(".chart-area").load(url);
         });
+
+        $(".chart-area-2").load('<?= base_url('dahsboard/load_income_history'); ?>');
+        /*$(".cb_tgl_2").change(function(){
+            var tgl1 = $("#tgl1_2").val();
+            var tgl2 = $("#tgl2_2").val();
+            var url  = '<?= base_url('dahsboard/load_income_history'); ?>/'+tgl1+"_"+tgl2;
+            console.log(url);
+
+            var loading_box = "";
+            loading_box += '<div class="loading_box" id="gaji_load">';
+            loading_box += '<img  src="<?= base_url('assets/img/loading_barchart.svg'); ?>" alt="loading">';
+            loading_box += '</div>';
+            $(".chart-area-2").html(loading_box);
+
+
+            $(".chart-area-2").load(url);
+        });*/
     });
 
 
