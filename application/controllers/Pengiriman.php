@@ -54,7 +54,7 @@ class Pengiriman extends CI_Controller {
 			if($sts == "3"){
 				$query = $this->Pengiriman_model->get_where_like2(array(
 																"pengiriman.status_pengiriman" => "3",
-																"pengiriman.status_pengiriman" => "4",
+																//"pengiriman.status_pengiriman" => "4",
 															));
 			}else{
 				$query = $this->Pengiriman_model->get_where2(array("pengiriman.status_pengiriman" => $sts));

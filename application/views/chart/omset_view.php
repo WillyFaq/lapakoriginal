@@ -7,7 +7,7 @@
         data: {
             labels: ["<?= join('", "', $omset['label']) ?>"],
             datasets: [{
-                label:"Laba",
+                label:"Omset",
                 backgroundColor:window.chartColors.green,
                 borderColor:window.chartColors.green,
                 data:[<?= join(", ", $omset['data']); ?>],

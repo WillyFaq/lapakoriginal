@@ -78,8 +78,8 @@ class Laporan_penjualan extends CI_Controller {
 			$i = 0;
 			foreach ($res as $row){
 				$tot += $row->total_order;
-				$laba_penjualan = $row->total_order - $row->laba_penjualan - $this->Barang_model->get_iklan($row->kode_barang, $row->bulan);
-				$laba += $laba_penjualan;
+				$laba_penjualan = (int)$row->laba_penjualan - (int)$this->Barang_model->get_iklan($row->kode_barang, $row->bulan);
+				$laba += (int)$laba_penjualan;
 				$this->table->add_row(	++$i,
 							$row->kode_barang,
 							$row->nama_barang,

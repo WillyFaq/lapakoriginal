@@ -60,6 +60,7 @@ class Payroll_model extends CI_Model {
 		$this->db->from($this->table2);
 		$this->db->join($this->join2, $this->join2.'.'.$this->fk1.' = '.$this->table2.'.'.$this->fk1);
 		$this->db->join('jabatan', 'user.id_jabatan = jabatan.id_jabatan');
+		$this->db->order_by($this->table2.'.tgl_gaji', 'desc');
 		return $this->db->get();
 	}
 
@@ -178,7 +179,7 @@ class Payroll_model extends CI_Model {
 				FROM pengiriman a
 				JOIN user b ON a.id_user = b.id_user
 				WHERE a.tgl_kirim <= '$tgl' AND a.status_pengiriman = 2 AND a.id_transaksi NOT IN($id_transaksi)
-				ORDER BY a.tgl_kirim, a.status_pengiriman DESC";
+				ORDER BY a.tgl_kirim DESC, a.status_pengiriman DESC";
 		return $this->db->query($sql);
 	}
 

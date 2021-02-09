@@ -271,6 +271,7 @@ class Payroll extends CI_Controller {
 			$query = $this->Payroll_model->get_det_admin_payroll($id);
 		}
 		$res = $query->result();
+		$ssql = $this->db->last_query();
 		$num_rows = $query->num_rows();
 
 		$tmpl = array(  'table_open'    => '<table class="table table-striped table-hover dataTableModal">',

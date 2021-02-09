@@ -87,9 +87,15 @@ class Dahsboard extends CI_Controller {
 			$tot += $row->total_order;
 			$iklan = $this->Barang_model->get_iklan($row->kode_barang, $row->bulan);
 			$iklan = $iklan==''?0:$iklan;
-			$laba_penjualan = $row->total_order - $row->laba_penjualan - $iklan;
-			$laba += $laba_penjualan;
+			//echo "$iklan<br>";
+			//$laba_penjualan = (int)$row->total_order - (int)$row->laba_penjualan - (int)$iklan;
+			$laba_penjualan = (int)$row->laba_penjualan - (int)$iklan;
+			//echo "$laba_penjualan = $row->total_order - $row->laba_penjualan - $iklan <br>";
+			//echo "$laba_penjualan<br>";
+			$laba += (int)$laba_penjualan;
 		}
+		/*echo "<hr>";
+		echo $laba;*/
 		return $laba;
 	}
 
