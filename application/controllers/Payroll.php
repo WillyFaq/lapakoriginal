@@ -272,6 +272,7 @@ class Payroll extends CI_Controller {
 		}
 		$res = $query->result();
 		$ssql = $this->db->last_query();
+		//echo $ssql;
 		$num_rows = $query->num_rows();
 
 		$tmpl = array(  'table_open'    => '<table class="table table-striped table-hover dataTableModal">',
@@ -293,7 +294,7 @@ class Payroll extends CI_Controller {
 				if($row->status_pengiriman==2){
 					$sts = '<span class="badge badge-success">Sudah diterima</span>';
 					$tot_terima++;
-				}else if($row->status_pengiriman==3){
+				}else if($row->status_pengiriman>=3){
 					$sts = '<span class="badge badge-danger">Ditolak</span>';
 					$tot_tolak++;
 				}

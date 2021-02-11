@@ -148,7 +148,7 @@ class Payroll_model extends CI_Model {
 					a.status_pengiriman
 				FROM pengiriman a
 				JOIN user b ON a.id_user = b.id_user
-				WHERE a.id_user = $id AND a.tgl_kirim <= '$tgl' AND a.status_pengiriman IN (2,3) AND a.id_transaksi NOT IN($id_transaksi)
+				WHERE a.id_user = $id AND a.tgl_kirim <= '$tgl' AND a.status_pengiriman IN (2,3,4) AND a.id_transaksi NOT IN($id_transaksi)
 				ORDER BY a.tgl_kirim, a.status_pengiriman DESC";
 		return $this->db->query($sql);
 	}
