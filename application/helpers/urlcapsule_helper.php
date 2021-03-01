@@ -39,7 +39,7 @@ if(!function_exists('init_datatable_tooltips')){
 if(!function_exists('init_datatable_tooltips_ajax')){
 	function init_datatable_tooltips_ajax(){
 	    $ret = '<script>';
-	    $ret .= 'if ($(window).width() < 768) {var table = $(".dataTableModal").DataTable({"scrollX": true});}else{var table = $(".dataTableModal").DataTable();}';
+	    $ret .= 'if ($(window).width() < 768) {var table = $("#dttba").DataTable({"scrollX": true});}else{var table = $("#dttba").DataTable();}';
 	    $ret .= '$(\'[data-toggle="tooltip"]\').tooltip();';
 	    $ret .= '</script>';
 		return $ret;

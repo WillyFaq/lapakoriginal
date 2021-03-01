@@ -129,6 +129,7 @@
         $("#nama").focus(function(){
             $(".load-modal").load('<?= base_url("payroll/gen_table_pegawai"); ?>');
             $('#modalPegawai').modal('show');
+            $(".load_detail").html(" ");
         });
 
         $("#tgl_gaji").change(function(){
@@ -150,6 +151,7 @@
 
     function pilih_pegawai(id, nama, level) {
         $('#modalPegawai').modal('hide');
+        $(".load-modal").html(' ');
         $("#id_user").val(id);
         $("#nama").val(nama);
         $("#level").val(level);
@@ -169,7 +171,7 @@
             success: function(result){
                 //console.log(result);
                 var obj = JSON.parse(result);
-                console.log(obj);
+                //console.log(obj);
                 $(".load_detail").html(obj.table);
                 $("#jumlah_gaji").val(obj.total);
             }

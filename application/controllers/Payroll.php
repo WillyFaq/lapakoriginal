@@ -226,7 +226,7 @@ class Payroll extends CI_Controller {
 		$res = $query->result();
 		$num_rows = $query->num_rows();
 
-		$tmpl = array(  'table_open'    => '<table class="table table-striped table-hover dataTableModal">',
+		$tmpl = array(  'table_open'    => '<table class="table table-striped table-hover dataTableModal" id="dttba">',
 				'row_alt_start'  => '<tr>',
 				'row_alt_end'    => '</tr>'
 			);
@@ -275,7 +275,7 @@ class Payroll extends CI_Controller {
 		//echo $ssql;
 		$num_rows = $query->num_rows();
 
-		$tmpl = array(  'table_open'    => '<table class="table table-striped table-hover dataTableModal">',
+		$tmpl = array(  'table_open'    => '<table class="table table-striped table-hover dataTableModal" id="dttba">',
 				'row_alt_start'  => '<tr>',
 				'row_alt_end'    => '</tr>'
 			);
@@ -331,7 +331,7 @@ class Payroll extends CI_Controller {
 		$res = $query->result();
 		$num_rows = $query->num_rows();
 
-		$tmpl = array(  'table_open'    => '<table class="table table-striped table-hover dataTableModal">',
+		$tmpl = array(  'table_open'    => '<table class="table table-striped table-hover dataTableModal" id="dttba">',
 				'row_alt_start'  => '<tr>',
 				'row_alt_end'    => '</tr>'
 			);
