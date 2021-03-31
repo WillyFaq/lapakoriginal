@@ -12,7 +12,7 @@
     <meta name="msapplication-navbutton-color" content="#2B3E4D">
     <!-- iOS Safari -->
     <meta name="apple-mobile-web-app-status-bar-style" content="#2B3E4D">
-    <link rel="shortcut icon" href="<?= base_url('assets/img/logo.ico'); ?>">
+    <link rel="shortcut icon" href="<?= base_url('assets/img/logo.ico'); ?>?v=2">
     <title>Lapak Original</title>
 
     <!-- Custom fonts for this template-->

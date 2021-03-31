@@ -19,7 +19,11 @@ body{
 }
 
 .sidebar-brand-icon>img{
-	width: 60px;
+	width: 90px;
+}
+
+.sidebar-brand-text{
+	margin-left: 0 !important;
 }
 
 .sidebar-dark .nav-item.active .nav-link{
