@@ -337,6 +337,7 @@
 
 <script type="text/javascript">
 	$(document).ready(function(){
+
 		$("#demograpi_load").load('<?= base_url("dahsboard/load_demografi/1"); ?>');
 		$(".cb_brg_box").load('<?= base_url("dahsboard/cb_barang_filter"); ?>');
 		$("#cb_filter").change(function(){

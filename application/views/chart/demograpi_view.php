@@ -89,7 +89,11 @@
 			url: url,
 			type:'post',
 			data:"id="+id+"&whr="+whr,
+			beforeSend: function(){
+ 				$(".ajax_loading_box").show();
+			},
 			success: function(result){
+ 				$(".ajax_loading_box").hide();
 				$("#modalDemoDetail").modal('show');
 				$("#body-modalDemoDetail").html(result);
 				//console.log(result);
