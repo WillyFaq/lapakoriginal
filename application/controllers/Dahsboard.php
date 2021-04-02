@@ -447,6 +447,7 @@ class Dahsboard extends CI_Controller {
         }*/
         //echo $this->db->last_query();
         $data["q"] = $q;
+        $data["whr"] = $whr;
         $res = $q->result();
         //print_pre($res);
 		$this->load->view('chart/demograpi_view', $data);
@@ -679,6 +680,57 @@ class Dahsboard extends CI_Controller {
 			}
 		}
 		return $this->table->generate();
+	}
+
+	public function load_detail_demografi()
+	{
+		$whr = $this->input->post('whr');
+		$id = $this->input->post('id');
+		$data = [];
+		/*	$map = json_decode(file_get_contents(base_url('assets/mapping.json')), true);
+		print_pre($map);
+		$idp = array_search('id-ac',$map);
+		echo $idp;
+		print_pre(get_kota('11'));*/
+		if($this->input->post('id')){
+
+			$map = json_decode(file_get_contents(base_url('assets/mapping.json')), true);
+			$idp = array_search($id,$map);
+			$whr .= " AND SUBSTR(c.alamat, 1, 2) = '$idp' ";
+			$sql = "SELECT 
+						SUBSTR(c.alamat, 4, 4) AS kota,
+						SUBSTR(c.alamat, 1, 2) AS prov, 
+						SUM(b.jumlah_order) AS jml 
+					FROM sales_order a 
+					JOIN sales_order_detail b ON a.id_transaksi = b.id_transaksi 
+					JOIN pelanggan c ON a.no_pelanggan = c.no_pelanggan 
+					WHERE 1=1 $whr
+					GROUP BY SUBSTR(c.alamat, 4, 4)";
+	        $q = $this->db->query($sql);
+	        $res = $q->result();
+	        foreach ($res as $row) {
+	        	$kota = $row->kota;
+	        	if(isset(get_kota($row->kota)['nama'])){
+	        		$kota = get_kota($row->kota)["nama"];
+	        	}
+	        	$data[$row->kota] = array(
+	        					"id_kota" => $row->kota,
+	        					"kota" => $kota,
+	        					"value" => $row->jml
+	        					);
+	        }
+		}
+        $label = [];
+        $dada = [];
+        foreach ($data as $k => $v) {
+        	$label[] = $v["kota"];
+        	$dada[] = $v["value"];
+        }
+        $return["detail"] = array(
+        				'label' => $label,
+        				'data' => $dada,
+        			);
+        $this->load->view('chart/demograpi_detail_view', $return);
 	}
 }
 
