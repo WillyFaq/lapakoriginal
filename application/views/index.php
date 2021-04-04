@@ -11,7 +11,7 @@
             <a class="sidebar-brand d-flex align-items-center justify-content-center" href="<?= base_url(); ?>">
                 <div class="sidebar-brand-icon">
                     <!-- <i class="fab fa-opencart"></i> -->
-                    <img src="<?= base_url('assets/img/logo.png'); ?>?v=2" alt="logo">
+                    <img src="<?= base_url('assets/img/logo.png'); ?>?v=3" alt="logo">
                 </div>
                 <div class="sidebar-brand-text mx-3">Lapak Original</div>
             </a>
