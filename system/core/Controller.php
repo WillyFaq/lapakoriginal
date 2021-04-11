@@ -86,14 +86,17 @@ class CI_Controller {
 		$this->load->initialize();
 		log_message('info', 'Controller Class Initialized');
 		$ins = self::$instance;
-		if(!$this->session->has_userdata('user') &&  $ins->router->class!="login"){
-			redirect('login');
-		}
 
-		if($ins->router->class!="Dahsboard" && $ins->router->class!="CustomError" && $ins->router->class!="login"){
-			$q = $this->Menu_model->cek_accesss($this->session->userdata('user')->level, strtolower($ins->router->class));
-			if(!$q){
-				redirect("CustomError/error_404");
+		if($ins->router->class!="api"){
+			if(!$this->session->has_userdata('user') && $ins->router->class!="login"){
+				redirect('login');
+			}
+
+			if($ins->router->class!="Dahsboard" && $ins->router->class!="CustomError" && $ins->router->class!="login"){
+				$q = $this->Menu_model->cek_accesss($this->session->userdata('user')->level, strtolower($ins->router->class));
+				if(!$q){
+					redirect("CustomError/error_404");
+				}
 			}
 		}
 	}

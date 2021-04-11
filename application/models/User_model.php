@@ -60,6 +60,16 @@ class User_model extends CI_Model {
 		return $this->db->get();
 	}
 
+	public function get_where_notin($id, $noin)
+	{
+		$this->db->select('*');
+		$this->db->from($this->table);
+		$this->db->join($this->join, $this->table.'.'.$this->fk.' = '.$this->join.'.'.$this->fk);
+		$this->db->where($id);
+		$this->db->where_not_in('id_user',$noin);
+		return $this->db->get();
+	}
+
 	public function add($da)
 	{
 		return $this->db->insert($this->table, $da);
