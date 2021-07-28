@@ -4,7 +4,7 @@
 		//echo $this->db->last_query();
 		$res = $q->result();
 		$data = [];
-		$map = json_decode(file_get_contents(base_url('assets/mapping.json')), true);
+		$map = json_decode(file_get_contents('assets/mapping.json'), true);
 		foreach ($res as $row) {
 			if(isset($map[$row->prov])){
 				$data[$map[$row->prov]] = $row->jml;
