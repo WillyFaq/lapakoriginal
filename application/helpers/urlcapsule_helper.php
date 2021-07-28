@@ -122,7 +122,7 @@ if(!function_exists('get_bulan')){
 
 if(!function_exists('get_provinsi')){
 	function get_provinsi($id='') {
-		$prov = json_decode(file_get_contents(base_url('assets/provinsi.json')), true);
+		$prov = json_decode(file_get_contents('assets/provinsi.json'), true);
 		$ret = [];
 		if($id!=''){
 			foreach ($prov as $k => $v) {
@@ -138,7 +138,7 @@ if(!function_exists('get_provinsi')){
 }
 if(!function_exists('get_kota')){
 	function get_kota($id='') {
-		$prov = json_decode(file_get_contents(base_url('assets/kota.json')), true);
+		$prov = json_decode(file_get_contents('assets/kota.json'), true);
 		$ret = [];
 		if($id!=''){
 			foreach ($prov as $k => $v) {
@@ -161,7 +161,7 @@ if(!function_exists('get_kota')){
 }
 if(!function_exists('get_kecamatan')){
 	function get_kecamatan($id='') {
-		$prov = json_decode(file_get_contents(base_url('assets/kecamatan.json')), true);
+		$prov = json_decode(file_get_contents('assets/kecamatan.json'), true);
 		$ret = [];
 		if($id!=''){
 			foreach ($prov as $k => $v) {

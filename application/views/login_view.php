@@ -11,7 +11,7 @@
 			              	<div class="col-lg-6 d-none d-lg-block">
 			              		<div id="container">
 			              			<?php
-							    		$json = json_decode(file_get_contents(base_url('assets/quotes.json')), true);
+							    		$json = json_decode(file_get_contents('assets/quotes.json'), true);
 							    		//print_r($json);
 							    		$rand = rand(0, sizeof($json)-1);
 							    		$quote = $json[$rand];
